@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title th:text="${title}">Herapheri Goods</title>
+    <meta name="description" th:content="${description}" />
+    <meta name="keywords" th:content="${keywords}" />
+    <meta property="og:title" th:content="${title}" />
+    <meta property="og:description" th:content="${description}" />
+    <meta name="twitter:title" th:content="${title}" />
+    <meta name="twitter:description" th:content="${description}" />
+    <link rel="canonical" th:href="${canonicalUrl}" />
+    <link rel="icon" type="image/x-icon" th:href="${frontendBase} + '/favicon.ico'" />
+    <link rel="icon" type="image/png" th:href="${frontendBase} + '/favicon.ico/favicon-32x32.png'" sizes="32x32" />
+    <link rel="icon" type="image/png" th:href="${frontendBase} + '/favicon.ico/favicon-16x16.png'" sizes="16x16" />
+    <link rel="apple-touch-icon" th:href="${frontendBase} + '/favicon.ico/apple-touch-icon.png'" />
+    <meta property="og:site_name" content="Herapheri Goods" />
+    <meta property="og:image" th:content="${frontendBase + '/attached_assets/images/new-logo.png'}" />
+
+    <script type="application/ld+json" th:utext="${jsonLd}"></script>
+</head>
+<body>
+    <h1 th:text="${heading}">Find Vehicles</h1>
+    <p><a th:href="${frontendUrl}" rel="nofollow">Open full page</a></p>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function(){
+            try {
+                var ua = navigator.userAgent || '';
+                var isBot = /bot|crawl|spider|slurp|bingpreview|duckduckbot|baiduspider|yandex|semrush|ahrefs|facebookexternalhit|twitterbot|embedly|pinterest|linkedinbot/i.test(ua);
+                if(!isBot){
+                    window.location.replace('[[${frontendUrl}]]');
+                }
+            } catch(_){ }
+        })();
+        /*]]>*/
+    </script>
+    <main>
+        <p>Browse transport vehicles.</p>
+    </main>
+</body>
+</html>
+
+

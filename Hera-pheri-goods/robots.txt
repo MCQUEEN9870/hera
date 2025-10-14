@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /driver-dashboard
+Sitemap: https://www.herapherigoods.in/sitemap.xml
+
+

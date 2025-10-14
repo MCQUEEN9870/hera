@@ -1,0 +1,1658 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Community Posts • Herapheri Goods</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <style>
+      :root {
+        --bg: #0b0c10;
+        --card: #121317;
+        --muted: #9aa3af;
+        --primary: #01d28e;
+        --primary-2: #00a875;
+        --text: #e8eaed;
+        --accent: #8ab4f8;
+        --danger: #ff6b6b;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: radial-gradient(1200px 1200px at 16% 98%, #0f172a 10%, #0b0c10 100%, #0b0c10 100%);
+        color: var(--text);
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* Aurora Background Effect */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+          radial-gradient(ellipse 800px 400px at 20% 10%, rgba(138, 180, 248, 0.15) 0%, transparent 50%),
+          radial-gradient(ellipse 600px 300px at 80% 20%, rgba(167, 139, 250, 0.12) 0%, transparent 50%),
+          radial-gradient(ellipse 700px 350px at 50% 80%, rgba(1, 210, 142, 0.08) 0%, transparent 50%),
+          radial-gradient(ellipse 500px 250px at 10% 60%, rgba(255, 107, 107, 0.06) 0%, transparent 50%);
+        animation: auroraFlow 20s ease-in-out infinite alternate;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      /* Aurora Burn Effect Overlay */
+      body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+          linear-gradient(45deg, transparent 30%, rgba(138, 180, 248, 0.03) 50%, transparent 70%),
+          linear-gradient(-45deg, transparent 30%, rgba(167, 139, 250, 0.02) 50%, transparent 70%);
+        animation: auroraBurn 15s ease-in-out infinite alternate;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      @keyframes auroraFlow {
+        0% {
+          transform: translateX(-2%) translateY(-1%) scale(1);
+          filter: hue-rotate(0deg) brightness(1);
+        }
+        25% {
+          transform: translateX(3%) translateY(-3%) scale(1.02);
+          filter: hue-rotate(15deg) brightness(1.1);
+        }
+        50% {
+          transform: translateX(-1%) translateY(-5%) scale(1.05);
+          filter: hue-rotate(30deg) brightness(1.2);
+        }
+        75% {
+          transform: translateX(4%) translateY(-2%) scale(1.03);
+          filter: hue-rotate(45deg) brightness(1.1);
+        }
+        100% {
+          transform: translateX(-3%) translateY(-4%) scale(1.01);
+          filter: hue-rotate(60deg) brightness(1.05);
+        }
+      }
+
+      @keyframes auroraBurn {
+        0% {
+          opacity: 0.3;
+          transform: translateX(-1%) translateY(-1%) rotate(0deg);
+          filter: blur(1px);
+        }
+        33% {
+          opacity: 0.6;
+          transform: translateX(2%) translateY(-2%) rotate(1deg);
+          filter: blur(0.5px);
+        }
+        66% {
+          opacity: 0.4;
+          transform: translateX(-2%) translateY(-3%) rotate(-1deg);
+          filter: blur(1.5px);
+        }
+        100% {
+          opacity: 0.5;
+          transform: translateX(1%) translateY(-1%) rotate(0.5deg);
+          filter: blur(0.8px);
+        }
+      }
+
+      /* Animated Back Button (top-left) */
+      .back-btn {
+        position: fixed;
+        top: 14px;
+        left: 14px;
+        z-index: 20;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 999px;
+        color: var(--text);
+        cursor: pointer;
+        backdrop-filter: blur(8px);
+        transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+      }
+      .back-btn i { transition: transform 180ms ease; }
+      .back-btn:hover {
+        background: rgba(255,255,255,0.12);
+        border-color: rgba(255,255,255,0.16);
+        transform: translateY(-1px);
+      }
+      .back-btn:hover i { transform: translateX(-2px); }
+      .back-pulse {
+        position: absolute;
+        inset: -4px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 10% 50%, rgba(1,210,142,0.25), transparent 60%);
+        z-index: -1;
+        animation: pulse 2.2s infinite ease-in-out;
+      }
+      @keyframes pulse {
+        0% { opacity: 0.4; }
+        50% { opacity: 0.85; }
+        100% { opacity: 0.4; }
+      }
+
+      /* Hero Section */
+      .posts-hero {
+        padding: 88px 20px 28px 20px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .posts-hero .glow {
+        position: absolute;
+        inset: 0% -10% auto -10%;
+        height: 420px;
+        background: 
+          radial-gradient(600px 220px at 50% 0%, rgba(1,210,142,0.25), transparent 75%),
+          radial-gradient(520px 200px at 70% 10%, rgba(138,180,248,0.15), transparent 80%),
+          radial-gradient(400px 180px at 30% 20%, rgba(167,139,250,0.12), transparent 70%),
+          radial-gradient(350px 160px at 80% 30%, rgba(255,107,107,0.08), transparent 65%);
+        filter: blur(25px);
+        pointer-events: none;
+        animation: auroraGlow 22s ease-in-out infinite alternate;
+      }
+      @keyframes auroraGlow {
+        0% { 
+          transform: translate3d(-2%, 0, 0) scale(1) rotate(0deg); 
+          opacity: 0.9; 
+          filter: blur(25px) hue-rotate(0deg) brightness(1);
+        }
+        20% { 
+          transform: translate3d(4%, -2%, 0) scale(1.03) rotate(1deg); 
+          opacity: 1; 
+          filter: blur(20px) hue-rotate(20deg) brightness(1.1);
+        }
+        40% { 
+          transform: translate3d(-3%, -4%, 0) scale(1.06) rotate(-1deg); 
+          opacity: 0.95; 
+          filter: blur(30px) hue-rotate(40deg) brightness(1.2);
+        }
+        60% { 
+          transform: translate3d(3%, -1%, 0) scale(1.02) rotate(0.5deg); 
+          opacity: 1; 
+          filter: blur(18px) hue-rotate(60deg) brightness(1.15);
+        }
+        80% { 
+          transform: translate3d(-1%, -3%, 0) scale(1.05) rotate(-0.5deg); 
+          opacity: 0.92; 
+          filter: blur(28px) hue-rotate(80deg) brightness(1.05);
+        }
+        100% { 
+          transform: translate3d(2%, -2%, 0) scale(1.01) rotate(0deg); 
+          opacity: 0.88; 
+          filter: blur(22px) hue-rotate(100deg) brightness(1);
+        }
+      }
+      .posts-hero h1 {
+        margin: 22px auto 10px auto;
+        max-width: 800px;
+        line-height: 1.12;
+        font-size: 63px;
+        letter-spacing: -0.02em;
+      }
+      .hero-headline {
+        margin: 22px auto 10px auto;
+        max-width: 840px;
+        line-height: 1.12;
+        font-size: clamp(28px, 5.6vw, 44px);
+        letter-spacing: -0.02em;
+      }
+      .changing-wrap { display: inline-block; position: relative; min-width: 10ch; }
+      .changing-word {
+        display: inline-block;
+        background: linear-gradient(90deg, #8ab4f8, #a78bfa, #60a5fa);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        transition: opacity .45s ease, transform .45s ease;
+        will-change: transform, opacity;
+      }
+      .word-in { opacity: 1; transform: translateY(0); }
+      .word-out { opacity: 0; transform: translateY(8px); }
+      .posts-hero p {
+        margin: 0 auto;
+        max-width: 780px;
+        color: var(--muted);
+        font-size: clamp(14px, 2.2vw, 16px);
+        position: relative;
+      }
+      .hero-badges {
+        margin: 18px auto 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        width: 100%;
+        max-width: 980px;
+      }
+      .badge {
+        padding: 13px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        font-size: 12px;
+        color: #ffffffb3;
+      }
+      /* Auto flip badges every 4s */
+      .hero-badges { perspective: 1000px; }
+      .hero-badges .badge {
+        position: relative;
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+        will-change: transform;
+        transform: rotateY(0deg) translateZ(0);
+        animation: flipBadge 5s infinite ease-in-out;
+      }
+      @keyframes flipBadge {
+        0%, 45% { transform: rotateY(0deg) translateZ(0); }
+        50%, 95% { transform: rotateY(180deg) translateZ(0); }
+        100% { transform: rotateY(0deg) translateZ(0); }
+      }
+      .hero-badges .badge::after {
+        content: attr(data-back);
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: inherit;
+        border-radius: inherit;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #dbeafe;
+        transform: rotateY(180deg) translateZ(1px);
+        backface-visibility: hidden;
+        pointer-events: none;
+      }
+      
+
+      /* Typewriter caret for hero description */
+      .typewriter-caret {
+        display: inline-block;
+        position: relative;
+        overflow: visible;
+        white-space: normal;
+      }
+      .typewriter-caret::after {
+        content: '';
+        position: absolute;
+        right: -2px;
+        top: .2em;
+        bottom: .2em;
+        width: 2px;
+        
+        animation: caretBlink .8s step-end infinite;
+      }
+      @keyframes caretBlink { 50% { opacity: 0; } }
+
+      /* Create Post CTA */
+      .cta-wrap { display: flex; justify-content: center; margin: 18px 0 8px 0; }
+      .create-post-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 18px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-2));
+        color: #081217;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(1,210,142,0.2);
+        transition: transform 160ms ease, box-shadow 160ms ease;
+      }
+      .create-post-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(1,210,142,0.25); }
+
+      /* Composer Section (slide down) */
+      .composer {
+        max-width: 780px;
+        margin: 12px auto 0 auto;
+        padding: 0 16px;
+      }
+      .composer-card {
+        background: var(--card);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
+        overflow: hidden;
+        transform-origin: top;
+        transition: grid-template-rows 240ms ease, opacity 240ms ease;
+        display: grid;
+        grid-template-rows: 0fr;
+        opacity: 0;
+        position: relative;
+      }
+      
+      .composer-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+          radial-gradient(ellipse 300px 150px at 20% 20%, rgba(1, 210, 142, 0.08) 0%, transparent 50%),
+          radial-gradient(ellipse 250px 125px at 80% 80%, rgba(138, 180, 248, 0.06) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: -1;
+        animation: composerAurora 18s ease-in-out infinite alternate;
+      }
+      
+      @keyframes composerAurora {
+        0% {
+          opacity: 0.3;
+          transform: scale(1) rotate(0deg);
+          filter: hue-rotate(0deg);
+        }
+        50% {
+          opacity: 0.6;
+          transform: scale(1.05) rotate(1deg);
+          filter: hue-rotate(30deg);
+        }
+        100% {
+          opacity: 0.4;
+          transform: scale(1.02) rotate(-0.5deg);
+          filter: hue-rotate(60deg);
+        }
+      }
+      .composer-card.open { grid-template-rows: 1fr; opacity: 1; }
+      .composer-inner { overflow: hidden; }
+      .composer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 14px 0 14px;
+      }
+      .composer-title { font-weight: 600; color: var(--text); }
+      .close-composer {
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .composer-body { padding: 12px 14px 4px 14px; position: relative; }
+      .tooltip-pill { position: absolute;  color: #ffe4a3; padding: 8px 10px; border-radius: 10px; font-size: 12px; pointer-events: none; opacity: 0; transition: opacity .2s ease; z-index: 1000; }
+
+      .composer-canvas {
+        border-radius: 12px;
+        min-height: 160px;
+        padding: 18px;
+        background: linear-gradient(135deg, #0f172a, #0b0c10);
+        color: #ffffff;
+        outline: none;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+        background-size: cover;
+        background-position: center;
+        word-break: break-word;
+      }
+      .composer-canvas[data-placeholder]:empty:before {
+        content: attr(data-placeholder);
+        color: #a7b0bb8a;
+      }
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+      .attach-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 10px; color: var(--muted); cursor: pointer; }
+      .attach-btn input { display: none; }
+      .category-select { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 10px; color: var(--muted); }
+      .category-select select { background: transparent; color: #e5e7eb; border: none; outline: none; }
+      .category-select option { color: #111827; }
+      .swatches {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+      }
+      .bg-swatch.selected { outline: 2px solid var(--accent); box-shadow: 0 0 0 2px rgba(138,180,248,0.3) inset; }
+      .font-size-control { display: inline-flex; align-items: center; gap: 6px; padding: 6px 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; }
+      .font-size-control input[type="range"] { width: 120px; accent-color: var(--accent); }
+      .bg-swatch {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.14);
+        cursor: pointer;
+        flex: 0 0 auto;
+      }
+      .text-toggle {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px;
+        padding: 8px 10px;
+        cursor: pointer;
+        color: var(--muted);
+      }
+      .composer-footer {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 14px 14px 14px;
+        position: relative;
+      }
+      .post-btn {
+        margin-left: auto;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: none;
+        background: var(--accent);
+        color: #07121a;
+        font-weight: 600;
+        cursor: pointer;
+        opacity: 0.6;
+      }
+      .post-btn.enabled { opacity: 1; }
+      .post-btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; filter: saturate(.7); }
+
+      /* Live Posts */
+      .feed {
+        max-width: 980px;
+        margin: 22px auto 40px auto;
+        padding: 0 16px;
+      }
+      .feed-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+      .chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
+      .chip {
+        padding: 8px 12px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 999px;
+        color: var(--muted);
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .chip.active { background: rgba(1,210,142,0.18); border-color: rgba(1,210,142,0.35); color: var(--text); }
+
+      .live-indicator { color: #ff5e5e; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+      .dot { width: 8px; height: 8px; background: #ff5e5e; border-radius: 50%; animation: blink 1.2s infinite; }
+      @keyframes blink { 50% { opacity: 0.2; } }
+
+      .card-list { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
+      .post-card {
+        grid-column: span 6;
+        background: var(--card);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        padding: 14px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      
+      .post-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(138, 180, 248, 0.05), transparent);
+        transition: left 0.6s ease;
+        pointer-events: none;
+      }
+      
+      .post-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+      
+      .post-card:hover::before {
+        left: 100%;
+      }
+      @media (max-width: 720px) { .post-card { grid-column: span 12; } }
+      .post-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+      .post-meta { color: var(--muted); font-size: 12px; }
+      .post-title { font-weight: 600; margin: 4px 0 6px 0; }
+      .post-text { color: #cdd3da; font-size: 14px; white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; }
+      .badge-cat { font-size: 11px; padding: 4px 8px; border-radius: 999px; background: rgba(138,180,248,0.18); border: 1px solid rgba(138,180,248,0.35); color: #d7e3ff; }
+    
+    @media (max-width: 420px){
+        .posts-hero h1{
+            font-size: 40px;
+        }
+    }
+    .truck-button {
+      --color: #fff;
+      --background: #2B3044;
+      --tick: #16BF78;
+      --base: #0D0F18;
+      --wheel: #2B3044;
+      --wheel-inner: #646B8C;
+      --wheel-dot: #fff;
+      --back: #6D58FF;
+      --back-inner: #362A89;
+      --back-inner-shadow: #2D246B;
+      --front: #A6ACCD;
+      --front-shadow: #535A79;
+      --front-light: #FFF8B1;
+      --window: #2B3044;
+      --window-shadow: #404660;
+      --street: #646B8C;
+      --street-fill: #404660;
+      --box: #DCB97A;
+      --box-shadow: #B89B66;
+      --progress: 0;
+      --hx: 0;
+      --bx: 0;
+      --box-s: .5;
+      --box-o: 0;
+      --truck-y: 0;
+      --truck-y-n: -26;
+      padding: 12px 0;
+      width: 172px;
+      cursor: pointer;
+      text-align: center;
+      position: relative;
+      border: none;
+      outline: none;
+      color: var(--color);
+      background: var(--background);
+      border-radius: var(--br, 5px);
+      appearance: none; -webkit-appearance: none;
+      -webkit-tap-highlight-color: transparent;
+      transform-style: preserve-3d;
+      transform: rotateX(var(--rx, 0deg)) translateZ(0);
+      transition: transform .5s, border-radius .3s linear var(--br-d, 0s);
+    }
+    .truck-button::before,
+    .truck-button::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 6px;
+      display: block;
+      background: var(--b, var(--street));
+      transform-origin: 0 100%;
+      transform: rotateX(90deg) scaleX(var(--sy, 1));
+    }
+    .truck-button::after {
+      --sy: var(--progress, 0);
+      --b: var(--street-fill);
+    }
+    .truck-button .default,
+    .truck-button .success {
+      display: block;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 24px;
+      opacity: var(--o, 1);
+      transition: opacity .3s;
+    }
+    .truck-button .success {
+      --o: 0;
+      position: absolute;
+      top: 12px;
+      left: 0;
+      right: 0;
+    }
+    .truck-button .success svg {
+      width: 12px;
+      height: 10px;
+      display: inline-block;
+      vertical-align: top;
+      fill: none;
+      margin: 7px 0 0 4px;
+      stroke: var(--tick);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 16px;
+      stroke-dashoffset: var(--offset, 16px);
+      transition: stroke-dashoffset .4s ease .45s;
+    }
+    .truck-button .truck {
+      position: absolute;
+      width: 72px;
+      height: 28px;
+      transform: rotateX(90deg) translate3d(var(--truck-x, 4px), calc(var(--truck-y-n, -26) * 1px), 12px);
+    }
+    .truck-button .truck::before,
+    .truck-button .truck::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: var(--l, 18px);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      z-index: 2;
+      box-shadow: inset 0 0 0 2px var(--wheel), inset 0 0 0 4px var(--wheel-inner);
+      background: var(--wheel-dot);
+      transform: translateY(calc(var(--truck-y) * -1px)) translateZ(0);
+    }
+    .truck-button .truck::after { --l: 54px; }
+    .truck-button .truck .wheel,
+    .truck-button .truck .wheel::before {
+      position: absolute;
+      bottom: var(--b, -6px);
+      left: var(--l, 6px);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--wheel);
+      transform: translateZ(0);
+    }
+    .truck-button .truck .wheel { transform: translateY(calc(var(--truck-y) * -1px)) translateZ(0); }
+    .truck-button .truck .wheel::before { --l: 35px; --b: 0; content: ''; }
+    .truck-button .truck .front,
+    .truck-button .truck .back,
+    .truck-button .truck .box { position: absolute; }
+    .truck-button .truck .back {
+      left: 0;
+      bottom: 0;
+      z-index: 1;
+      width: 47px;
+      height: 28px;
+      border-radius: 1px 1px 0 0;
+      background: linear-gradient(68deg, var(--back-inner) 0%, var(--back-inner) 22%, var(--back-inner-shadow) 22.1%, var(--back-inner-shadow) 100%);
+    }
+    .truck-button .truck .back::before,
+    .truck-button .truck .back::after { content: ''; position: absolute; }
+    .truck-button .truck .back::before {
+      left: 11px;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2;
+      border-radius: 0 1px 0 0;
+      background: var(--back);
+    }
+    .truck-button .truck .back::after {
+      border-radius: 1px;
+      width: 73px;
+      height: 2px;
+      left: -1px;
+      bottom: -2px;
+      background: var(--base);
+    }
+    .truck-button .truck .front {
+      left: 47px;
+      bottom: -1px;
+      height: 22px;
+      width: 24px;
+      -webkit-clip-path: polygon(55% 0, 72% 44%, 100% 58%, 100% 100%, 0 100%, 0 0);
+      clip-path: polygon(55% 0, 72% 44%, 100% 58%, 100% 100%, 0 100%, 0 0);
+      background: linear-gradient(84deg, var(--front-shadow) 0%, var(--front-shadow) 10%, var(--front) 12%, var(--front) 100%);
+    }
+    .truck-button .truck .front::before,
+    .truck-button .truck .front::after { content: ''; position: absolute; }
+    .truck-button .truck .front::before {
+      width: 7px;
+      height: 8px;
+      left: 7px;
+      top: 2px;
+      -webkit-clip-path: polygon(0 0, 60% 0%, 100% 100%, 0% 100%);
+      clip-path: polygon(0 0, 60% 0%, 100% 100%, 0% 100%);
+      background: linear-gradient(59deg, var(--window) 0%, var(--window) 57%, var(--window-shadow) 55%, var(--window-shadow) 100%);
+    }
+    .truck-button .truck .front::after { width: 3px; height: 2px; right: 0; bottom: 3px; background: var(--front-light); }
+    .truck-button .truck .box {
+      width: 13px;
+      height: 13px;
+      right: 56px;
+      bottom: 0;
+      z-index: 1;
+      border-radius: 1px;
+      overflow: hidden;
+      transform: translate(calc(var(--box-x, -24) * 1px), calc(var(--box-y, -6) * 1px)) scale(var(--box-s, .5));
+      opacity: var(--box-o, 0);
+      background: linear-gradient(68deg, var(--box) 0%, var(--box) 50%, var(--box-shadow) 50.2%, var(--box-shadow) 100%);
+      background-size: 250% 100%;
+      background-position-x: calc(var(--bx, 0) * 1%);
+    }
+    .truck-button .truck .box::before,
+    .truck-button .truck .box::after { content: ''; position: absolute; }
+    .truck-button .truck .box::before {
+      background: rgba(255, 255, 255, 0.2);
+      left: 0;
+      right: 0;
+      top: 6px;
+      height: 1px;
+    }
+    .truck-button .truck .box::after {
+      width: 6px;
+      left: 100%;
+      top: 0;
+      bottom: 0;
+      background: var(--back);
+      transform: translateX(calc(var(--hx, 0) * 1px));
+    }
+    .truck-button.animation { --rx: -90deg; --br: 0; }
+    .truck-button.animation .default { --o: 0; }
+    .truck-button.animation.done { --rx: 0deg; --br: 5px; --br-d: .2s; }
+    .truck-button.animation.done .success { --o: 1; --offset: 0; }
+    </style>
+  </head>
+  <body>
+    <button class="back-btn" id="backBtn"><span class="back-pulse"></span><i class="fas fa-arrow-left"></i><span>Back</span></button>
+    
+    <section class="posts-hero">
+      <div class="glow"></div>
+      <h1 class="hero-headline">The ultimate place for your<span class="changing-wrap"><span class="changing-word word-in" id="changingWord">Transportation needs</span></span></h1>
+      <p id="heroDesc" class="typewriter-caret">Create a post that auto-expires in 24 hours. Share your vehicle needs, transportation requirements, services offers, general queries, or local updates with the community.</p>
+      <div class="hero-badges">
+        <span class="badge" data-back="No Login">Auto-deletes in 24h</span>
+        <span class="badge" data-back="100% Secure">Simple text post with backgrounds</span>
+        <span class="badge" data-back="Quick Connect">Realtime feed</span>
+      </div>
+      <div class="cta-wrap">
+        <button class="create-post-btn" id="openComposer" title= "Instead of searching vehicles, let them find you. Your post stays live for 24 hours and then vanishes—keeping the platform fresh and safe."><i class="fas fa-pen"></i>Create Post</button>
+      </div>
+    </section>
+    
+    <!-- Post Detail Modal -->
+    <div id="postModal" style="display:none; position:fixed; inset:0; z-index:1500; background:rgba(0,0,0,.6);">
+      <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(92vw,760px); max-height:86vh; overflow:auto; background:#0f1116; border:1px solid rgba(255,255,255,.12); border-radius:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08);">
+          <span id="modalCat" class="badge-cat"></span>
+          <button id="postModalClose" style="background:transparent; border:none; color:#9aa3af; font-size:18px; cursor:pointer">✕</button>
+        </div>
+        <div id="modalBody" style="padding:14px; border-radius:0 0 12px 12px;"></div>
+      </div>
+    </div>
+    
+    <section class="composer">
+      <div class="composer-card" id="composerCard" aria-hidden="true">
+        <div class="composer-inner">
+          <div class="composer-header">
+            <div class="composer-title">Create a post • 24h</div>
+            <button class="close-composer" id="closeComposer" aria-label="Close composer"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="composer-body">
+            <div id="canvas" class="composer-canvas" contenteditable="true" data-placeholder="(e.g., Need Tata Ace from Agra→Mathura at 5 PM, contact no. 98XXXXXXXX, load 1.5Ton, Pincode 282001)"></div>
+            <div class="toolbar">
+              <div class="category-select">
+                <i class="fas fa-tags" aria-hidden="true"></i>
+                <select id="postCategory" aria-label="Select category">
+                  <option value="" selected>Select category</option>
+                  <option value="Vehicle Requirement">Vehicle Requirement</option>
+                  <option value="Transport Offer">Transport Offer</option>
+                  <option value="Service Promotion">Service Promotion</option>
+                  <option value="General Query">General Query</option>
+                  <option value="Local Updates">Local Updates</option>
+                </select>
+              </div>
+              <div class="swatches" id="swatches">
+                <div class="bg-swatch" title="Plain dark" data-bg="linear-gradient(135deg, #0f172a, #0b0c10)"></div>
+                <div class="bg-swatch" title="Mint gradient" data-bg="linear-gradient(135deg, #00f5a0, #00d9f5)"></div>
+                <div class="bg-swatch" title="Sunset" data-bg="linear-gradient(135deg, #ff9966, #ff5e62)"></div>
+                <div class="bg-swatch" title="Aurora" data-bg="linear-gradient(135deg, #a18cd1, #fbc2eb)"></div>
+                <div class="bg-swatch" title="Ocean" data-bg="linear-gradient(135deg, #36d1dc, #5b86e5)"></div>
+                <div class="bg-swatch" title="Deep Blue" data-bg="linear-gradient(135deg, #1f005c, #0a2a88)"></div>
+                <div class="bg-swatch" title="Lime" data-bg="linear-gradient(135deg, #a8ff78, #78ffd6)"></div>
+                <div class="bg-swatch" title="Rose" data-bg="linear-gradient(135deg, #f857a6, #ff5858)"></div>
+              </div>
+              <button class="text-toggle" id="textToggle" aria-pressed="true"><i class="fas fa-font"></i><span>Text: Light</span></button>
+              <label class="attach-btn" for="imageInput"><i class="fas fa-image"></i><span>Add image</span><input id="imageInput" type="file" accept="image/*"></label>
+              <div class="font-size-control">
+                <i class="fas fa-text-height" aria-hidden="true"></i>
+                <input type="range" id="fontSize" min="16" max="48" step="2" value="18" aria-label="Font size">
+              </div>
+            </div>
+            <div class="preview-grid" id="previewGrid"></div>
+          </div>
+          <div class="composer-footer">
+            <button class="truck-button post-btn" id="postBtn" disabled>
+              <span class="default">Post</span>
+              <span class="success">
+                Posted
+                <svg viewbox="0 0 12 10">
+                  <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                </svg>
+              </span>
+              <div class="truck">
+                <div class="wheel"></div>
+                <div class="back"></div>
+                <div class="front"></div>
+                <div class="box"></div>
+              </div>
+            </button>
+            <div class="tooltip-pill" id="postTip"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="feed">
+      <div class="feed-header">
+        <div class="chip-row" id="filters">
+          <div class="chip active">All</div>
+          <div class="chip">Vehicle Requirement</div>
+          <div class="chip">Transport Offer</div>
+          <div class="chip">Service Promotion</div>
+          <div class="chip">General Query</div>
+          <div class="chip">Local Updates</div>
+        </div>
+        <div class="live-indicator"><span class="dot"></span> <span>Live</span> <span id="liveCount"></span></div>
+      </div>
+      <div class="card-list" id="feedList">
+        <!-- Example posts (demo UI) -->
+      </div>
+    </section>
+    <script src="env.js"></script>
+    <script>
+      (function() {
+        const backBtn = document.getElementById('backBtn');
+        backBtn.addEventListener('click', function() {
+          if (window.history.length > 1) {
+            window.history.back();
+          } else {
+            const target = typeof window.buildUrl === 'function' ? window.buildUrl('index') : 'index.html';
+            window.location.href = target;
+          }
+        });
+
+        const openComposer = document.getElementById('openComposer');
+        const closeComposer = document.getElementById('closeComposer');
+        const composerCard = document.getElementById('composerCard');
+        const canvas = document.getElementById('canvas');
+        const postBtn = document.getElementById('postBtn');
+        const textToggle = document.getElementById('textToggle');
+        const swatches = document.getElementById('swatches');
+        const fontSizeRange = document.getElementById('fontSize');
+        const changingWord = document.getElementById('changingWord');
+        const heroDesc = document.getElementById('heroDesc');
+        const imageInput = document.getElementById('imageInput');
+        const previewGrid = document.getElementById('previewGrid');
+        const postTip = document.getElementById('postTip');
+        const postCategory = document.getElementById('postCategory');
+
+        function toggleComposer(open) {
+          const shouldOpen = open ?? !composerCard.classList.contains('open');
+          if (shouldOpen) {
+            composerCard.classList.add('open');
+            composerCard.setAttribute('aria-hidden', 'false');
+            setTimeout(() => canvas.focus(), 60);
+          } else {
+            composerCard.classList.remove('open');
+            composerCard.setAttribute('aria-hidden', 'true');
+          }
+        }
+
+        if (openComposer) {
+          openComposer.addEventListener('click', () => {
+            toggleComposer(true);
+            // hide CTA when composer opens
+            const cta = document.querySelector('.cta-wrap');
+            if (cta) cta.style.display = 'none';
+          });
+        }
+        closeComposer.addEventListener('click', () => {
+          toggleComposer(false);
+          // restore CTA when composer closes
+          const cta = document.querySelector('.cta-wrap');
+          if (cta) cta.style.display = '';
+        });
+
+        // Enable post button only if valid 50-500 chars
+        function textLength() { return canvas.innerText ? canvas.innerText.replace(/\s+/g, ' ').trim().length : 0; }
+        function isValidLength() { const n = textLength(); return n >= 50 && n <= 500; }
+        function hasCategory() { return postCategory && postCategory.value && postCategory.value.length > 0; }
+        function updatePostButton() {
+          const ok = isValidLength() && hasCategory();
+          // ensure button is always interactive for tooltips
+          postBtn.disabled = false;
+          postBtn.removeAttribute('disabled');
+          postBtn.setAttribute('aria-disabled', ok ? 'false' : 'true');
+          postBtn.classList.toggle('enabled', ok);
+        }
+        canvas.addEventListener('input', updatePostButton);
+        if (postCategory) postCategory.addEventListener('change', updatePostButton);
+        updatePostButton();
+
+        // Background swatches
+        function applyBackground(bg) {
+          canvas.style.background = bg;
+          canvas.style.backgroundSize = 'cover';
+          canvas.style.backgroundPosition = 'center';
+        }
+        swatches.addEventListener('click', function(e) {
+          const target = e.target.closest('.bg-swatch');
+          if (!target) return;
+          // apply to canvas
+          applyBackground(target.getAttribute('data-bg'));
+          // paint swatch boxes so they are visible and mark selected
+          const color = target.getAttribute('data-bg');
+          target.style.background = color;
+          document.querySelectorAll('.bg-swatch').forEach(s => s.classList.remove('selected'));
+          target.classList.add('selected');
+        });
+
+        // Initialize swatch visuals on load
+        document.querySelectorAll('.bg-swatch').forEach(s => {
+          const bg = s.getAttribute('data-bg');
+          s.style.background = bg;
+        });
+
+        // Font size control
+        if (fontSizeRange) {
+          const setSize = (px) => { canvas.style.fontSize = px + 'px'; };
+          setSize(parseInt(fontSizeRange.value, 10));
+          fontSizeRange.addEventListener('input', function() { setSize(parseInt(this.value, 10)); });
+        }
+
+        // Image attach + preview
+        const previews = [];
+        // Keep file in memory; upload later after animation completes
+        let pendingImageFile = null;
+        function renderPreviews() {
+          if (!previewGrid) return;
+          previewGrid.innerHTML = '';
+          previews.forEach((src, idx) => {
+            const item = document.createElement('div');
+            item.className = 'preview-item';
+            item.innerHTML = `<img src="${src}"><button class="remove-img" data-idx="${idx}" aria-label="Remove">×</button>`;
+            previewGrid.appendChild(item);
+          });
+        }
+        if (previewGrid) {
+          previewGrid.addEventListener('click', (e) => {
+            const btn = e.target.closest('.remove-img');
+            if (!btn) return;
+            const i = parseInt(btn.getAttribute('data-idx'), 10);
+            previews.splice(i, 1);
+            renderPreviews();
+            if (previews.length === 0) {
+              pendingImageFile = null;
+            }
+          });
+        }
+        if (imageInput) {
+          imageInput.addEventListener('change', function() {
+            const file = this.files && this.files[0];
+            if (!file) return;
+            pendingImageFile = file; // store, upload later
+            const reader = new FileReader();
+            reader.onload = (ev) => { previews.splice(0, previews.length, ev.target.result); renderPreviews(); };
+            reader.readAsDataURL(file);
+            this.value = '';
+          });
+        }
+
+        // Text color toggle
+        let lightText = true;
+        function setTextContrast(isLight) {
+          lightText = isLight;
+          canvas.style.color = isLight ? '#ffffff' : '#0b0c10';
+          textToggle.setAttribute('aria-pressed', String(isLight));
+          textToggle.querySelector('span').textContent = 'Text: ' + (isLight ? 'Light' : 'Dark');
+        }
+        textToggle.addEventListener('click', function() {
+          setTextContrast(!lightText);
+        });
+        setTextContrast(true);
+
+        // Changing text animation in hero
+        const words = ['Transportation needs', 'Vehicle Requirements', 'Services & Offers', 'Promotions & ads', 'Local Updates & More'];
+        let wordIdx = 0;
+        let intervalId;
+        // Prevent layout jumps on mobile by reserving space for the tallest headline
+        // and the widest changing phrase at current viewport
+        function stabilizeHero() {
+          const headline = document.querySelector('.hero-headline');
+          const wrap = document.querySelector('.changing-wrap');
+          if (!headline || !wrap) return;
+          const probe = headline.cloneNode(true);
+          probe.style.position = 'absolute';
+          probe.style.visibility = 'hidden';
+          probe.style.pointerEvents = 'none';
+          probe.style.left = '-10000px';
+          // Match current width so wrapping behaves the same as visible headline
+          const currentWidth = Math.ceil(headline.getBoundingClientRect().width);
+          if (currentWidth > 0) probe.style.width = currentWidth + 'px';
+          document.body.appendChild(probe);
+          let maxHeight = 0;
+          const probeWord = probe.querySelector('.changing-word');
+          words.forEach(w => {
+            probeWord.textContent = w;
+            const rect = probe.getBoundingClientRect();
+            if (rect.height > maxHeight) maxHeight = rect.height;
+          });
+          document.body.removeChild(probe);
+          headline.style.minHeight = Math.ceil(maxHeight) + 'px';
+          // Do not lock width; allow wrapping so full text remains visible
+        }
+        function cycleWord() {
+          if (!changingWord) return;
+          changingWord.classList.remove('word-in');
+          changingWord.classList.add('word-out');
+          setTimeout(() => {
+            wordIdx = (wordIdx + 1) % words.length;
+            changingWord.textContent = words[wordIdx];
+            changingWord.classList.remove('word-out');
+            changingWord.classList.add('word-in');
+          }, 320);
+        }
+        function startRotation() { intervalId = setInterval(cycleWord, 2000); }
+        function stopRotation() { clearInterval(intervalId); }
+        stabilizeHero();
+        startRotation();
+        let _heroRSzT;
+        window.addEventListener('resize', () => { clearTimeout(_heroRSzT); _heroRSzT = setTimeout(stabilizeHero, 150); });
+        if (changingWord) {
+          changingWord.addEventListener('mouseenter', stopRotation);
+          changingWord.addEventListener('mouseleave', startRotation);
+        }
+
+        // Demo feed content
+        const feedList = document.getElementById('feedList');
+        // Backend API helpers: always use env.js computed base
+        const API_BASE = (window.API_BASE_URL || (location.protocol === 'file:' ? 'http://localhost:8080' : '')).replace(/\/$/, '');
+        // --- Presence (Live users) ---
+        (function presence(){
+          const countEl = document.getElementById('liveCount');
+          if (!countEl) return;
+          const setCount = (n) => { countEl.textContent = '• ' + (Number.isFinite(n) ? n : 0); };
+
+          // Cross-tab session coordination keys
+          const SKEY_SESSION = 'presence:posts:sessionId';
+          const SKEY_TABS = 'presence:posts:openTabs';
+
+          // Store EventSource reference for cleanup
+          let currentEventSource = null;
+          let pollingTimeout = null;
+          let heartbeatInterval = null;
+          let sessionId = null;
+          let isConnected = false;
+          let didUnload = false;
+
+          // Create/reuse a stable sessionId for all tabs on this origin/page
+          function getOrCreateSessionId(){
+            try {
+              const existing = localStorage.getItem(SKEY_SESSION);
+              if (existing && existing.startsWith('session_')) return existing;
+            } catch(_) {}
+            const sid = 'session_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+            try { localStorage.setItem(SKEY_SESSION, sid); } catch(_) {}
+            return sid;
+          }
+          function getOpenTabs(){
+            try { return Math.max(0, parseInt(localStorage.getItem(SKEY_TABS) || '0', 10) || 0); } catch { return 0; }
+          }
+          function incOpenTabs(){
+            const n = getOpenTabs() + 1;
+            try { localStorage.setItem(SKEY_TABS, String(n)); } catch(_) {}
+            return n;
+          }
+          function decOpenTabs(){
+            const n = Math.max(0, getOpenTabs() - 1);
+            try { localStorage.setItem(SKEY_TABS, String(n)); } catch(_) {}
+            return n;
+          }
+
+          // Initialize session
+          sessionId = getOrCreateSessionId();
+          const tabsNow = incOpenTabs();
+          console.log('[presence] sessionId:', sessionId, 'openTabs:', tabsNow);
+
+          async function tryJson(url, options = {}){
+            const r = await fetch(url, { method: 'GET', ...options });
+            if (!r.ok) throw new Error(String(r.status));
+            return r.json();
+          }
+
+          function pickPresenceBase(base){
+            return {
+              stream: [base + '/api/presence/stream?page=posts&sessionId=' + sessionId, base + '/api/posts/presence/stream?page=posts&sessionId=' + sessionId],
+              count: [base + '/api/presence/count?page=posts', base + '/api/posts/presence/count?page=posts'],
+              heartbeat: [base + '/api/presence/heartbeat?page=posts&sessionId=' + sessionId, base + '/api/posts/presence/heartbeat?page=posts&sessionId=' + sessionId],
+              disconnect: [base + '/api/presence/disconnect?sessionId=' + sessionId, base + '/api/posts/presence/disconnect?sessionId=' + sessionId]
+            };
+          }
+
+          async function sendHeartbeatOnce(base) {
+            const urls = pickPresenceBase(base).heartbeat;
+            for (let i = 0; i < urls.length; i++) {
+              try { const r = await fetch(urls[i], { method: 'POST' }); if (r.ok) return true; } catch(_) {}
+            }
+            return false;
+          }
+          function startHeartbeat(base) {
+            if (heartbeatInterval) clearInterval(heartbeatInterval);
+            heartbeatInterval = setInterval(async () => {
+              // Keep heartbeats regardless of SSE state to keep session alive
+              const ok = await sendHeartbeatOnce(base);
+              if (!ok) {
+                // ignore, will retry on next tick
+              }
+            }, 10000);
+          }
+
+          function startPolling(base){
+            if (pollingTimeout) clearTimeout(pollingTimeout);
+            async function poll(){
+              try {
+                const urls = pickPresenceBase(base).count;
+                let d = null;
+                for (let i = 0; i < urls.length && d === null; i++) {
+                  try { d = await tryJson(urls[i]); } catch(_) {}
+                }
+                if (d) setCount(d.count ?? 0);
+              } catch(_) {}
+              finally {
+                pollingTimeout = setTimeout(poll, 15000);
+              }
+            }
+            poll();
+          }
+
+          function closeConnectionsOnly() {
+            isConnected = false;
+            if (currentEventSource) {
+              try { currentEventSource.close(); } catch(_) {}
+              currentEventSource = null;
+            }
+            if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
+            if (pollingTimeout) { clearTimeout(pollingTimeout); pollingTimeout = null; }
+          }
+
+          function sendDisconnectIfLast(base){
+            const remaining = decOpenTabs();
+            console.log('[presence] tab closing, remaining openTabs:', remaining);
+            if (remaining > 0) return; // other tabs still open; keep session
+            const urls = pickPresenceBase(base).disconnect;
+            // Prefer sendBeacon with a tiny payload to avoid CORS preflight and ensure delivery
+            const payload = new Blob(['1'], { type: 'text/plain' });
+            for (let i = 0; i < urls.length; i++) {
+              try {
+                if (navigator.sendBeacon) {
+                  const ok = navigator.sendBeacon(urls[i], payload);
+                  if (ok) break;
+                } else {
+                  fetch(urls[i], { method: 'POST', keepalive: true, headers: { 'Content-Type': 'text/plain' }, body: '1' }).catch(()=>{});
+                  break;
+                }
+              } catch(_) {}
+            }
+          }
+
+          // Connect SSE with fallback
+          (async function connect(){
+            const base = API_BASE;
+            try {
+              // Ensure a session row exists even if SSE fails
+              await sendHeartbeatOnce(base);
+              const urls = pickPresenceBase(base).stream;
+              currentEventSource = new EventSource(urls[0]);
+              let switched = false;
+
+              currentEventSource.addEventListener('open', () => {
+                isConnected = true;
+                startHeartbeat(base);
+              });
+              currentEventSource.addEventListener('count', (e)=>{
+                try { setCount(JSON.parse(e.data).count); } catch { setCount(parseInt(e.data,10)||0); }
+              });
+              currentEventSource.onerror = () => {
+                if (switched) { closeConnectionsOnly(); startPolling(base); return; }
+                switched = true;
+                closeConnectionsOnly();
+                try {
+                  currentEventSource = new EventSource(urls[1]);
+                  currentEventSource.addEventListener('open', () => { isConnected = true; startHeartbeat(base); });
+                  currentEventSource.addEventListener('count', (e)=>{
+                    try { setCount(JSON.parse(e.data).count); } catch { setCount(parseInt(e.data,10)||0); }
+                  });
+                  currentEventSource.onerror = () => { closeConnectionsOnly(); startPolling(base); };
+                } catch(_) { startPolling(base); }
+              };
+            } catch(_) {
+              // Start heartbeats and polling if SSE cannot start
+              startHeartbeat(base);
+              startPolling(base);
+            }
+          })();
+
+          // Cleanup events: close connections immediately; disconnect only if last tab
+          const onUnload = () => {
+            if (didUnload) return;
+            didUnload = true;
+            const base = API_BASE;
+            closeConnectionsOnly();
+            sendDisconnectIfLast(base);
+          };
+          window.addEventListener('beforeunload', onUnload);
+          window.addEventListener('unload', onUnload);
+          window.addEventListener('pagehide', onUnload);
+
+          // Handle page visibility
+          document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+              closeConnectionsOnly();
+            } else {
+              // Reconnect when page becomes visible again
+              if (!currentEventSource) {
+                // Do not increment openTabs; tab is the same
+                (async function reconnect(){
+                  const base = API_BASE;
+                  try {
+                    await sendHeartbeatOnce(base);
+                    const urls = pickPresenceBase(base).stream;
+                    currentEventSource = new EventSource(urls[0]);
+                    currentEventSource.addEventListener('open', () => { isConnected = true; startHeartbeat(base); });
+                    currentEventSource.addEventListener('count', (e)=>{
+                      try { setCount(JSON.parse(e.data).count); } catch { setCount(parseInt(e.data,10)||0); }
+                    });
+                    currentEventSource.onerror = () => { closeConnectionsOnly(); startHeartbeat(base); startPolling(base); };
+                  } catch(_) { startHeartbeat(base); startPolling(base); }
+                })();
+              }
+            }
+          });
+        })();
+        async function apiCreatePost(body) {
+          const res = await fetch(API_BASE + '/api/posts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+          if (!res.ok) throw new Error('Create failed');
+          return res.json();
+        }
+        async function apiListPosts(category) {
+          const qs = category && category !== 'All' ? ('?category=' + encodeURIComponent(category)) : '';
+          const res = await fetch(API_BASE + '/api/posts' + qs);
+          if (!res.ok) throw new Error('List failed');
+          return res.json();
+        }
+        async function apiUploadImage(file) {
+          const fd = new FormData();
+          fd.append('image', file);
+          const res = await fetch(API_BASE + '/api/posts/upload-image', { method: 'POST', body: fd });
+          if (!res.ok) throw new Error('Upload failed');
+          const data = await res.json();
+          return data.url;
+        }
+
+        function cardTpl(p) {
+          const el = document.createElement('div');
+          el.className = 'post-card';
+          el.dataset.id = p.id || '';
+          el.dataset.created = p.createdAt || '';
+          el.dataset.expires = p.expiresAt || '';
+          el.innerHTML = `
+            <div class="post-head">
+              <span class="badge-cat">${p.cat}</span>
+              <span class="post-meta"></span>
+            </div>
+            <div class="post-title">${p.title || ''}</div>
+            <div class="post-text">${p.text}</div>
+          `;
+          // Apply card background and text styles (preview)
+          if (p.bg) {
+            el.style.background = p.bg;
+            el.style.backgroundSize = 'cover';
+            el.style.backgroundPosition = 'center';
+          }
+          const textEl = el.querySelector('.post-text');
+          if (p.fontSize) textEl.style.fontSize = p.fontSize + 'px';
+          if (typeof p.isLight === 'boolean') textEl.style.color = p.isLight ? '#ffffff' : '#0b0c10';
+          return el;
+        }
+        let allPosts = [];
+        function renderFeed(filterCat) {
+          feedList.innerHTML = '';
+          const items = filterCat && filterCat !== 'All' ? allPosts.filter(p => p.cat === filterCat) : allPosts;
+          items.forEach(p => feedList.appendChild(cardTpl(p)));
+        }
+        // Initial load from backend
+        (async () => {
+          try {
+            const list = await apiListPosts('All');
+            allPosts = list.map(x => ({ id: x.id, cat: x.category, title: '', text: x.content, bg: x.backgroundCss, fontSize: x.fontSize, isLight: x.isLightText, imageUrl: x.imageUrl, createdAt: x.createdAt, expiresAt: x.expiresAt }));
+            renderFeed('All');
+            updateAllMetas();
+          } catch (e) {
+            // fallback: empty
+          }
+        })();
+
+        // Relative time + countdown helpers
+        function computeMeta(createdIso, expiresIso) {
+          const now = new Date();
+          const created = createdIso ? new Date(createdIso) : now;
+          const expires = expiresIso ? new Date(expiresIso) : new Date(now.getTime() + 24*60*60*1000);
+          const diffMs = now - created;
+          const diffMin = Math.floor(diffMs / 60000);
+          let left = '';
+          const leftMs = expires - now;
+          if (leftMs > 0) {
+            const leftMin = Math.floor(leftMs / 60000);
+            const lh = Math.floor(leftMin / 60);
+            const lm = leftMin % 60;
+            left = `${lh}h ${lm}m left`;
+          } else {
+            left = 'expired';
+          }
+          let rel = '';
+          if (diffMin < 1) rel = 'just now';
+          else if (diffMin === 1) rel = '1 minute ago';
+          else if (diffMin === 2) rel = '2 minutes ago';
+          else rel = '';
+          return rel ? `${rel} • ${left}` : left;
+        }
+        function updateAllMetas() {
+          const cards = feedList.querySelectorAll('.post-card');
+          cards.forEach(card => {
+            const created = card.dataset.created;
+            const expires = card.dataset.expires;
+            const metaEl = card.querySelector('.post-meta');
+            if (metaEl) metaEl.textContent = computeMeta(created, expires);
+          });
+        }
+        setInterval(updateAllMetas, 30000);
+
+        // Mock post action with validation + rotating tooltips + animation + success message
+        const funnyTips = [
+          'Scammers are not allowed here.',
+          'Your post is shorter than a WhatsApp status.',
+          'Even your crush writes longer texts than this.',
+          'Minimum 50-500 characters required to post.',
+          'We love short posts, but not this short.',
+          'Short posts are cool, but this one’s too short to help anyone.'
+        ];
+        const realTips = [
+          'Please write at least 50-500 characters.',
+          'Add pickup, drop, or load details.',
+          'We need more info to help you better.',
+          'Please add more details to help transporters.',
+          'We couldn’t publish this. Add more content.',
+          'Only 50-500 characters allowed.',
+          'Please write between 50-500 characters.'
+        ];
+        let tipClicks = 0;
+        function showTip(message) {
+          if (!postTip) return;
+          postTip.textContent = message;
+          // Position over the Post button
+          const btnRect = postBtn.getBoundingClientRect();
+          const footerRect = postBtn.parentElement.getBoundingClientRect();
+          const top = btnRect.top - footerRect.top - postTip.offsetHeight - 8; // directly above with 8px gap
+          const left = (btnRect.left - footerRect.left) + (btnRect.width/2) - (postTip.offsetWidth/2);
+          postTip.style.top = top + 'px';
+          postTip.style.left = Math.max(8, left) + 'px';
+          postTip.style.setProperty('--rot', (Math.random() * 6 - 3) + 'deg');
+          postTip.style.opacity = '1';
+          clearTimeout(postTip._t);
+          postTip._t = setTimeout(() => { postTip.style.opacity = '0'; }, 4200);
+        }
+        postBtn.addEventListener('click', async function(e) {
+          const len = textLength();
+          if (!hasCategory()) {
+            e.preventDefault();
+            const msg = 'Please select category before posting.';
+            showTip(msg);
+            return;
+          }
+          if (len < 50) {
+            e.preventDefault();
+            const useFunny = tipClicks % 2 === 0;
+            tipClicks++;
+            const list = useFunny ? funnyTips : realTips;
+            const msg = list[Math.floor(Math.random() * list.length)];
+            showTip(msg);
+            return;
+          }
+          if (len > 500) {
+            e.preventDefault();
+            showTip('Keep it concise. Max 500 characters.');
+            return;
+          }
+          // valid -> run truck animation, then show success message replacing composer
+          const button = postBtn;
+          // Always ensure data structure exists
+          const box = button.querySelector('.box');
+          const truck = button.querySelector('.truck');
+          if (!box || !truck) return;
+          // prevent double-trigger while animating
+          if (button.classList.contains('animation')) return;
+          // We'll animate first; the actual upload + save happens at timeline complete
+          // reset CSS custom props to initial before new run
+          gsap.set(button, { '--progress': 0, '--hx': 0, '--bx': 0, '--box-s': 0.5, '--box-o': 0, '--truck-y': 0, '--truck-y-n': -26 });
+          gsap.set(box, { x: -24, y: -6 });
+          button.classList.remove('done');
+          button.classList.add('animation');
+          gsap.to(button, { '--box-s': 1, '--box-o': 1, duration: 0.3, delay: 0.5 });
+          gsap.to(box, { x: 0, duration: 0.4, delay: 0.7 });
+          gsap.to(button, { '--hx': -5, '--bx': 50, duration: 0.18, delay: 0.92 });
+          gsap.to(box, { y: 0, duration: 0.1, delay: 1.15 });
+          gsap.set(button, { '--truck-y': 0, '--truck-y-n': -26 });
+          gsap.to(button, {
+            '--truck-y': 1,
+            '--truck-y-n': -25,
+            duration: 0.2,
+            delay: 1.25,
+            onComplete() {
+              gsap.timeline({
+                onComplete: async () => {
+                  // Upload image now (if any), then create post
+                  let imageUrlToSave = null;
+                  try {
+                    if (pendingImageFile) {
+                      imageUrlToSave = await apiUploadImage(pendingImageFile);
+                    }
+                    const storedUserId = parseInt(localStorage.getItem('userId') || '0', 10) || 0;
+                    await apiCreatePost({
+                      userId: storedUserId,
+                      content: canvas.innerText.trim(),
+                      category: postCategory ? postCategory.value : 'General',
+                      fontSize: parseInt(getComputedStyle(canvas).fontSize, 10) || 18,
+                      isLightText: lightText,
+                      backgroundCss: canvas.style.background || '',
+                      imageUrl: imageUrlToSave
+                    });
+                  } catch (err) {
+                    showTip('Server error. Please try again.');
+                    button.classList.remove('animation');
+                    return;
+                  }
+                  // success UI
+                  button.classList.add('done');
+                  const container = document.querySelector('.composer');
+                  if (container) {
+                    container.innerHTML = '<div style="max-width:780px;margin:20px auto;padding:18px;border:1px solid rgba(255,255,255,0.12);border-radius:12px;background:rgba(255,255,255,0.04);text-align:center">\
+                      <div style="margin-bottom:8px;"><span class="badge-cat">' + (postCategory ? postCategory.value : 'General') + '</span></div>\
+                      <h3 style="margin:6px 0 10px 0;">Your post is live!</h3>\
+                      <p style=\"color:#cbd5e1;margin:6px 0;\">It will automatically expire after 24 hours to keep the feed clean and updated.</p>\
+                      <p style=\"color:#9aa3af;margin:6px 0;\">If you want to repost then refresh the page</p>\
+                    </div>';
+                  }
+                  // refresh feed
+                  (async () => {
+                    try {
+                      const activeChip = document.querySelector('.chip-row .chip.active');
+                      const activeCat = activeChip ? activeChip.textContent.trim() : 'All';
+                      const list = await apiListPosts(activeCat);
+                      allPosts = list.map(x => ({ id: x.id, cat: x.category, title: '', text: x.content, bg: x.backgroundCss, fontSize: x.fontSize, isLight: x.isLightText, imageUrl: x.imageUrl, createdAt: x.createdAt, expiresAt: x.expiresAt }));
+                      renderFeed(activeCat);
+                      updateAllMetas();
+                    } catch (_) {}
+                  })();
+                }
+              })
+              .to(truck, { x: 0, duration: 0.4 })
+              .to(truck, { x: 40, duration: 1 })
+              .to(truck, { x: 20, duration: 0.6 })
+              .to(truck, { x: 96, duration: 0.4 });
+              gsap.to(button, { '--progress': 1, duration: 2.4, ease: 'power2.in' });
+            }
+          });
+        });
+
+        // Show tooltip also on hover when invalid (desktop only)
+        postBtn.addEventListener('mouseenter', function() {
+          const len = textLength();
+          if (len >= 50 && len <= 500 && hasCategory()) return;
+          const useFunny = tipClicks % 2 === 0;
+          tipClicks++;
+          const list = useFunny ? funnyTips : realTips;
+          const msg = list[Math.floor(Math.random() * list.length)];
+          showTip(msg);
+        });
+
+        // Category chip filtering
+        const chipRow = document.getElementById('filters');
+        if (chipRow) {
+          chipRow.addEventListener('click', (e) => {
+            const chip = e.target.closest('.chip');
+            if (!chip) return;
+            document.querySelectorAll('#filters .chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            const cat = chip.textContent.trim();
+            (async () => {
+              try {
+                const list = await apiListPosts(cat);
+                allPosts = list.map(x => ({ id: x.id, cat: x.category, title: '', text: x.content, bg: x.backgroundCss, fontSize: x.fontSize, isLight: x.isLightText, imageUrl: x.imageUrl, createdAt: x.createdAt, expiresAt: x.expiresAt }));
+                renderFeed(cat);
+                updateAllMetas();
+              } catch (_) {}
+            })();
+          });
+        }
+
+        // Openable post detail modal
+        feedList.addEventListener('click', (e) => {
+          const card = e.target.closest('.post-card');
+          if (!card) return;
+          const id = card.dataset.id;
+          const p = allPosts.find(x => x.id === id) || allPosts.find(x => !x.id && x.text === card.querySelector('.post-text')?.textContent);
+          if (!p) return;
+          const modal = document.getElementById('postModal');
+          const modalBody = document.getElementById('modalBody');
+          const modalCat = document.getElementById('modalCat');
+          modalCat.textContent = p.cat || '';
+          modalBody.style.background = p.bg || 'linear-gradient(135deg,#0f172a,#0b0c10)';
+          modalBody.style.backgroundSize = 'cover';
+          modalBody.style.backgroundPosition = 'center';
+          modalBody.innerHTML = '';
+          const text = document.createElement('div');
+          text.className = 'post-text';
+          text.style.fontSize = (p.fontSize || 18) + 'px';
+          text.style.color = (typeof p.isLight === 'boolean' ? (p.isLight ? '#ffffff' : '#0b0c10') : '#ffffff');
+          text.textContent = p.text || '';
+          modalBody.appendChild(text);
+          if (p.imageUrl) {
+            const img = document.createElement('img');
+            img.src = p.imageUrl;
+            img.alt = 'Attached image';
+            img.style.maxWidth = '100%';
+            img.style.borderRadius = '8px';
+            img.style.marginTop = '12px';
+            modalBody.appendChild(img);
+          }
+          modal.style.display = 'block';
+        });
+        document.getElementById('postModalClose').addEventListener('click', ()=>{
+          document.getElementById('postModal').style.display = 'none';
+        });
+      })();
+
+      // Real typewriter effect for hero description
+      (function() {
+        const el = document.getElementById('heroDesc');
+        if (!el) return;
+        const full = el.textContent.trim();
+        el.textContent = '';
+        let i = 0;
+        function type() {
+          if (i <= full.length) {
+            el.textContent = full.slice(0, i);
+            i++;
+            setTimeout(type, i < 12 ? 30 : 12);
+          }
+        }
+        setTimeout(type, 250);
+      })();
+
+      // script for truck button (composer Post button)
+      const truckButtons = document.querySelectorAll('.composer .truck-button');
+      truckButtons.forEach(button => {
+        button.addEventListener('click', e => {
+          // Post button has its own full logic (validation + animation + success)
+          if (button.id === 'postBtn') return;
+          if (button.hasAttribute('disabled')) return;
+          e.preventDefault();
+
+          const box = button.querySelector('.box');
+          const truck = button.querySelector('.truck');
+
+          const afterAnimation = () => {
+            // keep composer open, maybe show success state
+          };
+
+          if (!button.classList.contains('done')) {
+            if (!button.classList.contains('animation')) {
+              button.classList.add('animation');
+
+              gsap.to(button, { '--box-s': 1, '--box-o': 1, duration: 0.3, delay: 0.5 });
+              gsap.to(box, { x: 0, duration: 0.4, delay: 0.7 });
+              gsap.to(button, { '--hx': -5, '--bx': 50, duration: 0.18, delay: 0.92 });
+              gsap.to(box, { y: 0, duration: 0.1, delay: 1.15 });
+
+              gsap.set(button, { '--truck-y': 0, '--truck-y-n': -26 });
+              gsap.to(button, {
+                '--truck-y': 1,
+                '--truck-y-n': -25,
+                duration: 0.2,
+                delay: 1.25,
+                onComplete() {
+                  gsap.timeline({
+                    onComplete() {
+                      button.classList.add('done');
+                      afterAnimation();
+                    }
+                  })
+                  .to(truck, { x: 0, duration: 0.4 })
+                  .to(truck, { x: 40, duration: 1 })
+                  .to(truck, { x: 20, duration: 0.6 })
+                  .to(truck, { x: 96, duration: 0.4 });
+
+                  gsap.to(button, { '--progress': 1, duration: 2.4, ease: 'power2.in' });
+                }
+              });
+            }
+          } else {
+            button.classList.remove('animation', 'done');
+            gsap.set(truck, { x: 4 });
+            gsap.set(button, { '--progress': 0, '--hx': 0, '--bx': 0, '--box-s': 0.5, '--box-o': 0, '--truck-y': 0, '--truck-y-n': -26 });
+            gsap.set(box, { x: -24, y: -6 });
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
+
+

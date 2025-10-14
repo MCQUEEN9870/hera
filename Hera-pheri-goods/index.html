@@ -1,0 +1,1103 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V9X30VY879"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-V9X30VY879');
+</script>
+    
+    <!-- Basic meta tags for character encoding and responsive design -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title> </title>
+    
+    <!-- Favicons -->
+     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+     <link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
+     <link rel="icon" type="image/png" href="/android-chrome-512x512.png" sizes="512x512"> 
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+    
+    <!-- External CSS and Font Awesome for icons -->
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet">
+    
+    <!-- GSAP library for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    
+    <!-- AOS (Animate On Scroll) library for scroll animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    
+    <!-- Modal Styles -->
+    <style>
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        overflow: auto;
+      }
+      
+      .modal-content {
+        position: relative;
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 25px;
+        width: 90%;
+        max-width: 450px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        animation: modalFadeIn 0.4s;
+      }
+      
+      @keyframes modalFadeIn {
+        from {opacity: 0; transform: translateY(-30px);}
+        to {opacity: 1; transform: translateY(0);}
+      }
+      
+      .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        color: #aaa;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+      
+      .close-modal:hover {
+        color: #333;
+      }
+      
+      /* Form Elements */
+      .form-group {
+        margin-bottom: 15px;
+      }
+      
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: #333;
+      }
+      
+      .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+      
+      .user-info-form button,
+      #okButton {
+        width: 100%;
+        padding: 12px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+        transition: background-color 0.2s;
+      }
+      
+      .user-info-form button:hover,
+      #okButton:hover {
+        background-color: #45a049;
+      }
+      
+      /* Success Modal */
+      .success-content {
+        text-align: center;
+        padding: 30px 25px;
+      }
+      
+      .success-icon {
+        font-size: 60px;
+        color: #4CAF50;
+        margin-bottom: 15px;
+      }
+      
+      .success-content h3 {
+        margin-bottom: 10px;
+      }
+      
+     
+      
+      .success-content p {
+        margin-bottom: 20px;
+        color: #666;
+      }
+
+      @media (max-width: 768px) {
+      .find-vehicle-section {
+        width: 100%;
+        max-width: 75%;
+        margin: 0;
+      }
+      .find-vehicle-video {
+        margin-left: 0;
+      }
+      }
+
+      /* Footer layout: keep all columns (including Follow Us) in one row on wide screens */
+      @media (min-width: 1100px){
+        .footer .footer-content{
+          display: grid;
+          grid-template-columns: repeat(5, minmax(200px, 1fr));
+          align-items: start;
+          gap: 24px;
+        }
+      }
+
+      /* Footer: Follow Us - Modern Social Buttons */
+      .footer .social-follow {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .footer .btn-social {
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+        transition: transform .2s ease, box-shadow .35s ease, border-color .35s ease, background-color .35s ease;
+        will-change: transform, box-shadow;
+      }
+      .footer .btn-social i { font-size: 18px; }
+      .footer .btn-social::before {
+        content: '';
+        position: absolute;
+        inset: -60% -40% auto -40%;
+        height: 180%;
+        background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.18), transparent 60%);
+        transform: translateY(60%) rotate(12deg);
+        transition: transform .6s ease;
+        pointer-events: none;
+      }
+      .footer .btn-social:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.28); }
+      .footer .btn-social:hover::before { transform: translateY(-10%) rotate(0deg); }
+      .footer .btn-social:active { transform: translateY(0); }
+      .footer .btn-social.yt { background: linear-gradient(180deg, rgba(255,0,0,1.00), rgba(255,0,0,0.06)); box-shadow: 0 8px 24px rgba(255,0,0,0.12); }
+      .footer .btn-social.wa { background: linear-gradient(180deg, rgba(37,211,102,1.00), rgba(37,211,102,0.06)); box-shadow: 0 8px 24px rgba(37,211,102,0.12); }
+      .footer .btn-social.fb { background: linear-gradient(180deg, rgba(24,119,242,1.00), rgba(24,119,242,0.06)); box-shadow: 0 8px 24px rgba(24,119,242,0.12); }
+      .footer .btn-social.yt:hover { box-shadow: 0 14px 36px rgba(255,0,0,0.22); }
+      .footer .btn-social.wa:hover { box-shadow: 0 14px 36px rgba(37,211,102,0.22); }
+      .footer .btn-social.fb:hover { box-shadow: 0 14px 36px rgba(24,119,242,0.22); }
+      
+    </style>
+  </head>
+
+  <body>
+    
+    <!-- Navigation Bar Section -->
+    <nav class="navbar glass-nav">
+      
+      <!-- Logo Section with GSAP animation -->
+      <div class="navbar-logo logo">
+        <img
+          src="attached_assets/images/new-logo.webp"
+          alt="Herapheri Goods Logo"
+          class="logo-img"
+        />
+        <span class="brand-wordmark">Herapheri Goods</span>
+      </div>
+
+  
+
+      <!-- Navigation Links -->
+      <ul class="nav-links">
+        <!-- Truck Type Dropdown Menu -->
+        <li class="dropdown">
+          <a href="#" class="nav-item truck-type-btn" title="Find the right vehicle for your transport needs."><span>Vehicle Type</span></a>
+          <div class="dropdown-content">
+            <!-- Small Commercial Vehicles Category -->
+            <div class="category">
+              <h3 title="Perfect for small loads and city deliveries."><i class="fas fa-boxes"></i> Small Transport Vehicles (SCV)</h3>
+              <ul>
+                <!-- SCV Vehicle List Items -->
+                <li><a href="vehicles?type=Manual Cart (Thel / Rickshaw)" title="Ideal for very short distances and narrow lanes."><img src="attached_assets/images/manual cart (thela).webp" alt="Manual Cart (Thel)" class="vehicle-icon"> Manual Cart (Thel / Rickshaw)</a></li>
+                <li><a href="vehicles?type=Auto Loader (CNG loader)" title="Good for medium-sized goods within the city."><img src="attached_assets/images/Auto Loader(CNG loader).webp" alt="Auto Loader" class="vehicle-icon"> Auto Loader (CNG loader)</a></li>
+                <li><a href="vehicles?type=Tata Ace (Chhota Hathi)" title="Popular choice for small business deliveries."><img src="attached_assets/images/Auto Loader(CNG loader).webp" alt="Tata Ace" class="vehicle-icon"> Tata Ace (Chhota Hathi)</a></li>
+                <li><a href="vehicles?type=E-Rickshaw Loader (Tuk-Tuk)" title="Eco-friendly option for local cargo."><img src="attached_assets/images/e-ricksahw (tuk-tuk).webp" alt="E-Rickshaw" class="vehicle-icon"> E-Rickshaw Loader (Tuk-Tuk)</a></li>
+              </ul>
+            </div>
+            
+            <!-- Light Commercial Vehicles Category -->
+            <div class="category">
+              <h3 title="Good for medium loads and trips between nearby cities."><i class="fas fa-shuttle-van"></i> Light Transport Vehicles (LCV)</h3>
+              <ul>
+                <!-- LCV Vehicle List Items -->
+                <li><a href="vehicles?type=Mini Truck (Eicher Canter)" title="perfect for city-to-city."><img src="attached_assets/images/mini truck (Eicher Canter).webp" alt="Mini Truck" class="vehicle-icon"> Mini Truck (Eicher Canter)</a></li>
+                <li><a href="vehicles?type=Vikram Tempo" title="For local goods movement."><img src="attached_assets/images/vikram tempo.webp" alt="Vikram Tempo" class="vehicle-icon"> Vikram Tempo</a></li>
+                <li><a href="vehicles?type=Bolero Pickup (MaXX)" title="Strong and suitable for various terrains."><img src="attached_assets/images/bolero pickup-truck.webp" alt="Bolero Pickup" class="vehicle-icon"> Bolero Pickup (MaXX)</a></li>
+                <li><a href="vehicles?type=Tata 407" title="Popular for medium-size commercial transport."><img src="attached_assets/images/tata 407.webp" alt="Tata 407" class="vehicle-icon"> Tata 407</a></li>
+                <li><a href="vehicles?type=6 wheeler" title="Carries more load than smaller LCVs."><img src="attached_assets/images/6 wheeler.webp" alt="6 Wheeler" class="vehicle-icon"> 6 wheeler</a></li>
+              </ul>
+            </div>
+            
+            <!-- Medium & Heavy Commercial Vehicles Category -->
+            <div class="category">
+              <h3 title="Used for big goods and long-distance transport."><i class="fas fa-truck-loading"></i> Medium & Heavy Transport Vehicles (MHCV & HCV)</h3>
+              <ul>
+                <!-- MHCV & HCV Vehicle List Items -->
+                <li><a href="vehicles?type=Container Truck" title="Safe choice for important and secured goods."><img src="attached_assets/images/container truck.webp" alt="Container Truck" class="vehicle-icon"> Container Truck</a></li>
+                <li><a href="vehicles?type=Open Body Truck (6 wheeler)" title="Suitable for bulky and odd-sized items."><img src="attached_assets/images/open body truck.webp" alt="Open Body Truck" class="vehicle-icon"> Open Body Truck (6 wheeler)</a></li>
+                <li><a href="vehicles?type=Closed Body Truck" title="Protection from weather and theft."><img src="attached_assets/images/closed body truck.webp" alt="Closed Body Truck" class="vehicle-icon"> Closed Body Truck</a></li>
+                <li><a href="vehicles?type=Flatbed Truck" title="Ideal for oversized cargo and machinery."><img src="attached_assets/images/flat-bed-truck.webp" alt="Flatbed Truck" class="vehicle-icon"> Flatbed Truck</a></li>
+                <li><a href="vehicles?type=8 wheeler" title="Increased capacity for heavier loads."><img src="attached_assets/images/8 wheeler.webp" alt="8 Wheeler" class="vehicle-icon"> 8 wheeler</a></li>
+                <li><a href="vehicles?type=12 wheeler and onwards" title="Used for very large and heavy shipping like in industries."><img src="attached_assets/images/12 wheeler and onwards.webp" alt="12 Wheeler" class="vehicle-icon"> 12 wheeler and onwards</a></li>
+              </ul>
+            </div>
+            
+            <!-- Special Utility Vehicles Category -->
+            <div class="category">
+              <h3 title="Vehicles for special work like lifting, dumping, or carrying liquids."><i class="fas fa-tools"></i> Special Utility Vehicles (SUV)</h3>
+              <ul>
+                <!-- SUV Vehicle List Items -->
+                <li><a href="vehicles?type=JCB" title="For excavation and construction tasks."><img src="attached_assets/images/jcb.svg" alt="JCB" class="vehicle-icon"> JCB</a></li>
+                <li><a href="vehicles?type=Crane" title="Lifting and moving heavy objects or machinery."><img src="attached_assets/images/crane.svg" alt="Crane" class="vehicle-icon"> Crane</a></li>
+                <li><a href="vehicles?type=Trailer Truck" title="Transporting oversized and heavy loads."><img src="attached_assets/images/truck-trailer.svg" alt="Trailer Truck" class="trailer-icon"> Trailer Truck</a></li>
+                <li><a href="vehicles?type=Tipper Truck (Dumper Truck)" title="Used for carrying loose materials like sand, gravel."><img src="attached_assets/images/tipper truck.webp" alt="Tipper Truck" class="vehicle-icon"> Tipper Truck (Dumper Truck)</a></li>
+                <li><a href="vehicles?type=Tanker Truck" title="For transporting liquids or gases."><img src="attached_assets/images/tanker-truck.webp" alt="Tanker Truck" class="vehicle-icon"> Tanker Truck</a></li>
+                <li><a href="vehicles?type=Garbage Truck" title="For waste collection and disposal."><img src="attached_assets/images/garbage-truck.webp" alt="Garbage Truck" class="vehicle-icon"> Garbage Truck</a></li>
+            </ul>
+            </div>
+            <div class="category">
+              <h3 title="Vehicles for urgent medical and emergency situations."><i class="fas fa-ambulance"></i> Emergency Vehicles</h3>
+              <ul>
+                <!-- Emergency Vehicle List Items -->
+                <li><a href="vehicles?type=Ambulance" title="For patient transport and medical emergencies."><img src="attached_assets\images\ambulace.webp" alt="Ambulance" class="vehicle-icon"> Ambulance</a></li>
+              </ul>
+              <ul>
+                <li><a href="vehicles?type=Tow-Truck" title="For towing and recovery of vehicles."><img src="attached_assets\images\Tow-truck.webp" alt="Tow-Truck" class="vehicle-icon"> Tow-Truck</a></li>
+              </ul>
+            </div>
+            
+               
+            <div class="category">
+              <h3 title="Keeps items cold for dairy, ice cream, and other frozen goods."><i class="fas fa-snowflake"></i> Refrigerated & AC vehciles</h3>
+              <ul>
+                <!-- Refrigerated & AC Vehicle List Items -->
+                <li><a href="vehicles?type=Refrigerated Vans" title="Keeps dairy, ice cream, and food cool in short trips."><img src="attached_assets\images\refrigerator vans.webp" alt="Refrigerated Vans" class="vehicle-icon"> Refrigerated Vans</a></li>
+                <li><a href="vehicles?type=Refrigerated Trucks" title="Larger trucks for transporting frozen or chilled goods over long distances."><img src="attached_assets\images\refrigerated trucks.webp" alt="Refrigerated Trucks" class="vehicle-icon"> Refrigerated Trucks</a></li>
+              </ul>
+            </div>
+            <div class="category">
+              <h3 title="Used for shifting homes, delivering parcels, and other transport services in cities."><i class="fas fa-boxes-packing"></i>Service-Based Vehicles</h3>
+              <ul>
+                <!-- Packer&Movers Vehicle List Items -->
+                <li><a href="vehicles?type=Packer&Movers" title="For house shifting, office relocation, or furniture transport. Select this if you provide loading/unloading services too."><img src="attached_assets\images\Packers.webp" alt="Packer&Movers" class="vehicle-icon">Packer&Movers<img src="attached_assets\images\movers.webp" alt="Packer&Movers" class="vehicle-icon"></a></li>
+                <li><a href="vehicles?type=Parcel Delivery" title="For local & city-to-city parcel deliveries. If you deliver packages, documents, small cargo, select this. "><img src="attached_assets\images\delivery-man.webp" alt="Parcel Delivery" class="vehicle-icon"> Parcel Delivery</a></li>
+              </ul>
+            </div>
+            <div class="category">
+              <h3 title="For serving food and beverages."><i class="fas fa-utensils"></i>Food & Beverage Vehicles</h3>
+              <ul>
+                <li><a href="vehicles?type=Food trucks" title="For serving meals like Chinese, North-Indian, South-Indian Continental, etc."><img src="attached_assets\images\food-truck.webp" alt="Food Delivery" class="vehicle-icon"> Food-Based vehicles</a></li>
+                <li><a href="vehicles?type=Beverage trucks" title="For serving Juice & Shakes, coffee, tea, etc."><img src="attached_assets\images\drink-truck.webp" alt="Beverage Delivery" class="vehicle-icon">Drink-Based vehicles</a></li>
+              </ul>
+            </div>
+           
+
+          </div>
+        </li>
+        <!-- Other Navigation Items -->
+       
+        <li>
+          <a href="posts" title="Post your vehicle need for free" class="nav-item"><span>Posts</span></a>
+        </li>
+
+        <li>
+          <a href="contact-us" title= "send your query/issues to us" class="nav-item"><span>Contact Us</span></a>
+        </li>
+        
+        <!-- Authentication Section - Only shown when user is logged in -->
+        <li id="authSection" style="display: none;">
+            <a href="driver-dashboard" title="View your profile and manage your vehicles" class="nav-item"> 
+              <span>
+                <img src="attached_assets/images/user.webp" class="profile-icon">
+              </span>
+            </a>
+        </li>
+      </ul>
+
+      <!-- Mobile Hamburger Button -->
+      <button class="mobile-menu-btn menu" onclick="this.classList.toggle('opened');this.setAttribute('aria-expanded', this.classList.contains('opened'))" aria-label="Main Menu">
+        <svg width="40" height="40" viewBox="0 0 100 100">
+          <path class="line line1" d="M 20,29.000046 H 80.000231 C 80.000231,29.000046 94.498839,28.817352 94.532987,66.711331 94.543142,77.980673 90.966081,81.670246 85.259173,81.668997 79.552261,81.667751 75.000211,74.999942 75.000211,74.999942 L 25.000021,25.000058" />
+          <path class="line line2" d="M 20,50 H 80" />
+          <path class="line line3" d="M 20,70.999954 H 80.000231 C 80.000231,70.999954 94.498839,71.182648 94.532987,33.288669 94.543142,22.019327 90.966081,18.329754 85.259173,18.331003 79.552261,18.332249 75.000211,25.000058 75.000211,25.000058 L 25.000021,74.999942" />
+        </svg>
+      </button>
+      
+      <style>
+        .profile-icon {
+          width: 40px;
+          height: 40px;
+          border-radius: 40%;
+          margin-top: -10px;
+        }
+      </style>
+    </nav>
+    <!-- Mobile Sidebar Navigation -->
+    <div class="mobile-overlay"></div>
+    <aside class="mobile-sidebar">
+      <div class="mobile-sidebar-header">
+        <span class="brand-wordmark">Herapheri Goods</span>
+        <button class="mobile-close" aria-label="Close menu">&times;</button>
+      </div>
+      <ul class="mobile-nav-links">
+        <li><a href="vehicles" class="mobile-nav-item">Vehicle Type</a></li>
+        <li><a href="contact-us" class="mobile-nav-item">Contact Us</a></li>
+        <li><a href="posts" class="mobile-nav-item">Posts</a></li>
+        <li><a href="driver-dashboard" id="profileLink" class="mobile-nav-item">My Profile</a></li>
+      </ul>
+    </aside>
+<main>
+    <!-- Main Content Block -->
+    <div class="hero-section">
+      <!-- Hero Background GIF -->
+      <div class="hero-background">
+        <img src="attached_assets/animation/original-956409b077ef559b755248f8c2291d51.gif" alt="Transport Animation" class="hero-gif">
+      </div>
+      
+      <!-- Hero Content Overlay -->
+      <div class="hero-content-overlay">
+        <div class="hero-container">
+          <!-- Hero Content -->
+          <div class="hero-content" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+            <h1>Register Your Vehicle</h1>
+            <p>Join our network of trusted transporters, Add your vehicle to our platform and connect with people who need transport.</p>
+            
+            <!-- Hero Features -->
+            <div class="hero-features">
+              <!-- List Vehicle Feature -->
+              <div class="feature">
+                <img src="attached_assets/animation/animated truck.gif" alt="Animated Truck" class="feature-icon">
+                <span>List Your Vehicle</span>
+              </div>
+              <!-- Earn More Feature -->
+              <div class="feature">
+                <img src="attached_assets/animation/earn more.gif" alt="Earn More" class="feature-icon">
+                <span>Earn More</span>>
+              </div>
+            </div>
+            <!-- Hero Button -->
+            <button class="hero-btn" id="registerNowBtn">Register Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+
+      <!-- Find Vehicle Section -->
+      <div class="find-vehicle-section" id="find-vehicle-section">
+        <div class="find-vehicle-container">
+          <!-- Find Vehicle Content -->
+          <div class="find-vehicle-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+            <h2>Find Your Nearby Transport Vehicle</h2>
+            <p>Search for available vehicles according to your need in your area and get information about the vehicle</p>
+            <!-- Find Vehicle Button -->
+            <button class="find-vehicle-btn" onclick="window.location.href = 'vehicles.html'"><i class="fas fa-search"></i> Find Vehicle</button>
+          </div>
+          <!-- Find Vehicle Image -->
+          <div class="find-vehicle-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="200">
+            <video autoplay loop muted playsinline class="find-vehicle-video">
+              <source src="attached_assets/animation/Animation - 1741161878467.webm" type="video/webm">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Platform Description Section -->
+    <div class="platform-description">
+      <div class="description-container">
+        <div class="platform-heading" data-aos="fade-down" data-aos-duration="800">
+          <img src="attached_assets\animation\Aapka-Apna-Transport-Network-t-unscreen.gif" alt="Truck Animation" class="heading-animation">
+          <h2>Herapheri Goods – Aapka Apna Transport Network!</h2>
+        </div>
+        <p class="main-description" data-aos="fade-up" data-aos-duration="800">Do you need transportation for your goods, want to send items, or require any kind of delivery service? Herapheri Goods is a free listing platform that directly connects transport vehicle owners with customers—without any third-party commissions!</p>
+        
+        <div class="features-section" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
+          <h3>🏆 Why Choose Herapheri Goods?</h3>
+          <div class="features-grid">
+            <div class="feature-item" data-aos="fade-up" data-aos-delay="300">
+              <i class="fas fa-handshake"></i>
+              <p>Direct Connection with Transport Owners – No brokers or middlemen! You can directly contact to trusted truck, mini truck, auto, e-rickshaw, JCB, crane owners, and other transport vehicles in your area.</p>
+            </div>
+            <div class="feature-item" data-aos="fade-up" data-aos-delay="400">
+              <i class="fas fa-truck-loading"></i>
+              <p>All Types of Transport Vehicles Available – From small deliveries to heavy-duty shifting, we have solutions for all types of commercial and personal goods transport. "Truck, Auto, Crane, Packers & Movers, and more – Everything You Need is Here!"</p>
+            </div>
+            <div class="feature-item" data-aos="fade-up" data-aos-delay="500">
+              <i class="fas fa-bolt"></i>
+              <p>Fast & Hassle-Free Process – Simply search for the vehicle you need, contact the owner, and finalize the best deal. No extra charges!</p>
+            </div>
+            <div class="feature-item" data-aos="fade-up" data-aos-delay="600">
+              <i class="fas fa-percentage"></i>
+              <p>No Hidden Fees, No Commission – Your connection is direct with the vehicle owner, so you get the best price and service.</p>
+            </div>
+            <div class="feature-item" data-aos="fade-up" data-aos-delay="700">
+              <i class="fas fa-list"></i>
+              <p>Free Listing for Transport Owners – If you own a truck, mini truck, crane, other transport vehicles you can list your vehicle for free and reach to more new customers.</p>
+            </div>
+            <div class="feature-item" data-aos="fade-up" data-aos-delay="800">
+              <i class="fas fa-chart-line"></i>
+              <p>Paid Listing Feature – Transport vehicle owners can promote their listing to reach more customers and increase their income.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="how-it-works" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
+          <h3>🚛 How Herapheri Goods Works?</h3>
+          <div class="steps-grid">
+            <div class="step-item" data-aos="fade-up" data-aos-delay="500">
+              <div class="step-number">1️⃣</div>
+              <p>Customers – Choose the vehicle category according to your transportation requirement and see the available options.</p>
+            </div>
+            <div class="step-item" data-aos="fade-up" data-aos-delay="600">
+              <div class="step-number">2️⃣</div>
+              <p>Direct Contact – Contact any transport vehicle owner directly and discuss your requirements.</p>
+            </div>
+            <div class="step-item" data-aos="fade-up" data-aos-delay="700">
+              <div class="step-number">3️⃣</div>
+              <p>Best Deal Finalize – Choose the best service according to your budget and requirements—no middleman!</p>
+            </div>
+            <div class="step-item" data-aos="fade-up" data-aos-delay="800">
+              <div class="step-number">4️⃣</div>
+              <p>Transport as soon as possible! "Zaroorat Ho Jaha, Herapheri Ho Waha!" </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-section" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
+          <p>If you are a transport vehicle owner, list your vehicle for free and reach to more new customers! 📢</p>
+          <p class="highlight">Now transportation is easy, cheap, and stress-free!</p>
+          <p class="tagline">👉 Herapheri Goods – Where there's need arise, Herapheri surprise!</p>
+        </div>
+
+        <!-- Vehicle Categories Section with Flip Cards -->
+        <div class="vehicle-categories-section">
+          <h2 class="section-title">Our Vehicle Categories</h2>
+          <div class="flip-cards-container">
+            <!-- First row of flip cards -->
+            <div class="flip-cards-row">
+              <!-- Flip Card 1 -->
+              <div class="flip-card" data-category="small">
+                <div class="flip-card-inner">
+                  <div class="flip-card-front">
+                    <div class="image-container">
+                      <img src="attached_assets/vehicle category/tata ace.webp" alt="Small Commercial Vehicles">
+                      <img src="attached_assets/vehicle category/cng loader.webp" alt="Small Commercial Vehicles" class="active">
+                      <img src="attached_assets/vehicle category/e-rickshaw tirri.webp" alt="Small Commercial Vehicles">
+                      <img src="attached_assets/vehicle category/vikram.webp" alt="Small Commercial Vehicles">
+                    </div>
+                    <h3>Small Commercial Vehicles</h3>
+                  </div>
+                  <div class="flip-card-back">
+                    <h3>Small Commercial Vehicles</h3>
+                    <p>Perfect for city deliveries and small cargo transport</p>
+                    <a href="#" class="card-btn" data-category="small">View Vehicles</a>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Flip Card 2 -->
+              <div class="flip-card" data-category="medium">
+                <div class="flip-card-inner">
+                  <div class="flip-card-front">
+                    <div class="image-container">
+                      <img src="attached_assets/vehicle category/canter.webp"alt="Medium Commercial Vehicles" class="active">
+                      <img src="attached_assets/vehicle category/pickup.webp" alt="Medium Commercial Vehicles">
+                      <img src="attached_assets/vehicle category/maxx.webp" alt="Medium Commercial Vehicles">
+                    </div>
+                    <h3>Medium Commercial Vehicles</h3>
+                  </div>
+                  <div class="flip-card-back">
+                    <h3>Medium Commercial Vehicles</h3>
+                    <p>Ideal for intercity transport and medium-sized loads</p>
+                    <a href="#" class="card-btn" data-category="medium">View Vehicles</a>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Flip Card 3 -->
+              <div class="flip-card" data-category="heavy">
+                <div class="flip-card-inner">
+                  <div class="flip-card-front">
+                    <div class="image-container">
+                      <img src="attached_assets/vehicle category/14 wheeler.webp" alt="Heavy Commercial Vehicles" class="active">
+                      <img src="attached_assets/vehicle category/container truck.webp" alt="Heavy Commercial Vehicles">
+                      <img src="attached_assets/vehicle category/closed body truck.webp" alt="Heavy Commercial Vehicles">
+                      <img src="attached_assets/vehicle category/container truck 2.webp" alt="Heavy Commercial Vehicles">
+                      <img src="attached_assets/vehicle category/dumper.webp" alt="Heavy Commercial Vehicles">
+                      <img src="attached_assets/vehicle category/flatbed.webp" alt="Heavy Commercial Vehicles">
+                      
+                    </div>
+                    <h3>Heavy Commercial Vehicles</h3>
+                  </div>
+                  <div class="flip-card-back">
+                    <h3>Heavy Commercial Vehicles</h3>
+                    <p>For long-distance transport and heavy loads</p>
+                    <a href="#" class="card-btn" data-category="heavy">View Vehicles</a>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Flip Card 4 -->
+              <div class="flip-card" data-category="special">
+                <div class="flip-card-inner">
+                  <div class="flip-card-front">
+                    <div class="image-container">
+                      <img src="attached_assets/vehicle category/crane 2.webp" alt="Special Utility Vehicles" class="active">
+                      <img src="attached_assets/vehicle category/JCB.webp" alt="Special Utility Vehicles">
+                      <img src="attached_assets/vehicle category/dumper truck.webp" alt="Special Utility Vehicles">
+                      <img src="attached_assets/vehicle category/garbage truck 1.webp" alt="Special Utility Vehicles">
+                      <img src="attached_assets/vehicle category/waste collector.webp" alt="Special Utility Vehicles">
+                    </div>
+                    <h3>Special Utility Vehicles</h3>
+                  </div>
+                  <div class="flip-card-back">
+                    <h3>Special Utility Vehicles</h3>
+                    <p>Specialized vehicles for specific transport needs</p>
+                    <a href="#" class="card-btn" data-category="special">View Vehicles</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Second row of flip cards -->
+            <div class="flip-cards-row">
+              <!-- Flip Card 5 -->
+              <div class="flip-card" data-category="packers">
+                <div class="flip-card-inner">
+                  <div class="flip-card-front">
+                    <div class="image-container">
+                      <img src="attached_assets/vehicle category/ac truck.webp" alt="AC Transport" class="active">
+                      <img src="attached_assets/vehicle category/AC truck 2.webp" alt="AC Transport">
+                      <img src="attached_assets/vehicle category/refrigerated van.webp" alt="AC Transport">
+                    </div>
+                    <h3>Refrigerated & AC Transport </h3>
+                  </div>
+                  <div class="flip-card-back">
+                    <h3>Refrigerated & AC Transport </h3>
+                    <p>Transport of food, beverages, ice-creams and other perishable goods</p>
+                    <a href="#" class="card-btn" data-category="packers">View Services</a>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Flip Card 6 -->
+              <div class="flip-card" data-category="delivery">
+                <div class="flip-card-inner">
+                  <div class="flip-card-front">
+                    <div class="image-container">
+                      <img src="attached_assets/vehicle category/delievery.webp" alt="Delivery Services" class="active">
+                      <img src="attached_assets/vehicle category/packers and movers.webp" alt="Delivery Services">
+                    </div>
+                    <h3>Delivery Services</h3>
+                  </div>
+                  <div class="flip-card-back">
+                    <h3>Delivery Services</h3>
+                    <p>Fast and reliable delivery solutions for your goods</p>
+                    <a href="#" class="card-btn" data-category="delivery">View Services</a>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Flip Card 7 -->
+              <div class="flip-card" data-category="food">
+                <div class="flip-card-inner">
+                  <div class="flip-card-front">
+                    <div class="image-container">
+                          <img src="attached_assets/vehicle category/drink truck.webp" alt="Food & Beverage Vehicles" class="active">
+                      <img src="attached_assets/vehicle category/food truck 2.webp" alt="Food & Beverage Vehicles">
+                      <img src="attached_assets/vehicle category/food truck 3.webp" alt="Food & Beverage Vehicles">
+                    </div>
+                    <h3>Food & Beverage Vehicles</h3>
+                  </div>
+                  <div class="flip-card-back">
+                    <h3>Food & Beverage Vehicles</h3>
+                    <p>Mobile food and beverage services for events and locations</p>
+                    <a href="#" class="card-btn" data-category="food">View Services</a>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Flip Card 8 -->
+              <div class="flip-card" data-category="emergency">
+                <div class="flip-card-inner">
+                  <div class="flip-card-front">
+                    <div class="image-container">
+                      <img src="attached_assets/vehicle category/ambulance 3.webp" alt="Emergency Vehicles" class="active">
+                      <img src="attached_assets/vehicle category/ambulance2.webp" alt="Emergency Vehicles">
+                      <img src="attached_assets/vehicle category/tow truck.webp" alt="Emergency Vehicles">
+                    </div>
+                    <h3>Emergency Vehicles</h3>
+                  </div>
+                  <div class="flip-card-back">
+                    <h3>Emergency Vehicles</h3>
+                    <p>Ambulances, tow trucks, and other emergency response vehicles</p>
+                    <a href="#" class="card-btn" data-category="emergency">View Services</a>
+                  </div>
+          </div>
+          </div>
+          </div>
+          </div>
+        </div>
+    </div>
+
+    <!-- Review Slide Bar -->
+    <div class="review-sidebar">
+      <button class="review-toggle" title="Want your experience to be part of our public reviews? Just tell us your name and address!">
+        <i class="fas fa-star"></i>
+        <span>Rate Us</span>
+      </button>
+      
+      <div class="review-content">
+        <h3>Rate Your Experience</h3>
+        <div class="rating-container">
+          <div class="stars">
+            <i class="fas fa-star" data-rating="1"></i>
+            <i class="fas fa-star" data-rating="2"></i>
+            <i class="fas fa-star" data-rating="3"></i>
+            <i class="fas fa-star" data-rating="4"></i>
+            <i class="fas fa-star" data-rating="5"></i>
+          </div>
+          <div class="rating-text">Click to rate</div>
+        </div>
+
+        <div class="rating-descriptions">
+          <div class="rating-desc" data-rating="1">
+            <h4>Poor 😞</h4>
+            <p>We're sorry about your experience. Please let us know how we can improve.</p>
+          </div>
+          <div class="rating-desc" data-rating="2">
+            <h4>Fair 😐</h4>
+            <p>Thanks for your feedback. We'll work on making things better.</p>
+          </div>
+          <div class="rating-desc" data-rating="3">
+            <h4>Good 🙂</h4>
+            <p>Thanks! We're glad you had a decent experience.</p>
+          </div>
+          <div class="rating-desc" data-rating="4">
+            <h4>Very Good 😊</h4>
+            <p>Great! We're happy you enjoyed our service.</p>
+          </div>
+          <div class="rating-desc" data-rating="5">
+            <h4>Excellent 🤩</h4>
+            <p>Awesome! Thank you for your amazing feedback!</p>
+          </div>
+        </div>
+
+        <div class="review-form">
+          <textarea placeholder="Share your experience (optional)...."></textarea>
+          <p style="font-size: 12px; color: #ffa500; margin-top: 5px;">Your feedback matters! For Making our website more user friendly</p>
+          <!-- reCAPTCHA v2 Checkbox for Rate Us -->
+          <div style="margin:8px 0;">
+            <div class="g-recaptcha" data-sitekey="6LfyB6grAAAAAGS2q6vTIGLH0I0FGPbxEYdGdAMH"></div>
+          </div>
+          <button class="submit-review">Submit Review</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Info Modal for Non-Signed-In Users -->
+    <div id="userInfoModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h3>Please Share Your Details</h3>
+        <p>We value honest voices. Add your name and city to let your feedback inspire others.</p>
+        <div class="user-info-form">
+          <div class="form-group">
+            <label for="userName">Your Name</label>
+            <input type="text" id="userName" placeholder="Enter your name">
+          </div>
+          <div class="form-group">
+            <label for="userAddress">Your Address(*City)</label>
+            <input type="text" id="userAddress" placeholder="Enter your address">
+          </div>
+          <button id="submitUserInfo">Submit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+      <div class="modal-content success-content">
+        <span class="close-modal">&times;</span>
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h3>Thank You!</h3>
+        <p>We only use this info to display your review. Nothing else, promise!</p>
+        <button id="okButton">OK</button>
+      </div>
+    </div>
+
+    <!-- Social Share Drawer -->
+    <div class="share-drawer">
+      <button class="share-toggle">
+        <i class="fas fa-share-alt"></i>
+      </button>
+      
+      <div class="share-content">
+        <div class="social-bar">
+          <div class="social-icons">
+            <a href="https://wa.me/?text=Check%20out%20Herapheri%20Goods%20-%20Your%20one-stop%20platform%20for%20finding%20reliable%20transport%20vehicle%20owners!%20No%20middlemen,%20no%20extra%20charges.%20Visit%20https://herapherigoods.in" target="_blank" class="whatsapp">
+              <i class="fab fa-whatsapp"></i>
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://herapherigoods.in&quote=Herapheri%20Goods%20-%20Find%20reliable%20transport%20vehicle%20owners%20directly!" target="_blank" class="facebook">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="email" onclick="shareViaEmail(event)">
+              <i class="fas fa-envelope"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+    
+    <!-- Feedback Carousel Section -->
+    <section class="feedback-carousel-section">
+      <div class="section-heading">
+        <h2>What Our Users Say</h2>
+        <p>See what people are saying after using our platform for their transport needs.</p>
+      </div>
+      
+      <div class="feedback-carousel-container">
+        <div class="feedback-carousel" id="feedbackCarousel">
+          <!-- Feedback cards will be populated dynamically via JavaScript -->
+          <!-- Loading placeholder -->
+          <div class="feedback-card loading">
+            <div class="loading-animation"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Vehicle Owner Feedback Carousel Section -->
+    <section class="vehicle-owner-feedback-section">
+      <div class="section-heading">
+        <h2>What Our Vehicle Owners Say</h2>
+        <p>Hear from transport providers who have registered their vehicles on our platform.</p>
+      </div>
+      
+      <div class="vehicle-owner-carousel-container">
+        <div class="vehicle-owner-carousel" id="vehicleOwnerCarousel">
+          <!-- Vehicle owner feedback cards will be populated dynamically via JavaScript -->
+          <!-- Loading placeholder -->
+          <div class="feedback-card loading">
+            <div class="loading-animation"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- JavaScript File -->
+    <script src="env.js"></script>
+    <script src="seo.js"></script>
+    <script src="script.js"></script>
+    <!-- Feedback Carousel JavaScript - Load this after env.js and script.js -->
+    <script src="feedback-carousel.js"></script>
+    <!-- Vehicle Owner Carousel JavaScript - Load this after feedback-carousel.js -->
+    <script src="vehicle-owner-carousel.js"></script>
+    <!-- No Supabase Configuration needed -->
+    <!-- AI Assistant JavaScript and CSS -->
+    <link rel="stylesheet" href="ai-assistant.css">
+    <script src="ai-assistant.js"></script>
+
+
+<!-- Footer Section -->
+<footer class="footer">
+    <div class="footer-content">
+        <!-- About Us Column -->
+        <div class="footer-column">
+            <h3>About Us</h3>
+            <div class="about-content">
+                <p class="about-text">Welcome to Herapheri Goods, your one-stop platform for finding reliable transport vehicle owners across various locations. Whether you need a truck, mini truck, auto, e-rickshaw, JCB, or crane, we connect you directly with the right vehicle owners—no middlemen, no extra charges!</p>
+                <p class="about-text-more">Our mission is to make transportation hassle-free by providing authentic listings of vehicle owners, so you can contact them directly for your shifting, construction, or logistics needs. As we grow, we aim to expand our reach to more cities and offer additional services to make the process even smoother. Join us in building a trusted network of transport solutions!</p>
+            </div>
+            <button class="show-more-btn">Show More</button>
+            <!-- <div class="social-links">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div> -->
+        </div>
+
+        <!-- Quick Links Column -->
+        <div class="footer-column">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="#" class="scroll-to-top"><i class="fas fa-chevron-right"></i> Home</a></li>
+                <li><a href="#registration-section" class="scroll-link"><i class="fas fa-chevron-right"></i> Register your Transport Vehicle</a></li>
+                <li><a href="#find-vehicle-section" class="scroll-link"><i class="fas fa-chevron-right"></i> Find Vehicle</a></li>
+                <li><a href="privacy-policy"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+                <li><a href="terms-and-condition"><i class="fas fa-chevron-right"></i> Terms & Conditions</a></li>
+                <li><a href="refer-and-refund-policy"><i class="fas fa-chevron-right"></i> Refer & Earn and Refund Policy</a></li>
+            </ul>
+        </div>
+
+        <!-- Contact Column -->
+        <div class="footer-column">
+            <h3>Contact</h3>
+            <ul class="contact-info">
+                <li>
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Fatehabad(Agra), Uttar Pradesh, India</span>
+                </li>
+                <li>
+                    <i class="fas fa-phone"></i>
+                    <span>+91 9411292852</span>
+                </li>
+                <li>
+                    <i class="fas fa-envelope"></i>
+                    <span class="email-link" onclick="openGmail('info@herapherigoods.in')" style="text-decoration: none; color: inherit;" onmouseover="this.style.textDecoration='underline'; this.style.color='white';" onmouseout="this.style.textDecoration='none'; this.style.color='inherit';">info@herapherigoods.in</span>
+                </li>
+                <li>
+                    <i class="fas fa-clock"></i>
+                    <span>Mon - Sat: 9:00 AM - 8:00 PM</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Our Services Column -->
+        <div class="footer-column">
+            <h3>Our Services</h3>
+                <p>Transport Vehicle Listings <img src="attached_assets/animation/transport vehicle listing.gif" alt="Transport Listings" class="service-icon" style="display: inline;"></p>
+                <p>Direct Contact with Owners of Transport Vehicles <img src="attached_assets/animation/Direct Contact with Owners.gif" alt="Direct Contact" class="service-icon" style="display: inline;"></p>
+                <p>Search & Filter Options <img src="attached_assets/animation/Search & Filter Options.gif" alt="Search & Filter" class="service-icon" style="display: inline;"></p>
+        </div>
+
+        <!-- Follow Us Column (last in the row) -->
+        <div class="footer-column">
+            <h3>Follow Us</h3>
+            <div class="social-follow" aria-label="Follow Herapheri Goods on social media">
+                <a class="btn-social yt" href="https://youtube.com/@abhishekjha9870-k6b?si=K2n8Xz_COSUdRCg0" target="_blank" rel="noopener" title="YouTube">
+                    <i class="fab fa-youtube"></i>
+                </a>
+                <a class="btn-social wa" href="https://chat.whatsapp.com/LMUfgwk7qwOCh7p4Gxy0tc" target="_blank" rel="noopener" title="WhatsApp Group">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+                <a class="btn-social fb" href="https://www.facebook.com/share/1BQ8hdGTNo/" target="_blank" rel="noopener" title="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copyright Bar -->
+    <div class="footer-bottom">
+        <p>&copy; 2025 Herapheri Goods. All rights reserved.</p>
+    </div>
+</footer>
+
+    <!-- Google reCAPTCHA v2 -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <!-- Add Auth JS at the end of the body -->
+<script>
+    // Function to open email compose, preferring Gmail app on mobile
+    function openGmail(email) {
+        const subject = 'Inquiry from Herapheri Goods Website';
+        const body = 'Hello,\n\nI would like to get in touch regarding your services.\n\nBest regards,\n[Your Name]';
+        const isAndroid = /Android/i.test(navigator.userAgent);
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const mailtoUrl = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        const gmailWeb = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+        // Try Gmail app deep links first
+        if (isAndroid) {
+            // Android intent to Gmail app
+            const intentUrl = `intent://compose?to=${encodeURIComponent(email)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}#Intent;scheme=mailto;package=com.google.android.gm;end`;
+            // Attempt to open Gmail app
+            window.location.href = intentUrl;
+            // Fallbacks after a short delay
+            setTimeout(() => {
+                window.location.href = mailtoUrl;
+                setTimeout(() => {
+                    window.open(gmailWeb, '_blank');
+                }, 400);
+            }, 400);
+            return;
+        }
+        if (isIOS) {
+            // iOS Gmail URL scheme
+            const gmailIOS = `googlegmail://co?to=${encodeURIComponent(email)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            // Try Gmail app first
+            window.location.href = gmailIOS;
+            // Fallbacks
+            setTimeout(() => {
+                window.location.href = mailtoUrl;
+                setTimeout(() => {
+                    window.open(gmailWeb, '_blank');
+                }, 400);
+            }, 400);
+            return;
+        }
+        // Desktop: prefer mailto, fallback to Gmail web
+        const a = document.createElement('a');
+        a.href = mailtoUrl;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            window.open(gmailWeb, '_blank');
+            document.body.removeChild(a);
+        }, 400);
+    }
+    
+    // Function to share via email (works on all devices)
+    function shareViaEmail(event) {
+        event.preventDefault();
+        
+        const subject = 'Check out Herapheri Goods';
+        const body = `Hi! I found this great platform for finding transport vehicles - Herapheri Goods.
+        
+No middlemen, no extra charges. Visit https://herapherigoods.in
+
+Best regards,
+[Your Name]`;
+        
+        // Try multiple email sharing methods
+        try {
+            // Method 1: Try mailto first (works on desktop with email clients)
+            const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Method 2: Try Gmail web (works on mobile and desktop)
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Method 3: Try Outlook web (alternative)
+            const outlookUrl = `https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Check if we're on mobile
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // On mobile, prefer app via openGmail helper
+                openGmail('');
+            } else {
+                // On desktop, try mailto first, fallback to Gmail web
+                const mailtoLink = document.createElement('a');
+                mailtoLink.href = mailtoUrl;
+                mailtoLink.click();
+                
+                // Fallback: if mailto doesn't work, open Gmail web after a short delay
+                setTimeout(() => {
+                    window.open(gmailUrl, '_blank');
+                }, 500);
+            }
+            
+        } catch (error) {
+            console.error('Email sharing failed:', error);
+            // Fallback: always open Gmail web
+            window.open(gmailUrl, '_blank');
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Smart URL conversion - automatically adds .html for local development
+        if (typeof window.buildUrl === 'function') {
+            // Convert all internal links to use smart URLs
+            const links = document.querySelectorAll('a[href^="vehicles"], a[href^="login"], a[href^="register"], a[href^="driver-dashboard"], a[href^="contact-us"], a[href^="privacy-policy"], a[href^="terms-and-condition"], a[href^="refer-and-refund-policy"], a[href^="posts"]');
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && !href.includes('?')) {
+                    // For links without query parameters, just convert the base path
+                    const path = href.split('?')[0];
+                    link.href = window.buildUrl(path) + (href.includes('?') ? href.substring(href.indexOf('?')) : '');
+                } else if (href && href.includes('?')) {
+                    // For links with query parameters, convert the base path and keep the query
+                    const path = href.split('?')[0];
+                    const query = href.substring(href.indexOf('?'));
+                    link.href = window.buildUrl(path) + query;
+                }
+            });
+            
+            // Convert JavaScript redirects
+            const scripts = document.querySelectorAll('script');
+            scripts.forEach(script => {
+                if (script.textContent.includes('window.location.href')) {
+                    script.textContent = script.textContent.replace(
+                        /window\.location\.href\s*=\s*['"`]([^'"`]+)['"`]/g,
+                        (match, url) => {
+                            if (url && !url.startsWith('http') && !url.startsWith('#') && !url.startsWith('mailto:')) {
+                                return `window.location.href = '${window.buildUrl(url)}'`;
+                            }
+                            return match;
+                        }
+                    );
+                }
+            });
+        }
+        
+        // Check if user is logged in
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        const authSection = document.getElementById('authSection');
+        
+        // Only show profile icon if user is logged in
+        if (isLoggedIn) {
+            authSection.style.display = 'block';
+        }
+        
+        // Add logout functionality (can be called from other places)
+        window.logoutUser = function() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userPhone');
+            window.location.href = window.buildUrl ? window.buildUrl('index') : 'index';
+        };
+        
+        // Handle register button click
+        const registerNowBtn = document.getElementById('registerNowBtn');
+        if (registerNowBtn) {
+            registerNowBtn.addEventListener('click', function() {
+                // Check if user is logged in
+                const userLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+                if (userLoggedIn) {
+                    // If logged in, go directly to register
+                    window.location.href = window.buildUrl ? window.buildUrl('register') : 'register';
+                } else {
+                    // If not logged in, go to login and auto-open signup
+                    const target = window.buildUrl ? window.buildUrl('login') : 'login';
+                    window.location.href = `${target}?signup=1`;
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
+

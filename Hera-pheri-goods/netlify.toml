@@ -1,0 +1,148 @@
+[build]
+  publish = "Hera-pheri-goods"
+
+[build.processing]
+  skip_processing = false
+
+[build.processing.html]
+  pretty_urls = true
+
+# Prefer static pages for these exact paths (place BEFORE any SSR rewrites)
+[[redirects]]
+  from = "/register"
+  to = "/register.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/register/"
+  to = "/register.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/vehicles"
+  to = "/vehicles.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/vehicles/"
+  to = "/vehicles.html"
+  status = 200
+  force = true
+
+# Backend SSR rewrites for SEO discovery
+# Serve sitemap statically from Netlify (no proxy)
+
+[[redirects]]
+  from = "/vehicles/*"
+  to = "https://api.herapherigoods.in/vehicles/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/register/*"
+  to = "https://api.herapherigoods.in/register/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/city/*"
+  to = "https://api.herapherigoods.in/city/:splat"
+  status = 200
+  force = true
+
+# Keep homepage on Netlify (do not proxy "/" to backend)
+
+# Clean URLs without .html extensions (200 = success, no redirect)
+[[redirects]]
+  from = "/login"
+  to = "/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/register"
+  to = "/register.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/vehicles"
+  to = "/vehicles.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/driver-dashboard"
+  to = "/driver-dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/contact-us"
+  to = "/contact-us.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy-policy"
+  to = "/privacy-policy.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms-and-conditions"
+  to = "/terms-and-condition.html"
+  status = 200
+
+[[redirects]]
+  from = "/refer-and-refund-policy"
+  to = "/refer-and-refund-policy.html"
+  status = 200
+
+# Redirect .html extensions to clean URLs (301 = permanent redirect)
+[[redirects]]
+  from = "/login.html"
+  to = "/login"
+  status = 301
+
+[[redirects]]
+  from = "/register.html"
+  to = "/register"
+  status = 301
+
+[[redirects]]
+  from = "/vehicles.html"
+  to = "/vehicles"
+  status = 301
+
+[[redirects]]
+  from = "/driver-dashboard.html"
+  to = "/driver-dashboard"
+  status = 301
+
+[[redirects]]
+  from = "/contact-us.html"
+  to = "/contact-us"
+  status = 301
+
+[[redirects]]
+  from = "/privacy-policy.html"
+  to = "/privacy-policy"
+  status = 301
+
+[[redirects]]
+  from = "/terms-and-condition.html"
+  to = "/terms-and-conditions"
+  status = 301
+
+[[redirects]]
+  from = "/refer-and-refund-policy.html"
+  to = "/refer-and-refund-policy"
+  status = 301
+
+# SPA fallback redirect (must be last)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+

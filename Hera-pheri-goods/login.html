@@ -1,0 +1,240 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="robots" content="noindex,nofollow">
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V9X30VY879"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-V9X30VY879');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login/Signup - Herapheri Goods</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+
+ <!-- Favicons -->
+ <link rel="icon" type="image/x-icon" href="/favicon.ico">
+ <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+ <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+ <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+ <link rel="manifest" href="site.webmanifest">
+
+
+
+    <style>
+        /* Add some styling for debugging messages if needed */
+        .debug-info {
+            display: none; /* Hidden by default */
+            margin-top: 10px;
+            padding: 5px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+        }
+        /* Simple modal styles */
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000}
+        .modal{background:#fff;border-radius:12px;max-width:480px;width:92%;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+        .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+        .modal-close{background:none;border:none;font-size:25px;cursor:pointer}
+        .pw-toggle{cursor:pointer;font-size:13px;color:#0077cc;user-select:none}
+        .otp-timer{margin-left:10px;font-size:13px;color:#666}
+        .otp-group{transition:all 0.3s ease;opacity:1;transform:translateY(0);}
+        .otp-group[style*="display: none"]{opacity:0;transform:translateY(-10px);}
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <a href="index" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div class="auth-box">
+            
+            <div class="auth-header">
+                <img src="attached_assets\images\herapheri_logo-removebg-preview.webp" alt="Herapheri Goods Logo" class="auth-logo">
+                <h2>Welcome to Herapheri Goods</h2>
+                <p>Herapheri Goods – Mile Sahi Gaadi, Bane Sahi Sauda!</p>
+                <img src="attached_assets/animation/login-page.gif" alt="Login Animation" class="login-animation" style="width: 15%; height: auto;">
+            </div>
+
+            <!-- Login Form -->
+            <div class="auth-form login-form">
+                <h3>Login</h3>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="loginContactNumber" name="contactNumber" placeholder="Contact Number" required pattern="[0-9]{10}" maxlength="10">
+                        <span class="validation-message">Please enter a valid 10-digit mobile number</span>
+                    </div>
+                    <div class="form-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" name="password" placeholder="Password (optional if using OTP)" minlength="4" autocomplete="current-password">
+                        <span class="pw-toggle" data-target="loginPassword">Show</span>
+                    </div>
+                    <button type="submit" class="auth-btn" id="loginBtn">Login</button>
+                    <div style="margin-top:8px"><a href="#" id="forgotPasswordLink">Forgot password?</a></div>
+                    <div class="debug-info" id="loginDebugInfo"></div>
+                </form>
+                <p class="auth-switch">New to Herapheri Goods? <a href="#" id="showSignup">Sign up</a></p>
+
+                
+                
+            </div> 
+
+            <!-- Signup Form -->
+            <div class="auth-form signup-form" style="display: none;">
+                <h3>Create Account</h3>
+                <form id="signupForm">
+                    <div class="form-group">
+                        <i class="fas fa-user"></i>
+                        <input 
+                            type="text" 
+                            name="fullName" 
+                            placeholder="Full Name" 
+                            required
+                            minlength="2"
+                            title="Please enter only letters"
+                        >
+                        <span class="validation-message">Please enter a valid name (only letters allowed)</span>
+                    </div>
+                    <div class="form-group">
+                        <i class="fas fa-mobile-alt"></i>
+                        <input 
+                            type="tel" 
+                            name="contactNumber"
+                            placeholder="Contact Number" 
+                            required 
+                            pattern="[0-9]{10}"
+                            maxlength="10"
+                            title="Please enter a 10-digit mobile number"
+                        >
+                        <span class="validation-message">Please enter a valid 10-digit mobile number</span>
+                    </div>
+                    <div class="form-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="email" placeholder="Email (Optional)">
+                    </div>
+                    <div class="form-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signupPassword" name="password" placeholder="Create Password (min 4 chars)" minlength="4" required autocomplete="new-password">
+                        <span class="pw-toggle" data-target="signupPassword">Show</span>
+                    </div>
+                    <div class="form-group otp-group" style="display: none;">
+                        <i class="fas fa-key"></i>
+                        <input type="text" placeholder="Enter OTP" maxlength="4" pattern="[0-9]{4}">
+                        <span class="validation-message">Please enter a valid 4-digit OTP</span>
+                    </div>
+                    <div class="form-group terms">
+                        <input type="checkbox" id="terms1" name="terms1" required>
+                        <label for="terms1">I agree to the <a href="terms-and-condition">Terms & Conditions</a></label>
+                    </div>
+                    <div class="form-group terms">
+                        <input type="checkbox" id="terms2" name="terms2" required>
+                        <label for="terms2">I agree to the <a href="privacy-policy">Privacy Policy</a></label>
+                    </div>
+                    <!-- reCAPTCHA v2 checkbox for Signup (explicit render) -->
+                    <div style="margin:10px 0;">
+                        <div id="signupRecaptcha"></div>
+                    </div>
+                    <button type="submit" class="auth-btn" id="signupBtn">Sign up</button>
+                    <div class="debug-info" id="signupDebugInfo"></div>
+                </form>
+                <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Login Modal -->
+    <div id="otpLoginModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>OTP Login</h3>
+                <button class="modal-close" id="otpLoginClose" aria-label="Close">×</button>
+            </div>
+            <div class="form-group">
+                <i class="fas fa-phone"></i>
+                <input type="tel" id="otpLoginPhone" readonly>
+            </div>
+            <div class="form-group" id="otpLoginOtpGroup" style="display:none;">
+                <i class="fas fa-key"></i>
+                <input type="text" id="otpLoginOtp" placeholder="Enter OTP" maxlength="4" pattern="[0-9]{4}">
+                <span id="otpLoginTimer" class="otp-timer" style="display:none;"></span>
+            </div>
+            <div style="margin:10px 0;">
+                <div id="otpLoginRecaptcha"></div>
+            </div>
+            <button id="otpLoginPrimaryBtn" class="auth-btn" type="button">Get OTP</button>
+            <div id="otpLoginNewPassBlock" style="display:none; margin-top:12px;">
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="otpNewPassword" placeholder="New Password (min 4)">
+                    <span class="pw-toggle" data-target="otpNewPassword">Show</span>
+                </div>
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="otpConfirmPassword" placeholder="Confirm Password">
+                    <span class="pw-toggle" data-target="otpConfirmPassword">Show</span>
+                </div>
+                <button id="otpSetNewPasswordBtn" class="auth-btn" type="button">Set Password</button>
+            </div>
+            <div class="debug-info" id="otpLoginDebug"></div>
+        </div>
+    </div>
+
+    <!-- Google reCAPTCHA v2 explicit render -->
+    <script>
+        function onRecaptchaLoad() {
+            try {
+                window.SIGNUP_RECAPTCHA_ID = grecaptcha.render('signupRecaptcha', { sitekey: '6LfyB6grAAAAAGS2q6vTIGLH0I0FGPbxEYdGdAMH' });
+            } catch (e) { console.warn('Signup recaptcha render failed', e); }
+            try {
+                window.OTPLOGIN_RECAPTCHA_ID = grecaptcha.render('otpLoginRecaptcha', { sitekey: '6LfyB6grAAAAAGS2q6vTIGLH0I0FGPbxEYdGdAMH' });
+            } catch (e) { console.warn('OTP login recaptcha render failed', e); }
+        }
+    </script>
+    <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
+    <script src="env.js"></script>
+    <script src="auth.js"></script>
+    
+    <script>
+        // Smart URL conversion - automatically adds .html for local development
+        if (typeof window.buildUrl === 'function') {
+            // Convert all internal links to use smart URLs
+            const links = document.querySelectorAll('a[href^="terms-and-condition"], a[href^="privacy-policy"]');
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && !href.includes('?')) {
+                    // For links without query parameters, just convert the base path
+                    const path = href.split('?')[0];
+                    link.href = window.buildUrl(path) + (href.includes('?') ? href.substring(href.indexOf('?')) : '');
+                } else if (href && href.includes('?')) {
+                    // For links with query parameters, convert the base path and keep the query
+                    const path = href.split('?')[0];
+                    const query = href.substring(href.indexOf('?'));
+                    link.href = window.buildUrl(path) + query;
+                }
+            });
+        }
+        // Show signup form if signup param is present
+        (function(){
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('signup') || params.get('mode') === 'signup') {
+                const loginForm = document.querySelector('.login-form');
+                const signupForm = document.querySelector('.signup-form');
+                if (loginForm && signupForm) {
+                    loginForm.style.display = 'none';
+                    signupForm.style.display = 'block';
+                }
+            }
+        })();
+    </script>
+    
+</body>
+</html>
+

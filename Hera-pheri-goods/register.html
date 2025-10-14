@@ -1,0 +1,773 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Your Vehicle - Hera Pheri Goods</title>
+    <script>
+        (function(){
+            try {
+                var isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+                if (!isLoggedIn) {
+                    var isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+                    var loginPath = isLocal ? 'login.html' : 'login';
+                    // Hint to open signup and return to register after login
+                    window.location.replace(loginPath + '?signup=1&redirect=register');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
+ <!-- Favicons -->
+ <link rel="icon" type="image/x-icon" href="/favicon.ico">
+ <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+ <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+ <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+ <link rel="manifest" href="site.webmanifest">
+
+
+    <style>
+        .registration-form-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 25px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Photo upload box styles */
+        .photo-upload-box {
+            transition: all 0.3s ease;
+        }
+        
+        .form-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        
+        .form-title h2 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .form-title p {
+            color: #777;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        .form-group input, 
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #100f0f9e;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus, 
+        .form-group select:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        
+        .form-group input.error, 
+        .form-group select.error,
+        .form-groupregi input.error, 
+        .form-groupregi select.error {
+            border-color: #d9534f;
+            box-shadow: 0 0 5px rgba(217, 83, 79, 0.5);
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .image-upload-container {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .image-upload-container:hover {
+            border-color: #4CAF50;
+        }
+        
+        .upload-icon {
+            font-size: 40px;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+        
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preview-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .error-message {
+            color: #d9534f;
+            margin-top: 5px;
+            font-size: 14px;
+            display: block;
+            padding: 3px 0;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .toast {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .toast.error {
+            border-left: 4px solid #d32f2f;
+        }
+        
+        .toast.success {
+            border-left: 4px solid #388e3c;
+        }
+        
+        .success-message {
+            background-color: #dff0d8;
+            color: #3c763d;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        /* Fixed vehicle dropdown styles */
+        .vehicle-type-select {
+            position: relative;
+            width: 100%;
+        }
+        
+        .vehicle-select-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .vehicle-select-btn:hover {
+            border-color: #4CAF50;
+        }
+        
+        .vehicle-select-btn.error {
+            border-color: #d9534f;
+            animation: shake 0.5s;
+        }
+        
+        .vehicle-select-btn:after {
+            content: '\f107';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            margin-left: 10px;
+        }
+        
+        .vehicle-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 4px 8px #666;
+        }
+        
+        .vehicle-dropdown.show {
+            display: block;
+        }
+        
+        /* Loading overlay styles */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4CAF50;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        .loading-overlay p {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      
+        <ul class="nav-links">
+            <li><a href="index" class="nav-item"><span>Home</span></a></li>
+           
+        </ul>
+    </nav>
+
+        <div class="registration-form-container">
+        <div class="form-title">
+            <h2>List Your Vehicle</h2>
+            <p>Please fill in the details below to register or list your vehicle with us.</p>
+        </div>
+        
+        <div id="successMessage" class="success-message">
+            <i class="fas fa-check-circle"></i> Your vehicle has been registered successfully!
+        </div>
+
+        <form id="vehicleRegistrationForm" enctype="multipart/form-data">
+                <!-- Name Field -->
+                <div class="form-groupregi">
+                    <label for="name">Full Name <span class="required">*</span></label>
+                <input type="text" id="name" name="fullName" required placeholder="Enter your full name">
+                </div>
+
+                <!-- Vehicle Type Selection -->
+                <div class="form-groupregi">
+                    <label for="vehicleType">Choose Vehicle Type <span class="required">*</span></label>
+                    <div class="vehicle-type-select">
+                        <button type="button" class="vehicle-select-btn" id="vehicleSelectBtn">
+                            <span>Select Vehicle Type</span>
+                        </button>
+                        <div class="vehicle-dropdown">
+                            <!-- Small Commercial Vehicles Category -->
+                            <div class="vehicle-category">
+                                <h3>Small Commercial Vehicles (SCV)</h3>
+                                <div class="vehicle-options">
+                                    <label class="vehicle-option">
+                                    <input type="radio" name="vehicleType" value="Manual Cart (Thel / Rickshaw)">
+                                    <img src="attached_assets/images/manual cart (thela).webp" alt="Manual Cart (Thela)" class="vehicle-icon">
+                                        <span>Manual Cart (Thela)</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                    <input type="radio" name="vehicleType" value="Auto Loader (CNG loader)">
+                                    <img src="attached_assets/images/Auto Loader(CNG loader).webp" alt="Auto Loader" class="vehicle-icon">
+                                        <span>Auto Loader (CNG loader)</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                    <input type="radio" name="vehicleType" value="Tata Ace (Chhota Hathi)">
+                                    <img src="attached_assets/images/Tata Ace (Chhota Hathi).webp" alt="Tata Ace" class="vehicle-icon">
+                                        <span>Tata Ace (Chhota Hathi)</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                    <input type="radio" name="vehicleType" value="E-Rickshaw Loader (Tuk-Tuk)">
+                                    <img src="attached_assets/images/e-ricksahw (tuk-tuk).webp" alt="E-Rickshaw" class="vehicle-icon">
+                                        <span>E-Rickshaw Loader (Tuk-Tuk)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Light Commercial Vehicles Category -->
+                            <div class="vehicle-category">
+                                <h3> Light Commercial Vehicles (LCV)</h3>
+                                <div class="vehicle-options">
+                                    <label class="vehicle-option">
+                                    <input type="radio" name="vehicleType" value="Mini Truck (Eicher Canter)">
+                                    <img src="attached_assets/images/mini truck (Eicher Canter).webp" alt="Mini Truck" class="vehicle-icon">
+                                        <span>Mini Truck (Eicher Canter)</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Vikram Tempo">
+                                    <img src="attached_assets/images/vikram tempo.webp" alt="Vikram Tempo" class="vehicle-icon">
+                                        <span>Vikram Tempo</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                    <input type="radio" name="vehicleType" value="Bolero Pickup (MaXX)">
+                                    <img src="attached_assets/images/bolero pickup-truck.webp" alt="Bolero Pickup" class="vehicle-icon">
+                                        <span>Bolero Pickup (MaXX)</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Tata 407">
+                                    <img src="attached_assets/images/tata 407.webp" alt="Tata 407" class="vehicle-icon">
+                                        <span>Tata 407</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                    <input type="radio" name="vehicleType" value="6 wheeler">
+                                    <img src="attached_assets/images/6 wheeler.webp" alt="6 Wheeler" class="vehicle-icon">
+                                        <span>6 wheeler</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Medium & Heavy Commercial Vehicles Category -->
+                            <div class="vehicle-category">
+                                <h3> Medium & Heavy Commercial Vehicles (MHCV & HCV)</h3>
+                                <div class="vehicle-options">
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Container Truck">
+                                    <img src="attached_assets/images/container truck.webp" alt="Container Truck" class="vehicle-icon">
+                                        <span>Container Truck</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                    <input type="radio" name="vehicleType" value="Open Body Truck (6 wheeler)">
+                                    <img src="attached_assets/images/open body truck.webp" alt="Open Body Truck" class="vehicle-icon">
+                                        <span>Open Body Truck (6 wheeler)</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Closed Body Truck">
+                                        <img src="attached_assets/images/closed body truck.webp" alt="Closed Body Truck" class="vehicle-icon">
+                                        <span>Closed Body Truck</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Flatbed Truck">
+                                    <img src="attached_assets/images/flat-bed-truck.webp" alt="Flatbed Truck" class="vehicle-icon">
+                                        <span>Flatbed Truck</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                    <input type="radio" name="vehicleType" value="8 wheeler">
+                                    <img src="attached_assets/images/8 wheeler.webp" alt="8 Wheeler" class="vehicle-icon">
+                                        <span>8 wheeler</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                    <input type="radio" name="vehicleType" value="12 wheeler and onwards">
+                                    <img src="attached_assets/images/12 wheeler and onwards.webp" alt="12 Wheeler" class="vehicle-icon">
+                                        <span>12 wheeler and onwards</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Special Utility Vehicles Category -->
+                            <div class="vehicle-category">
+                                <h3>Special Utility Vehicles (SUV)</h3>
+                                <div class="vehicle-options">
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="JCB">
+                                    <img src="attached_assets/images/jcb.webp" alt="JCB" class="vehicle-icon">
+                                        <span>JCB</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Crane">
+                                    <img src="attached_assets/images/crane.svg" alt="Crane" class="vehicle-icon">
+                                        <span>Crane</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Trailer Truck">
+                                    <img src="attached_assets/images/truck-trailer.svg" alt="Trailer Truck" class="vehicle-icon">
+                                        <span>Trailer Truck</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                    <input type="radio" name="vehicleType" value="Tipper Truck (Dumper Truck)">
+                                    <img src="attached_assets/images/tipper truck.webp" alt="Tipper Truck" class="vehicle-icon">
+                                        <span>Tipper Truck (Dumper Truck)</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                    <input type="radio" name="vehicleType" value="Tanker Truck">
+                                        <img src="attached_assets/images/tanker-truck.webp" alt="Tanker Truck" class="vehicle-icon">
+                                        <span>Tanker Truck</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                    <input type="radio" name="vehicleType" value="Garbage Truck">
+                                        <img src="attached_assets/images/garbage-truck.webp" alt="Garbage Truck" class="vehicle-icon">
+                                        <span>Garbage Truck</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="vehicle-category">
+                                <h3> Emergency Vehicles</h3>
+                                <div class="vehicle-options">
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Ambulance">
+                                    <img src="attached_assets/images/ambulace.webp" alt="Ambulance" class="vehicle-icon">
+                                        <span>Ambulance</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Tow-Truck">
+                                    <img src="attached_assets/images/Tow-truck.webp" alt="Tow-Truck" class="vehicle-icon">
+                                        <span>Tow-Truck</span>
+                                    </label>
+                            </div>
+                            </div>
+                            <div class="vehicle-category">
+                                <h3>Refrigerated & AC vehciles</h3>
+                                <div class="vehicle-options">
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Refrigerated Vans">
+                                    <img src="attached_assets/images/refrigerator vans.webp" alt="Refrigerated Vans" class="vehicle-icon">
+                                        <span>Refrigerated Vans</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Refrigerated Trucks">
+                                    <img src="attached_assets/images/refrigerated trucks.webp" alt="Refrigerated Trucks" class="vehicle-icon">
+                                        <span>Refrigerated Trucks</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="vehicle-category">
+                                <h3>Service-Based Vehicles</h3>
+                                <div class="vehicle-options">
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Packer&Movers">
+                                        <img src="attached_assets/images/Packers.webp" alt="Packer&Movers" class="vehicle-icon">
+                                        <span>Packer&Movers</span> <img src="attached_assets/images/movers.webp" alt="Packer&Movers" class="vehicle-icon">
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Parcel Delivery">
+                                        <img src="attached_assets/images/delivery-man.webp" alt="Parcel Delivery" class="vehicle-icon">
+                                        <span>Parcel Delivery</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="vehicle-category">
+                                <h3>Food & Beverage Vehicles</h3>
+                                <div class="vehicle-options">
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Food trucks">
+                                        <img src="attached_assets/images/food-truck.webp" alt="Food trucks" class="vehicle-icon">
+                                        <span>Food trucks</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Drink trucks">
+                                        <img src="attached_assets/images/drink-truck.webp" alt="Drink trucks" class="vehicle-icon">
+                                        <span>Drink trucks</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vehicle Photo Upload -->
+                <div class="form-groupregi">
+                <label for="vehiclePhotos">Vehicle Photos (Upload exactly 4 photos) <span class="required">*</span></label>
+                <div class="photo-instructions">
+                    <p><i class="fas fa-info-circle"></i> Please upload 4 photos of your vehicle from different angles</p>
+                </div>
+                
+                <div class="vehicle-photos-container">
+                    <!-- Front View Upload -->
+                    <div class="photo-upload-box" data-view="front">
+                        <div class="photo-preview"></div>
+                        <div class="photo-label">Front View</div>
+                        <div class="photo-actions">
+                            <button type="button" class="photo-upload-btn">
+                                <i class="fas fa-camera"></i> Upload
+                            </button>
+                            <button type="button" class="photo-remove-btn" style="display: none;">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Side View Upload -->
+                    <div class="photo-upload-box" data-view="side">
+                        <div class="photo-preview"></div>
+                        <div class="photo-label">Side View</div>
+                        <div class="photo-actions">
+                            <button type="button" class="photo-upload-btn">
+                                <i class="fas fa-camera"></i> Upload
+                            </button>
+                            <button type="button" class="photo-remove-btn" style="display: none;">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Back View Upload -->
+                    <div class="photo-upload-box" data-view="back">
+                        <div class="photo-preview"></div>
+                        <div class="photo-label">Back View</div>
+                        <div class="photo-actions">
+                            <button type="button" class="photo-upload-btn">
+                                <i class="fas fa-camera"></i> Upload
+                            </button>
+                            <button type="button" class="photo-remove-btn" style="display: none;">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Loading Area Upload -->
+                    <div class="photo-upload-box" data-view="loading">
+                        <div class="photo-preview"></div>
+                        <div class="photo-label">Loading Area</div>
+                        <div class="photo-actions">
+                            <button type="button" class="photo-upload-btn">
+                                <i class="fas fa-camera"></i> Upload
+                            </button>
+                            <button type="button" class="photo-remove-btn" style="display: none;">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="photo-counter">0/4 photos uploaded</div>
+                <div class="photo-error" style="display: none; color: red;"></div>
+                
+                <!-- Hidden file inputs for each view -->
+                <input type="file" id="frontViewPhoto" name="vehicleImages" accept="image/*" hidden>
+                <input type="file" id="sideViewPhoto" name="vehicleImages" accept="image/*" hidden>
+                <input type="file" id="backViewPhoto" name="vehicleImages" accept="image/*" hidden>
+                <input type="file" id="loadingViewPhoto" name="vehicleImages" accept="image/*" hidden>
+                
+                <!-- Camera or Gallery Selection Modal -->
+                <div class="photo-upload-modal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <span class="upload-view-title">Upload Photo</span>
+                            <span class="close-modal">&times;</span>
+                        </div>
+                        <div class="modal-options">
+                            <div class="modal-option camera-option">
+                                <i class="fas fa-camera"></i>
+                                <span>Take Photo</span>
+                            </div>
+                            <div class="modal-option gallery-option">
+                                <i class="fas fa-images"></i>
+                                <span>Choose from Gallery</span>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Number -->
+                <div class="form-groupregi">
+                    <label for="contactNo">Contact Number <span class="required">*</span></label>
+                <input type="tel" id="contactNo" name="contactNumber" required pattern="[0-9]{10}" maxlength="10" placeholder="Enter your contact number">
+                </div>
+
+                <!-- WhatsApp Number -->
+                <div class="form-groupregi">
+                    <label for="whatsappNo">WhatsApp Number</label>
+                <input type="tel" id="whatsappNo" name="whatsappNumber" pattern="[0-9]{10}" maxlength="10" placeholder="Enter your WhatsApp number (optional)">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="sameAsContact">
+                        <label for="sameAsContact">Same as contact number</label>
+                    </div>
+                </div>
+
+                <div class="form-groupregi">
+                    <label for="Vehicle Number">Enter Your Vehicle Number(Ex:- MH-01-AA-0000) <span class="required">*</span></label>
+                <input type="text" id="vehicleNumber" name="vehiclePlateNumber" required placeholder="Format: XX-00-XX-0000" oninput="this.value = this.value.toUpperCase()">
+                </div>
+                <!-- Address Section -->
+                <div class="form-group address-group">
+                    <label>Address <span class="required">*</span></label>
+                    
+                    <div class="address-row">
+                    <select id="state" name="state" required>
+                        <option value="">Select State</option>
+                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                        <option value="Assam">Assam</option>
+                        <option value="Bihar">Bihar</option>
+                        <option value="Chhattisgarh">Chhattisgarh</option>
+                        <option value="Goa">Goa</option>
+                        <option value="Gujarat">Gujarat</option>
+                        <option value="Haryana">Haryana</option>
+                        <option value="Himachal Pradesh">Himachal Pradesh</option>
+                        <option value="Jharkhand">Jharkhand</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Kerala">Kerala</option>
+                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Manipur">Manipur</option>
+                        <option value="Meghalaya">Meghalaya</option>
+                        <option value="Mizoram">Mizoram</option>
+                        <option value="Nagaland">Nagaland</option>
+                        <option value="Odisha">Odisha</option>
+                        <option value="Punjab">Punjab</option>
+                        <option value="Rajasthan">Rajasthan</option>
+                        <option value="Sikkim">Sikkim</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Telangana">Telangana</option>
+                        <option value="Tripura">Tripura</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                        <option value="Uttarakhand">Uttarakhand</option>
+                        <option value="West Bengal">West Bengal</option>
+                        <option value="Delhi">Delhi</option>
+                    </select>
+                        <input type="text" id="city" name="city" required placeholder="City">
+                     </div>
+                    <div class="pincode-row">
+                        <input type="text" id="pincode" name="pincode" required maxlength="6" placeholder="Pincode">
+                        <button type="button" class="verify-pincode-btn">
+                            Verify 
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group terms">
+                    <input type="checkbox" id="terms" required>
+                    <label for="terms">I agree to the <a href="terms-and-condition">Terms & Conditions</a></label>
+                </div>
+                <div class="form-group terms">
+                <input type="checkbox" id="privacy" required>
+                <label for="privacy">I agree to the <a href="privacy-policy">Privacy Policy</a></label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-check-circle"></i>
+                    Register Vehicle
+                </button>
+            </form>
+    </div>
+
+    <!-- Celebration Overlay -->
+    <div class="celebration-overlay" id="celebrationOverlay">
+        <div class="celebration-content">
+            <h2>Registration Successful! 🎉</h2>
+            <p>Your vehicle has been registered successfully</p>
+            <div class="fireworks">
+                <div class="firework"></div>
+                <div class="firework"></div>
+                <div class="firework"></div>
+                <div class="firework"></div>
+                <div class="firework"></div>
+                <div class="firework"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="env.js"></script>
+    <script src="seo.js"></script>
+    <script src="register.js"></script>
+    
+    <script>
+        // Smart URL conversion - automatically adds .html for local development
+        if (typeof window.buildUrl === 'function') {
+            // Convert all internal links to use smart URLs
+            const links = document.querySelectorAll('a[href^="terms-and-condition"], a[href^="privacy-policy"]');
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && !href.includes('?')) {
+                    // For links without query parameters, just convert the base path
+                    const path = href.split('?')[0];
+                    link.href = window.buildUrl(path) + (href.includes('?') ? href.substring(href.indexOf('?')) : '');
+                } else if (href && href.includes('?')) {
+                    // For links with query parameters, convert the base path and keep the query
+                    const path = href.split('?')[0];
+                    const query = href.substring(href.indexOf('?'));
+                    link.href = window.buildUrl(path) + query;
+                }
+            });
+        }
+    </script>
+    
+</body>
+</html> 

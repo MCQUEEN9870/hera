@@ -1,0 +1,1173 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V9X30VY879"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-V9X30VY879');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Vehicles - Herapheri Goods</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+     
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+     <link rel="manifest" href="site.webmanifest">
+    
+    
+    <style>
+        /* Vehicles page specific styles */
+        .vehicles-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .search-section {
+            background: linear-gradient(135deg, #1e5799, #207cca);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .search-section h2 {
+            margin-top: 0;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group select,
+        .form-group input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .search-btn {
+            align-self: end;
+            padding: 12px 25px;
+            background-color: #ffa500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-btn:hover {
+            background-color: #e69500;
+            transform: translateY(-2px);
+        }
+
+        .results-section {
+            margin-top: 20px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .results-count {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .sort-options {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sort-options select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .vehicles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .vehicle-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 10px #6666668a;
+            position: relative;
+        }
+
+        .vehicle-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(176, 149, 11, 0.941);
+            border-color: #ddd;
+        }
+        
+        /* Premium Vehicle Card Styling */
+        .premium-vehicle {
+            border: 2px solid #FFD700;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .premium-vehicle:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        .premium-vehicle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+            z-index: 3;
+        }
+        
+        /* Premium title and button styles */
+        .premium-title {
+            color: #333;
+            font-weight: 700;
+            background: -webkit-linear-gradient(45deg, #FFD700, #FFA500);
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .premium-btn {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 3px 10px rgba(255, 165, 0, 0.3);
+        }
+        
+        .premium-btn:hover {
+            background: linear-gradient(45deg, #FFA500, #FF8C00);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 165, 0, 0.5);
+        }
+        
+        /* Premium info items */
+        .premium-info-item {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 3px solid #FFD700;
+            padding: 5px 8px;
+            margin: 5px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        /* Premium highlights */
+        .premium-highlights {
+            margin-top: 10px;
+        }
+        
+        .premium-tag {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(255, 165, 0, 0.3);
+        }
+        
+        .premium-more {
+            background: rgba(255, 215, 0, 0.2);
+            color: #000;
+            border: 1px solid #FFD700;
+        }
+
+        .vehicle-image {
+            height: 200px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        
+
+        .vehicle-card:hover .vehicle-image img {
+            transform: scale(1.05);
+        }
+
+        .vehicle-details {
+            padding: 15px;
+        }
+
+        .vehicle-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .vehicle-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .info-item i {
+            color: #ffa500;
+            width: 16px;
+        }
+
+        .service-highlights {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .highlight-tag {
+            display: inline-block;
+            background-color: #e6f7ff;
+            color: #0066cc;
+            border: 1px solid #99ccff;
+            border-radius: 12px;
+            padding: 3px 10px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .highlight-more {
+            display: inline-block;
+            background-color: #f0f0f0;
+            color: #666;
+            border-radius: 12px;
+            padding: 3px 10px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .vehicle-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .view-details-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .view-details-btn:hover {
+            background-color: #0069d9;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 50px 0;
+            color: #666;
+        }
+
+        .no-results i {
+            font-size: 50px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .no-results h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        /* Pincode verification styles */
+        .pincode-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .verify-pincode-btn {
+            padding: 10px 15px;
+            background-color: #ffa500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .verify-pincode-btn:hover {
+            background-color: #e69500;
+        }
+
+        .location-note {
+            font-size: 12px;
+            color: #edebebfd;
+            margin-top: 5px;
+        }
+
+        /* Toast message styles */
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, 20px); }
+            10% { opacity: 1; transform: translate(-50%, 0); }
+            90% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -20px); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: rgb(255, 255, 255);
+            z-index: 1000;
+            animation: fadeInOut 5s forwards;
+            background-color: #c20812;
+        }
+
+        .toast.success {
+            background-color: #4CAF50;
+        }
+
+        .toast.error {
+            background-color: #f44336;
+        }
+
+        /* Modal for vehicle details */
+        .vehicle-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            max-width: 800px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            color: white;
+            background: rgba(0,0,0,0.5);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: rgba(0,0,0,0.7);
+        }
+
+        .modal-header {
+            position: relative;
+            height: 300px;
+        }
+
+        .modal-header-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Fullscreen Image Viewer */
+        .image-lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-lightbox.active { display: flex; }
+        .image-lightbox img {
+            max-width: 95vw;
+            max-height: 90vh;
+            border-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.4);
+        }
+        .image-lightbox .close-lightbox {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            font-size: 28px;
+            background: rgba(255,255,255,.15);
+            width: 40px; height: 40px; border-radius: 50%;
+            display:flex; align-items:center; justify-content:center;
+            cursor: pointer;
+        }
+
+        .modal-header-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+        }
+
+        .modal-vehicle-title {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .modal-vehicle-type {
+            display: inline-block;
+            background: #ffa500;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .modal-gallery {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 20px;
+        }
+
+        .gallery-item {
+            height: 100px;
+            cursor: pointer;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .modal-info {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #ffa500;
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+
+        .modal-info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .modal-info-item {
+            display: flex;
+            margin-bottom: 12px;
+            align-items: flex-start;
+        }
+
+        .info-icon {
+            color: #ffa500;
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .info-content {
+            flex: 1;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 3px;
+            font-size: 14px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 16px;
+        }
+
+        .modal-actions {
+            padding: 20px;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .contact-driver-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-driver-btn:hover {
+            background-color: #218838;
+        }
+
+        .favorite-btn {
+            background-color: white;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .favorite-btn:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* Copy and call button styles */
+        .copy-btn, .call-btn {
+            cursor: pointer;
+            color: #007bff;
+            margin-left: 8px;
+            padding: 3px;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover, .call-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        .call-btn {
+            color: #28a745;
+        }
+
+        .info-value-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .call-driver-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .call-driver-btn:hover {
+            background-color: #0069d9;
+        }
+
+        /* Trust counter styles */
+        .trust-counter {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background-color: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 13px;
+            color: #495057;
+            margin-right: 10px;
+        }
+
+        .trust-counter i {
+            color: #28a745;
+        }
+
+        .trust-counter-large {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #e9f7ef;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .trust-counter-large i {
+            color: #27ae60;
+            font-size: 16px;
+        }
+
+        .trust-counter-number {
+            font-weight: 600;
+        }
+
+        /* Trust indicator styles */
+        .trust-indicator {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .trust-indicator-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .trust-indicator-message {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .trust-level-low {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+        }
+
+        .trust-level-low .trust-indicator-header i {
+            color: #ffc107;
+        }
+
+        .trust-level-medium {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+
+        .trust-level-medium .trust-indicator-header i {
+            color: #4caf50;
+        }
+
+        .trust-level-high {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+
+        .trust-level-high .trust-indicator-header i {
+            color: #2196f3;
+        }
+
+        .trust-level-highest {
+            background-color: #ede7f6;
+            border-left: 4px solid #673ab7;
+        }
+
+        .trust-level-highest .trust-indicator-header i {
+            color: #673ab7;
+        }
+        
+        /* New vehicle indicator styles */
+        .new-vehicle-badge {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            z-index: 2;
+            width: 40px;
+            height: 46px;
+            border-radius: 0;
+            overflow: hidden;
+        }
+        
+        .new-vehicle-badge img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .verified-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 2;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .verified-badge img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Premium ribbon */
+        .premium-ribbon {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            overflow: hidden;
+            z-index: 2;
+        }
+        
+        .premium-ribbon::before {
+            content: 'PREMIUM';
+            position: absolute;
+            top: 30px;
+            right: -30px;
+            transform: rotate(45deg);
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+            padding: 5px 40px;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+        }
+
+        @media (max-width: 768px) {
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Responsive styles for badges */
+            .new-vehicle-badge {
+                width: 30px;
+                height: 35px;
+                top: 5px;
+                right: 5px;
+            }
+            
+            .verified-badge {
+                width: 30px;
+                height: 30px;
+                top: 10px;
+                left: 10px;
+            }
+            
+            .premium-badge {
+                top: 45px;
+                left: 10px;
+                font-size: 10px;
+                padding: 3px 8px;
+            }
+
+            .vehicles-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+
+            .modal-info {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-gallery {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .modal-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .contact-driver-btn, .favorite-btn, .call-driver-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .pincode-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .verify-pincode-btn {
+                width: 30%;
+                justify-content: center;
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar Section -->
+    <nav class="navbar" style ="height: 115px;">
+        <!-- Logo Section -->
+        <div class="navbar-logo logo">
+            <a href="index">
+                <img src="#" alt="" class="logo-img" />
+            </a>
+        </div>
+
+        <!-- Navigation Links -->
+        <ul class="nav-links">
+            
+            
+            <li>
+                <a href="index" class="nav-item"><span>Home</span></a>
+            </li>
+            
+            <!-- Authentication Section - Only shown when user is logged in -->
+            <li id="authSection" style="display: none;">
+                <a href="driver-dashboard" class="nav-item"> 
+                    <span>
+                        <img src="attached_assets/images/user.webp" class="profile-icon">
+                    </span>
+                </a>
+            </li>
+        </ul> 
+        
+        <style>
+            .profile-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 40%;
+                margin-top: -10px;
+            }
+        </style>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="vehicles-container">
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-container">
+                <h2>Find Available Vehicles</h2>
+                <form id="vehicleSearchForm" class="search-form">
+                    <div class="form-group">
+                        <label for="vehicleType">Vehicle Type</label>
+                        <select id="vehicleType" name="vehicleType">
+                            <option value="">Select Vehicle Type</option>
+                            <option value="Manual Cart (Thel / Rickshaw)">Manual Cart (Thel / Rickshaw)</option>
+                            <option value="Auto Loader (CNG loader)">Auto Loader (CNG loader)</option>
+                            <option value="Tata Ace (Chhota Hathi)">Tata Ace (Chhota Hathi)</option>
+                            <option value="E-Rickshaw Loader (Tuk-Tuk)">E-Rickshaw Loader (Tuk-Tuk)</option>
+                            <option value="Mini Truck (Eicher Canter)">Mini Truck (Eicher Canter)</option>
+                            <option value="Vikram Tempo">Vikram Tempo</option>
+                            <option value="Bolero Pickup (MaXX)">Bolero Pickup (MaXX)</option>
+                            <option value="Tata 407">Tata 407</option>
+                            <option value="Container Truck">Container Truck</option>
+                            <option value="6 wheeler">6 wheeler</option>
+                            <option value="Open Body Truck">Open Body Truck</option>
+                            <option value="Open Body Truck (6 wheeler)">Open Body Truck (6 wheeler)</option>
+                            <option value="Closed Body Truck">Closed Body Truck</option>
+                            <option value="Flatbed Truck">Flatbed Truck</option>
+                            <option value="8 wheeler">8 wheeler</option>
+                            <option value="12 wheeler and onwards">12 wheeler and onwards</option>
+                            <option value="JCB">JCB</option>
+                            <option value="Crane">Crane</option>
+                            <option value="Trailer Truck">Trailer Truck</option>
+                            <option value="Tipper Truck (Dumper Truck)">Tipper Truck (Dumper Truck)</option>
+                            <option value="Tanker Truck">Tanker Truck</option>
+                            <option value="Garbage Truck">Garbage Truck</option>
+                            <option value="Ambulance">Ambulance</option>
+                            <option value="Tow-Truck">Tow-Truck</option>
+                            <option value="Refrigerated Vans">Refrigerated Vans</option>
+                            <option value="Refrigerated Trucks">Refrigerated Trucks</option>
+                            <option value="Packer&Movers">Packers&Movers</option>
+                            <option value="Parcel Delivery">Parcel Delivery</option>
+                            <option value="Food trucks">Food-Based vehicles</option>
+                            <option value="Beverage trucks">Drink-Based vehicles</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pincode">Pincode (Required)</label>
+                        <div class="pincode-row">
+                            <input type="text" id="pincode" name="pincode" placeholder="Enter 6-digit pincode" maxlength="6" pattern="[0-9]*">
+                            <button type="button" id="verifyPincodeBtn" class="verify-pincode-btn">
+                                     Verify
+                            </button>
+                        </div>
+                        <div class="location-note">Please verify pincode first</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <select id="state" name="state" disabled>
+                            <option value="">State</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Rajasthan">Rajasthan</option>
+                            <option value="Haryana">Haryana</option>
+                            <option value="Punjab">Punjab</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                            <option value="Assam">Assam</option>
+                            <option value="Bihar">Bihar</option>
+                            <option value="Chhattisgarh">Chhattisgarh</option>
+                            <option value="Goa">Goa</option>
+                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                            <option value="Jharkhand">Jharkhand</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                            <option value="Manipur">Manipur</option>
+                            <option value="Meghalaya">Meghalaya</option>
+                            <option value="Mizoram">Mizoram</option>
+                            <option value="Nagaland">Nagaland</option>
+                            <option value="Odisha">Odisha</option>
+                            <option value="Sikkim">Sikkim</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Tripura">Tripura</option>
+                            <option value="Uttarakhand">Uttarakhand</option>
+                            <option value="West Bengal">West Bengal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" name="city" placeholder="City" readonly>
+                    </div>
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i> Search Vehicles
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section">
+            <div class="results-header">
+                <div class="results-count" id="resultsCount">Showing 0 vehicles</div>
+                <div class="sort-options">
+                    <label for="sortBy">Sort By:</label>
+                    <select id="sortBy">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="nameAsc">Name (A-Z)</option>
+                        <option value="nameDesc">Name (Z-A)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Vehicles Grid - Will be populated with JavaScript -->
+            <div class="vehicles-grid" id="vehiclesGrid">
+                <!-- Vehicle cards will be inserted here -->
+            </div>
+
+            <!-- No Results Message -->
+            <div class="no-results" id="noResults" style="display: none;">
+                <i class="fas fa-truck-moving"></i>
+                <h3>No Vehicles Found</h3>
+                <p id="novehiclefoundResultsMessage">Try adjusting your search criteria or check back later for new listings.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Vehicle Details Modal -->
+    <div class="vehicle-modal" id="vehicleModal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">&times;</span>
+            <div class="modal-header" id="modalHeader">
+                <!-- Will be populated with JavaScript -->
+            </div>
+            <div class="modal-gallery" id="modalGallery">
+                <!-- Will be populated with JavaScript -->
+            </div>
+            <div class="modal-info" id="modalInfo">
+                <!-- Will be populated with JavaScript -->
+            </div>
+            
+
+            
+            <div class="modal-actions">
+                <button class="contact-driver-btn" id="contactDriverBtn">
+                    <i class="fab fa-whatsapp"></i> Contact via WhatsApp
+                </button>
+                <button class="call-driver-btn" id="callDriverBtn">
+                    <i class="fas fa-phone"></i> Call him
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Image Lightbox -->
+    <div class="image-lightbox" id="imageLightbox">
+        <span class="close-lightbox" id="closeLightbox">&times;</span>
+        <img id="lightboxImage" src="" alt="Vehicle Photo">
+    </div>
+
+   
+    
+    <!-- Vehicles JavaScript -->
+    <script src="env.js"></script>
+    <script src="seo.js"></script>
+    <script src="vehicles.js"></script>
+    
+    <script>
+        // Smart URL conversion - automatically adds .html for local development
+        if (typeof window.buildUrl === 'function') {
+            // Convert all internal links to use smart URLs
+            const links = document.querySelectorAll('a[href^="index"], a[href^="driver-dashboard"]');
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && !href.includes('?')) {
+                    // For links without query parameters, just convert the base path
+                    const path = href.split('?')[0];
+                    link.href = window.buildUrl(path) + (href.includes('?') ? href.substring(href.indexOf('?')) : '');
+                } else if (href && href.includes('?')) {
+                    // For links with query parameters, convert the base path and keep the query
+                    const path = href.split('?')[0];
+                    const query = href.substring(href.indexOf('?'));
+                    link.href = window.buildUrl(path) + query;
+                }
+            });
+        }
+
+        
+  const messages = [
+    "Your area is so peaceful, even the vehicles seem to be meditating!",
+    "No vehicles found... looks like they’ve all taken a Sunday off. Try again on Monday!",
+    "We spoke to the vehicle owners. They’re interested... just waiting for the right mood!",
+    "We sent a vehicle to your location. It saw the traffic and said, 'Not today, bro.'",
+    "We’re expanding fast—but your area is playing hard to get!",
+    "Your PIN code is trending—but vehicles haven’t caught up yet!",
+    "No vehicles yet. They’re probably binge-watching Netflix and ignoring our calls.",
+    "No vehicles found. They’re probably stuck in a group chat deciding who goes first.",
+    "Your area is trending... but vehicles are still updating their status. Refresh for drama!",
+    "Your area’s giving premium vibes. Vehicle owners are still buffering...",
+    "Your PIN code is calling. Vehicles are on silent mode!"
+];
+
+  window.onload = function () {
+    const messageElement = document.getElementById("novehiclefoundResultsMessage");
+    const randomIndex = Math.floor(Math.random() * messages.length);
+    messageElement.textContent = messages[randomIndex];
+  };
+
+    </script>
+    
+</body>
+</html> 
