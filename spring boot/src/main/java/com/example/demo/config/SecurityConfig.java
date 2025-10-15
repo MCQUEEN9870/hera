@@ -42,8 +42,7 @@ public class SecurityConfig {
                     "/api/get-all-feedback",
                     "/api/get-user-feedback",
                     "/api/get-user-locations",
-                    "/api/contact-submissions",
-                    "/api/presence/**"
+                    "/api/contact-submissions"
                 ).permitAll()
                 .anyRequest().permitAll() // TODO: tighten later for admin endpoints
             );
