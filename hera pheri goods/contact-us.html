@@ -374,7 +374,7 @@
                 
                 <div class="contact-form-group">
                     <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" placeholder="Enter your 10-digit phone number" title="Please enter a 10-digit phone number">
+                    <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required placeholder="Enter your 10-digit phone number" title="Please enter a 10-digit phone number">
                     <div class="error-message" id="phoneError">Please enter a valid 10-digit phone number</div>
                 </div>
                 
@@ -934,35 +934,41 @@ Best regards,
             
             // Validate all fields before submission
             let isValid = true;
+            let firstInvalid = null;
             
             // Validate name
             if (!nameInput.validity.valid) {
                 validateField(nameInput, document.getElementById('nameError'));
                 isValid = false;
+                if (!firstInvalid) firstInvalid = nameInput;
             }
             
             // Validate email
             if (!emailInput.validity.valid) {
                 validateField(emailInput, document.getElementById('emailError'));
                 isValid = false;
+                if (!firstInvalid) firstInvalid = emailInput;
             }
             
-            // Validate phone if provided
-            if (phoneInput.value !== '' && !phoneInput.validity.valid) {
+            // Validate phone (required)
+            if (!phoneInput.validity.valid) {
                 validateField(phoneInput, document.getElementById('phoneError'));
                 isValid = false;
+                if (!firstInvalid) firstInvalid = phoneInput;
             }
             
             // Validate subject
             if (!subjectInput.validity.valid) {
                 validateField(subjectInput, document.getElementById('subjectError'));
                 isValid = false;
+                if (!firstInvalid) firstInvalid = subjectInput;
             }
             
             // Validate message
             if (!messageInput.validity.valid) {
                 validateField(messageInput, document.getElementById('messageError'));
                 isValid = false;
+                if (!firstInvalid) firstInvalid = messageInput;
             }
             
             // If all fields are valid, submit the form
@@ -1027,6 +1033,9 @@ Best regards,
                         console.log('Button reset to:', originalBtnText);
                     }, 500);
                 }
+            } else if (firstInvalid) {
+                firstInvalid.focus();
+                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
 
