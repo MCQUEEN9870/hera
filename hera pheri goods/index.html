@@ -1209,6 +1209,56 @@ Best regards,
     } catch (err) {
       console.warn('Tutorial popup init failed:', err);
     }
+
+    // Gentle scroll nudge when user is at very top to hint more content below
+    try {
+      const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let nudgeTimer = null;
+      let nudging = false;
+
+      function anyModalOpen() {
+        try {
+          return Array.from(document.querySelectorAll('.modal')).some(m => getComputedStyle(m).display !== 'none');
+        } catch (_) { return false; }
+      }
+
+      function startNudge() {
+        if (prefersReduced || nudgeTimer) return;
+        nudgeTimer = setInterval(() => {
+          if (window.scrollY <= 4 && !nudging && !anyModalOpen()) {
+            nudging = true;
+            // Scroll down a bit, then back to top to create a gentle hint
+            window.scrollBy({ top: 60, behavior: 'smooth' });
+            setTimeout(() => {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              setTimeout(() => { nudging = false; }, 450);
+            }, 650);
+          }
+        }, 6000);
+      }
+
+      function stopNudge() {
+        if (nudgeTimer) { clearInterval(nudgeTimer); nudgeTimer = null; }
+      }
+
+      // Start nudging on load if user is at top
+      if (window.scrollY <= 4) startNudge();
+
+      // If user actively scrolls down, stop nudging for good
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 80) stopNudge();
+        else if (window.scrollY <= 4 && !prefersReduced) startNudge();
+      }, { passive: true });
+
+      // Any interaction counts as engagement; if they navigate, we stop
+      ['wheel','touchstart','keydown','mousedown'].forEach(evt => {
+        window.addEventListener(evt, () => {
+          if (window.scrollY > 80) stopNudge();
+        }, { passive: true });
+      });
+    } catch (e) {
+      console.warn('Scroll nudge init failed:', e);
+    }
     });
 </script>
 
