@@ -13,10 +13,33 @@
 </script>
     
     <!-- Basic meta tags for character encoding and responsive design -->
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title> </title>
-    
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- AdSense site verification -->
+  <meta name="google-adsense-account" content="ca-pub-9790279842280207">
+ 
+  <!-- Preconnects to speed up third-party hosts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <title>Herapherigoods - Register & Find Transport Vehicles in India – Free, No Brokers</title>
+  <meta property="og:title" content="Herapherigoods - Register & Find Transport Vehicles in India for free - No Brokers" />
+  <meta name="twitter:title" content="Herapherigoods - Register & Find Transport Vehicles in India for free - No Brokers" />
+  <meta name="description" content="Herapherigoods - Register Transport vehicle and Find trucks, tempos/autos, JCBs, maxx, packers&movers, and more just by pincode. Contact To Vehicle owner Directly — no commission." />
+  <meta property="og:description" content="Herapherigoods - Register Transport vehicle and Find trucks, tempos/autos, JCBs, maxx, packers&movers, and more just by pincode. Contact To Vehicle owner Directly — no commission." />
+  <meta name="twitter:description" content="Herapherigoods - Register Transport vehicle and Find trucks, tempos/autos, JCBs, maxx, packers&movers, and more just by pincode. Contact To Vehicle owner Directly — no commission." />
+  
+  <!-- Social Media Meta Tags -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://herapherigoods.in/" />
+  <meta property="og:site_name" content="Herapheri Goods" />
+  <meta property="og:image" content="attached_assets/images/1200x630.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="attached_assets/images/1200x630.jpg" />
+
     <!-- Favicons -->
      <link rel="icon" type="image/x-icon" href="/favicon.ico">
      <link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
@@ -27,16 +50,37 @@
     <link rel="manifest" href="site.webmanifest">
     
     <!-- External CSS and Font Awesome for icons -->
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet">
+  <!-- Load main CSS non-blocking with preload+swap -->
+  <link rel="preload" href="style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="style.css"></noscript>
+    
+  <!-- Load Font Awesome non-blocking -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+ 
+    <!-- Load Google Fonts CSS non-blocking with preload+swap -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet"></noscript>
     
     <!-- GSAP library for animations -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     
     <!-- AOS (Animate On Scroll) library for scroll animations -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <!-- Load AOS CSS non-blocking -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" /></noscript>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    
+  <!-- Google AdSense (loads async, non-blocking) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9790279842280207" crossorigin="anonymous"></script>
+    <script>
+      
+      window.addEventListener('DOMContentLoaded', function(){
+        if (window.AOS && typeof AOS.init === 'function') {
+          try { AOS.init({ once: true }); } catch(e){}
+        }
+      });
+    </script>
     
     <!-- Modal Styles -->
     <style>
@@ -283,6 +327,7 @@
         <img
           src="attached_assets/images/new-logo.webp"
           alt="Herapheri Goods Logo"
+          title="Herapheri Goods Logo"
           class="logo-img"
         />
         <span class="brand-wordmark">Herapheri Goods</span>
@@ -301,10 +346,10 @@
               <h3 title="Perfect for small loads and city deliveries."><i class="fas fa-boxes"></i> Small Transport Vehicles (SCV)</h3>
               <ul>
                 <!-- SCV Vehicle List Items -->
-                <li><a href="vehicles?type=Manual Cart (Thel / Rickshaw)" title="Ideal for very short distances and narrow lanes."><img src="attached_assets/images/manual cart (thela).webp" alt="Manual Cart (Thel)" class="vehicle-icon"> Manual Cart (Thel / Rickshaw)</a></li>
-                <li><a href="vehicles?type=Auto Loader (CNG loader)" title="Good for medium-sized goods within the city."><img src="attached_assets/images/Auto Loader(CNG loader).webp" alt="Auto Loader" class="vehicle-icon"> Auto Loader (CNG loader)</a></li>
-                <li><a href="vehicles?type=Tata Ace (Chhota Hathi)" title="Popular choice for small business deliveries."><img src="attached_assets/images/Auto Loader(CNG loader).webp" alt="Tata Ace" class="vehicle-icon"> Tata Ace (Chhota Hathi)</a></li>
-                <li><a href="vehicles?type=E-Rickshaw Loader (Tuk-Tuk)" title="Eco-friendly option for local cargo."><img src="attached_assets/images/e-ricksahw (tuk-tuk).webp" alt="E-Rickshaw" class="vehicle-icon"> E-Rickshaw Loader (Tuk-Tuk)</a></li>
+                <li><a href="vehicles?type=Manual Cart (Thel / Rickshaw)" title="Ideal for very short distances and narrow lanes."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/manual cart (thela).webp" alt="Manual Cart (Thel)" title="Manual Cart (Thel / Rickshaw)" class="vehicle-icon"> Manual Cart (Thel / Rickshaw)</a></li>
+                <li><a href="vehicles?type=Auto Loader (CNG loader)" title="Good for medium-sized goods within the city."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/Auto Loader(CNG loader).webp" alt="Auto Loader" title="Auto Loader (CNG loader)" class="vehicle-icon"> Auto Loader (CNG loader)</a></li>
+                <li><a href="vehicles?type=Tata Ace (Chhota Hathi)" title="Popular choice for small business deliveries."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/Auto Loader(CNG loader).webp" alt="Tata Ace" title="Tata Ace (Chhota Hathi)" class="vehicle-icon"> Tata Ace (Chhota Hathi)</a></li>
+                <li><a href="vehicles?type=E-Rickshaw Loader (Tuk-Tuk)" title="Eco-friendly option for local cargo."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/e-ricksahw (tuk-tuk).webp" alt="E-Rickshaw" title="E-Rickshaw Loader (Tuk-Tuk)" class="vehicle-icon"> E-Rickshaw Loader (Tuk-Tuk)</a></li>
               </ul>
             </div>
             
@@ -313,11 +358,11 @@
               <h3 title="Good for medium loads and trips between nearby cities."><i class="fas fa-shuttle-van"></i> Light Transport Vehicles (LCV)</h3>
               <ul>
                 <!-- LCV Vehicle List Items -->
-                <li><a href="vehicles?type=Mini Truck (Eicher Canter)" title="perfect for city-to-city."><img src="attached_assets/images/mini truck (Eicher Canter).webp" alt="Mini Truck" class="vehicle-icon"> Mini Truck (Eicher Canter)</a></li>
-                <li><a href="vehicles?type=Vikram Tempo" title="For local goods movement."><img src="attached_assets/images/vikram tempo.webp" alt="Vikram Tempo" class="vehicle-icon"> Vikram Tempo</a></li>
-                <li><a href="vehicles?type=Bolero Pickup (MaXX)" title="Strong and suitable for various terrains."><img src="attached_assets/images/bolero pickup-truck.webp" alt="Bolero Pickup" class="vehicle-icon"> Bolero Pickup (MaXX)</a></li>
-                <li><a href="vehicles?type=Tata 407" title="Popular for medium-size commercial transport."><img src="attached_assets/images/tata 407.webp" alt="Tata 407" class="vehicle-icon"> Tata 407</a></li>
-                <li><a href="vehicles?type=6 wheeler" title="Carries more load than smaller LCVs."><img src="attached_assets/images/6 wheeler.webp" alt="6 Wheeler" class="vehicle-icon"> 6 wheeler</a></li>
+                <li><a href="vehicles?type=Mini Truck (Eicher Canter)" title="perfect for city-to-city."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/mini truck (Eicher Canter).webp" alt="Mini Truck" title="Mini Truck (Eicher Canter)" class="vehicle-icon"> Mini Truck (Eicher Canter)</a></li>
+                <li><a href="vehicles?type=Vikram Tempo" title="For local goods movement."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/vikram tempo.webp" alt="Vikram Tempo" title="Vikram Tempo" class="vehicle-icon"> Vikram Tempo</a></li>
+                <li><a href="vehicles?type=Bolero Pickup (MaXX)" title="Strong and suitable for various terrains."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/bolero pickup-truck.webp" alt="Bolero Pickup" title="Bolero Pickup (MaXX)" class="vehicle-icon"> Bolero Pickup (MaXX)</a></li>
+                <li><a href="vehicles?type=Tata 407" title="Popular for medium-size commercial transport."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/tata 407.webp" alt="Tata 407" title="Tata 407" class="vehicle-icon"> Tata 407</a></li>
+                <li><a href="vehicles?type=6 wheeler" title="Carries more load than smaller LCVs."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/6 wheeler.webp" alt="6 Wheeler" title="6 wheeler" class="vehicle-icon"> 6 wheeler</a></li>
               </ul>
             </div>
             
@@ -326,12 +371,12 @@
               <h3 title="Used for big goods and long-distance transport."><i class="fas fa-truck-loading"></i> Medium & Heavy Transport Vehicles (MHCV & HCV)</h3>
               <ul>
                 <!-- MHCV & HCV Vehicle List Items -->
-                <li><a href="vehicles?type=Container Truck" title="Safe choice for important and secured goods."><img src="attached_assets/images/container truck.webp" alt="Container Truck" class="vehicle-icon"> Container Truck</a></li>
-                <li><a href="vehicles?type=Open Body Truck (6 wheeler)" title="Suitable for bulky and odd-sized items."><img src="attached_assets/images/open body truck.webp" alt="Open Body Truck" class="vehicle-icon"> Open Body Truck (6 wheeler)</a></li>
-                <li><a href="vehicles?type=Closed Body Truck" title="Protection from weather and theft."><img src="attached_assets/images/closed body truck.webp" alt="Closed Body Truck" class="vehicle-icon"> Closed Body Truck</a></li>
-                <li><a href="vehicles?type=Flatbed Truck" title="Ideal for oversized cargo and machinery."><img src="attached_assets/images/flat-bed-truck.webp" alt="Flatbed Truck" class="vehicle-icon"> Flatbed Truck</a></li>
-                <li><a href="vehicles?type=8 wheeler" title="Increased capacity for heavier loads."><img src="attached_assets/images/8 wheeler.webp" alt="8 Wheeler" class="vehicle-icon"> 8 wheeler</a></li>
-                <li><a href="vehicles?type=12 wheeler and onwards" title="Used for very large and heavy shipping like in industries."><img src="attached_assets/images/12 wheeler and onwards.webp" alt="12 Wheeler" class="vehicle-icon"> 12 wheeler and onwards</a></li>
+                <li><a href="vehicles?type=Container Truck" title="Safe choice for important and secured goods."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/container truck.webp" alt="Container Truck" title="Container Truck" class="vehicle-icon"> Container Truck</a></li>
+                <li><a href="vehicles?type=Open Body Truck (6 wheeler)" title="Suitable for bulky and odd-sized items."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/open body truck.webp" alt="Open Body Truck" title="Open Body Truck (6 wheeler)" class="vehicle-icon"> Open Body Truck (6 wheeler)</a></li>
+                <li><a href="vehicles?type=Closed Body Truck" title="Protection from weather and theft."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/closed body truck.webp" alt="Closed Body Truck" title="Closed Body Truck" class="vehicle-icon"> Closed Body Truck</a></li>
+                <li><a href="vehicles?type=Flatbed Truck" title="Ideal for oversized cargo and machinery."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/flat-bed-truck.webp" alt="Flatbed Truck" title="Flatbed Truck" class="vehicle-icon"> Flatbed Truck</a></li>
+                <li><a href="vehicles?type=8 wheeler" title="Increased capacity for heavier loads."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/8 wheeler.webp" alt="8 Wheeler" title="8 wheeler" class="vehicle-icon"> 8 wheeler</a></li>
+                <li><a href="vehicles?type=12 wheeler and onwards" title="Used for very large and heavy shipping like in industries."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/12 wheeler and onwards.webp" alt="12 Wheeler" title="12 wheeler and onwards" class="vehicle-icon"> 12 wheeler and onwards</a></li>
               </ul>
             </div>
             
@@ -340,22 +385,22 @@
               <h3 title="Vehicles for special work like lifting, dumping, or carrying liquids."><i class="fas fa-tools"></i> Special Utility Vehicles (SUV)</h3>
               <ul>
                 <!-- SUV Vehicle List Items -->
-                <li><a href="vehicles?type=JCB" title="For excavation and construction tasks."><img src="attached_assets/images/jcb.svg" alt="JCB" class="vehicle-icon"> JCB</a></li>
-                <li><a href="vehicles?type=Crane" title="Lifting and moving heavy objects or machinery."><img src="attached_assets/images/crane.svg" alt="Crane" class="vehicle-icon"> Crane</a></li>
-                <li><a href="vehicles?type=Trailer Truck" title="Transporting oversized and heavy loads."><img src="attached_assets/images/truck-trailer.svg" alt="Trailer Truck" class="trailer-icon"> Trailer Truck</a></li>
-                <li><a href="vehicles?type=Tipper Truck (Dumper Truck)" title="Used for carrying loose materials like sand, gravel."><img src="attached_assets/images/tipper truck.webp" alt="Tipper Truck" class="vehicle-icon"> Tipper Truck (Dumper Truck)</a></li>
-                <li><a href="vehicles?type=Tanker Truck" title="For transporting liquids or gases."><img src="attached_assets/images/tanker-truck.webp" alt="Tanker Truck" class="vehicle-icon"> Tanker Truck</a></li>
-                <li><a href="vehicles?type=Garbage Truck" title="For waste collection and disposal."><img src="attached_assets/images/garbage-truck.webp" alt="Garbage Truck" class="vehicle-icon"> Garbage Truck</a></li>
+                <li><a href="vehicles?type=JCB" title="For excavation and construction tasks."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/jcb.svg" alt="JCB" title="JCB" class="vehicle-icon"> JCB</a></li>
+                <li><a href="vehicles?type=Crane" title="Lifting and moving heavy objects or machinery."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/crane.svg" alt="Crane" title="Crane" class="vehicle-icon"> Crane</a></li>
+                <li><a href="vehicles?type=Trailer Truck" title="Transporting oversized and heavy loads."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/truck-trailer.svg" alt="Trailer Truck" title="Trailer Truck" class="trailer-icon"> Trailer Truck</a></li>
+                <li><a href="vehicles?type=Tipper Truck (Dumper Truck)" title="Used for carrying loose materials like sand, gravel."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/tipper truck.webp" alt="Tipper Truck" title="Tipper Truck (Dumper Truck)" class="vehicle-icon"> Tipper Truck (Dumper Truck)</a></li>
+                <li><a href="vehicles?type=Tanker Truck" title="For transporting liquids or gases."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/tanker-truck.webp" alt="Tanker Truck" title="Tanker Truck" class="vehicle-icon"> Tanker Truck</a></li>
+                <li><a href="vehicles?type=Garbage Truck" title="For waste collection and disposal."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/garbage-truck.webp" alt="Garbage Truck" title="Garbage Truck" class="vehicle-icon"> Garbage Truck</a></li>
             </ul>
             </div>
             <div class="category">
               <h3 title="Vehicles for urgent medical and emergency situations."><i class="fas fa-ambulance"></i> Emergency Vehicles</h3>
               <ul>
                 <!-- Emergency Vehicle List Items -->
-                <li><a href="vehicles?type=Ambulance" title="For patient transport and medical emergencies."><img src="attached_assets\images\ambulace.webp" alt="Ambulance" class="vehicle-icon"> Ambulance</a></li>
+                <li><a href="vehicles?type=Ambulance" title="For patient transport and medical emergencies."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\ambulace.webp" alt="Ambulance" title="Ambulance" class="vehicle-icon"> Ambulance</a></li>
               </ul>
               <ul>
-                <li><a href="vehicles?type=Tow-Truck" title="For towing and recovery of vehicles."><img src="attached_assets\images\Tow-truck.webp" alt="Tow-Truck" class="vehicle-icon"> Tow-Truck</a></li>
+                <li><a href="vehicles?type=Tow-Truck" title="For towing and recovery of vehicles."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\Tow-truck.webp" alt="Tow-Truck" title="Tow-Truck" class="vehicle-icon"> Tow-Truck</a></li>
               </ul>
             </div>
             
@@ -364,23 +409,23 @@
               <h3 title="Keeps items cold for dairy, ice cream, and other frozen goods."><i class="fas fa-snowflake"></i> Refrigerated & AC vehciles</h3>
               <ul>
                 <!-- Refrigerated & AC Vehicle List Items -->
-                <li><a href="vehicles?type=Refrigerated Vans" title="Keeps dairy, ice cream, and food cool in short trips."><img src="attached_assets\images\refrigerator vans.webp" alt="Refrigerated Vans" class="vehicle-icon"> Refrigerated Vans</a></li>
-                <li><a href="vehicles?type=Refrigerated Trucks" title="Larger trucks for transporting frozen or chilled goods over long distances."><img src="attached_assets\images\refrigerated trucks.webp" alt="Refrigerated Trucks" class="vehicle-icon"> Refrigerated Trucks</a></li>
+                <li><a href="vehicles?type=Refrigerated Vans" title="Keeps dairy, ice cream, and food cool in short trips."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\refrigerator vans.webp" alt="Refrigerated Vans" title="Refrigerated Vans" class="vehicle-icon"> Refrigerated Vans</a></li>
+                <li><a href="vehicles?type=Refrigerated Trucks" title="Larger trucks for transporting frozen or chilled goods over long distances."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\refrigerated trucks.webp" alt="Refrigerated Trucks" title="Refrigerated Trucks" class="vehicle-icon"> Refrigerated Trucks</a></li>
               </ul>
             </div>
             <div class="category">
               <h3 title="Used for shifting homes, delivering parcels, and other transport services in cities."><i class="fas fa-boxes-packing"></i>Service-Based Vehicles</h3>
               <ul>
                 <!-- Packer&Movers Vehicle List Items -->
-                <li><a href="vehicles?type=Packer&Movers" title="For house shifting, office relocation, or furniture transport. Select this if you provide loading/unloading services too."><img src="attached_assets\images\Packers.webp" alt="Packer&Movers" class="vehicle-icon">Packer&Movers<img src="attached_assets\images\movers.webp" alt="Packer&Movers" class="vehicle-icon"></a></li>
-                <li><a href="vehicles?type=Parcel Delivery" title="For local & city-to-city parcel deliveries. If you deliver packages, documents, small cargo, select this. "><img src="attached_assets\images\delivery-man.webp" alt="Parcel Delivery" class="vehicle-icon"> Parcel Delivery</a></li>
+                <li><a href="vehicles?type=Packer&Movers" title="For house shifting, office relocation, or furniture transport. Select this if you provide loading/unloading services too."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\Packers.webp" alt="Packer&Movers" title="Packers & Movers" class="vehicle-icon">Packer&Movers<img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\movers.webp" alt="Packer&Movers" title="Packers & Movers" class="vehicle-icon"></a></li>
+                <li><a href="vehicles?type=Parcel Delivery" title="For local & city-to-city parcel deliveries. If you deliver packages, documents, small cargo, select this. "><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\delivery-man.webp" alt="Parcel Delivery" title="Parcel Delivery" class="vehicle-icon"> Parcel Delivery</a></li>
               </ul>
             </div>
             <div class="category">
               <h3 title="For serving food and beverages."><i class="fas fa-utensils"></i>Food & Beverage Vehicles</h3>
               <ul>
-                <li><a href="vehicles?type=Food trucks" title="For serving meals like Chinese, North-Indian, South-Indian Continental, etc."><img src="attached_assets\images\food-truck.webp" alt="Food Delivery" class="vehicle-icon"> Food-Based vehicles</a></li>
-                <li><a href="vehicles?type=Beverage trucks" title="For serving Juice & Shakes, coffee, tea, etc."><img src="attached_assets\images\drink-truck.webp" alt="Beverage Delivery" class="vehicle-icon">Drink-Based vehicles</a></li>
+                <li><a href="vehicles?type=Food trucks" title="For serving meals like Chinese, North-Indian, South-Indian Continental, etc."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\food-truck.webp" alt="Food Delivery" title="Food-based vehicles" class="vehicle-icon"> Food-Based vehicles</a></li>
+                <li><a href="vehicles?type=Beverage trucks" title="For serving Juice & Shakes, coffee, tea, etc."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\drink-truck.webp" alt="Beverage Delivery" title="Drink-based vehicles" class="vehicle-icon">Drink-Based vehicles</a></li>
               </ul>
             </div>
            
@@ -401,7 +446,7 @@
         <li id="authSection" style="display: none;">
             <a href="driver-dashboard" title="View your profile and manage your vehicles" class="nav-item"> 
               <span>
-                <img src="attached_assets/images/user.webp" class="profile-icon">
+                <img src="attached_assets/images/user.webp" class="profile-icon" alt="User profile" title="User profile">
               </span>
             </a>
         </li>
@@ -422,6 +467,7 @@
           height: 40px;
           border-radius: 40%;
           margin-top: -10px;
+          object-fit: cover;
         }
       </style>
     </nav>
@@ -444,7 +490,7 @@
     <div class="hero-section">
       <!-- Hero Background GIF -->
       <div class="hero-background">
-        <img src="attached_assets/animation/original-956409b077ef559b755248f8c2291d51.gif" alt="Transport Animation" class="hero-gif">
+  <img src="attached_assets/animation/original-956409b077ef559b755248f8c2291d51.gif" alt="Transport Animation" title="Transport Animation" class="hero-gif">
       </div>
       
       <!-- Hero Content Overlay -->
@@ -452,20 +498,20 @@
         <div class="hero-container">
           <!-- Hero Content -->
           <div class="hero-content" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-            <h1>Register Your Vehicle</h1>
+            <h1>Register Transport Vehicle</h1>
             <p>Join our network of trusted transporters, Add your vehicle to our platform and connect with people who need transport vehicles.</p>
             
             <!-- Hero Features -->
             <div class="hero-features">
               <!-- List Vehicle Feature -->
               <div class="feature">
-                <img src="attached_assets/animation/animated truck.gif" alt="Animated Truck" class="feature-icon">
+                <img src="attached_assets/animation/animated truck.gif" alt="Animated Truck" title="List Your Vehicle" class="feature-icon">
                 <span>List Your Vehicle</span>
               </div>
               <!-- Earn More Feature -->
               <div class="feature">
-                <img src="attached_assets/animation/earn more.gif" alt="Earn More" class="feature-icon">
-                <span>Earn More</span>>
+                <img src="attached_assets/animation/earn more.gif" alt="Earn More" title="Earn More" class="feature-icon">
+                <span>Earn More</span>
               </div>
             </div>
             <!-- Hero Button -->
@@ -482,8 +528,8 @@
         <div class="find-vehicle-container">
           <!-- Find Vehicle Content -->
           <div class="find-vehicle-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-            <h2>Find Your Nearby Transport Vehicle</h2>
-            <p>Search for available vehicles according to your need in your area and get information about the vehicle</p>
+            <h2>Find Nearby Transport Vehicle</h2>
+            <p>Search for available transport vehicles according to your need in your area and get information about the vehicle</p>
             <!-- Find Vehicle Button -->
             <button class="find-vehicle-btn" onclick="window.location.href = 'vehicles.html'"><i class="fas fa-search"></i> Find Vehicle</button>
           </div>
@@ -502,7 +548,7 @@
     <div class="platform-description">
       <div class="description-container">
         <div class="platform-heading" data-aos="fade-down" data-aos-duration="800">
-          <img src="attached_assets\animation\Aapka-Apna-Transport-Network-t-unscreen.gif" alt="Truck Animation" class="heading-animation">
+          <img src="attached_assets\animation\Aapka-Apna-Transport-Network-t-unscreen.gif" alt="Truck Animation" title="Aapka Apna Transport Network animation" class="heading-animation">
           <h2>Herapheri Goods – Aapka Apna Transport Network!</h2>
         </div>
         <p class="main-description" data-aos="fade-up" data-aos-duration="800">Do you need transportation for your goods, want to send items, or require any kind of delivery service? Herapheri Goods is a free listing platform that directly connects transport vehicle owners with customers—without any third-party commissions!</p>
@@ -576,10 +622,10 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/tata ace.webp" alt="Small Commercial Vehicles">
-                      <img src="attached_assets/vehicle category/cng loader.webp" alt="Small Commercial Vehicles" class="active">
-                      <img src="attached_assets/vehicle category/e-rickshaw tirri.webp" alt="Small Commercial Vehicles">
-                      <img src="attached_assets/vehicle category/vikram.webp" alt="Small Commercial Vehicles">
+                      <img data-src="attached_assets/vehicle category/tata ace.webp" alt="Small Commercial Vehicles" title="Small Commercial Vehicles" class="lazy-swap">
+                      <img src="attached_assets/vehicle category/cng loader.webp" loading="lazy" decoding="async" alt="Small Commercial Vehicles" title="Small Commercial Vehicles" class="active">
+                      <img data-src="attached_assets/vehicle category/e-rickshaw tirri.webp" alt="Small Commercial Vehicles" title="Small Commercial Vehicles" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/vikram.webp" alt="Small Commercial Vehicles" title="Small Commercial Vehicles" class="lazy-swap">
                     </div>
                     <h3>Small Commercial Vehicles</h3>
                   </div>
@@ -596,9 +642,9 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/canter.webp"alt="Medium Commercial Vehicles" class="active">
-                      <img src="attached_assets/vehicle category/pickup.webp" alt="Medium Commercial Vehicles">
-                      <img src="attached_assets/vehicle category/maxx.webp" alt="Medium Commercial Vehicles">
+                      <img src="attached_assets/vehicle category/canter.webp" loading="lazy" decoding="async" alt="Medium Commercial Vehicles" title="Medium Commercial Vehicles" class="active">
+                      <img data-src="attached_assets/vehicle category/pickup.webp" alt="Medium Commercial Vehicles" title="Medium Commercial Vehicles" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/maxx.webp" alt="Medium Commercial Vehicles" title="Medium Commercial Vehicles" class="lazy-swap">
                     </div>
                     <h3>Medium Commercial Vehicles</h3>
                   </div>
@@ -615,12 +661,12 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/14 wheeler.webp" alt="Heavy Commercial Vehicles" class="active">
-                      <img src="attached_assets/vehicle category/container truck.webp" alt="Heavy Commercial Vehicles">
-                      <img src="attached_assets/vehicle category/closed body truck.webp" alt="Heavy Commercial Vehicles">
-                      <img src="attached_assets/vehicle category/container truck 2.webp" alt="Heavy Commercial Vehicles">
-                      <img src="attached_assets/vehicle category/dumper.webp" alt="Heavy Commercial Vehicles">
-                      <img src="attached_assets/vehicle category/flatbed.webp" alt="Heavy Commercial Vehicles">
+                      <img src="attached_assets/vehicle category/14 wheeler.webp" loading="lazy" decoding="async" alt="Heavy Commercial Vehicles" title="Heavy Commercial Vehicles" class="active">
+                      <img data-src="attached_assets/vehicle category/container truck.webp" alt="Heavy Commercial Vehicles" title="Heavy Commercial Vehicles" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/closed body truck.webp" alt="Heavy Commercial Vehicles" title="Heavy Commercial Vehicles" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/container truck 2.webp" alt="Heavy Commercial Vehicles" title="Heavy Commercial Vehicles" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/dumper.webp" alt="Heavy Commercial Vehicles" title="Heavy Commercial Vehicles" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/flatbed.webp" alt="Heavy Commercial Vehicles" title="Heavy Commercial Vehicles" class="lazy-swap">
                       
                     </div>
                     <h3>Heavy Commercial Vehicles</h3>
@@ -638,11 +684,11 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/crane 2.webp" alt="Special Utility Vehicles" class="active">
-                      <img src="attached_assets/vehicle category/JCB.webp" alt="Special Utility Vehicles">
-                      <img src="attached_assets/vehicle category/dumper truck.webp" alt="Special Utility Vehicles">
-                      <img src="attached_assets/vehicle category/garbage truck 1.webp" alt="Special Utility Vehicles">
-                      <img src="attached_assets/vehicle category/waste collector.webp" alt="Special Utility Vehicles">
+                      <img src="attached_assets/vehicle category/crane 2.webp" loading="lazy" decoding="async" alt="Special Utility Vehicles" title="Special Utility Vehicles" class="active">
+                      <img data-src="attached_assets/vehicle category/JCB.webp" alt="Special Utility Vehicles" title="Special Utility Vehicles" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/dumper truck.webp" alt="Special Utility Vehicles" title="Special Utility Vehicles" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/garbage truck 1.webp" alt="Special Utility Vehicles" title="Special Utility Vehicles" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/waste collector.webp" alt="Special Utility Vehicles" title="Special Utility Vehicles" class="lazy-swap">
                     </div>
                     <h3>Special Utility Vehicles</h3>
                   </div>
@@ -662,9 +708,9 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/ac truck.webp" alt="AC Transport" class="active">
-                      <img src="attached_assets/vehicle category/AC truck 2.webp" alt="AC Transport">
-                      <img src="attached_assets/vehicle category/refrigerated van.webp" alt="AC Transport">
+                      <img src="attached_assets/vehicle category/ac truck.webp" loading="lazy" decoding="async" alt="AC Transport" title="Refrigerated & AC Transport" class="active">
+                      <img data-src="attached_assets/vehicle category/AC truck 2.webp" alt="AC Transport" title="Refrigerated & AC Transport" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/refrigerated van.webp" alt="AC Transport" title="Refrigerated & AC Transport" class="lazy-swap">
                     </div>
                     <h3>Refrigerated & AC Transport </h3>
                   </div>
@@ -681,8 +727,8 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/delievery.webp" alt="Delivery Services" class="active">
-                      <img src="attached_assets/vehicle category/packers and movers.webp" alt="Delivery Services">
+                      <img src="attached_assets/vehicle category/delievery.webp" loading="lazy" decoding="async" alt="Delivery Services" title="Delivery Services" class="active">
+                      <img data-src="attached_assets/vehicle category/packers and movers.webp" alt="Delivery Services" title="Delivery Services" class="lazy-swap">
                     </div>
                     <h3>Delivery Services</h3>
                   </div>
@@ -699,9 +745,9 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                          <img src="attached_assets/vehicle category/drink truck.webp" alt="Food & Beverage Vehicles" class="active">
-                      <img src="attached_assets/vehicle category/food truck 2.webp" alt="Food & Beverage Vehicles">
-                      <img src="attached_assets/vehicle category/food truck 3.webp" alt="Food & Beverage Vehicles">
+              <img src="attached_assets/vehicle category/drink truck.webp" loading="lazy" decoding="async" alt="Food & Beverage Vehicles" title="Food & Beverage Vehicles" class="active">
+            <img data-src="attached_assets/vehicle category/food truck 2.webp" alt="Food & Beverage Vehicles" title="Food & Beverage Vehicles" class="lazy-swap">
+            <img data-src="attached_assets/vehicle category/food truck 3.webp" alt="Food & Beverage Vehicles" title="Food & Beverage Vehicles" class="lazy-swap">
                     </div>
                     <h3>Food & Beverage Vehicles</h3>
                   </div>
@@ -718,9 +764,9 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/ambulance 3.webp" alt="Emergency Vehicles" class="active">
-                      <img src="attached_assets/vehicle category/ambulance2.webp" alt="Emergency Vehicles">
-                      <img src="attached_assets/vehicle category/tow truck.webp" alt="Emergency Vehicles">
+                      <img src="attached_assets/vehicle category/ambulance 3.webp" loading="lazy" decoding="async" alt="Emergency Vehicles" title="Emergency Vehicles" class="active">
+                      <img data-src="attached_assets/vehicle category/ambulance2.webp" alt="Emergency Vehicles" title="Emergency Vehicles" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/tow truck.webp" alt="Emergency Vehicles" title="Emergency Vehicles" class="lazy-swap">
                     </div>
                     <h3>Emergency Vehicles</h3>
                   </div>
@@ -831,11 +877,11 @@
         <p style="color:#555; margin: 8px 0 10px;">
           वाहन रजिस्टर करना सीखें! नीचे दिए गए वीडियो को देखें और जानें की कैसे आप अपने ट्रक, मिनी ट्रक, टेम्पो, या अन्य ट्रांसपोर्ट वाहन को हमारे प्लेटफ़ॉर्म पर मुफ्त में रजिस्टर कर सकते हैं।
         </p>
-        <a class="tutorial-illustration-link" href="https://youtu.be/FREi_Lb4gWY?si=pA-zy8ryJQ_TEgzC" target="_blank" rel="noopener">
-          <img src="attached_assets/images/yt.webp" alt="Herapheri Goods Tutorial" class="tutorial-illustration" loading="lazy">
+  <a class="tutorial-illustration-link" href="https://youtu.be/FREi_Lb4gWY?si=pA-zy8ryJQ_TEgzC" target="_blank" rel="noopener noreferrer">
+          <img src="attached_assets/images/yt.webp" alt="Herapheri Goods Tutorial" title="Watch Herapheri Goods tutorial on YouTube" class="tutorial-illustration" loading="lazy">
         </a>
         <div class="tutorial-actions">
-          <a class="watch-btn" href="https://youtu.be/FREi_Lb4gWY" target="_blank" rel="noopener">Watch Tutorial</a>
+          <a class="watch-btn" href="https://youtu.be/FREi_Lb4gWY" target="_blank" rel="noopener noreferrer">Watch Tutorial</a>
           <button class="skip-btn" type="button">Skip <<</button>
         </div>
       </div>
@@ -850,10 +896,10 @@
       <div class="share-content">
         <div class="social-bar">
           <div class="social-icons">
-            <a href="https://wa.me/?text=Check%20out%20Herapheri%20Goods%20-%20Your%20one-stop%20platform%20for%20finding%20reliable%20transport%20vehicle%20owners!%20No%20middlemen,%20no%20extra%20charges.%20Visit%20https://herapherigoods.in" target="_blank" class="whatsapp">
+            <a href="https://wa.me/?text=Check%20out%20Herapheri%20Goods%20-%20Your%20one-stop%20platform%20for%20finding%20reliable%20transport%20vehicle%20owners!%20No%20middlemen,%20no%20extra%20charges.%20Visit%20https://herapherigoods.in" target="_blank" rel="noopener noreferrer" class="whatsapp">
               <i class="fab fa-whatsapp"></i>
             </a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=https://herapherigoods.in&quote=Herapheri%20Goods%20-%20Find%20reliable%20transport%20vehicle%20owners%20directly!" target="_blank" class="facebook">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://herapherigoods.in&quote=Herapheri%20Goods%20-%20Find%20reliable%20transport%20vehicle%20owners%20directly!" target="_blank" rel="noopener noreferrer" class="facebook">
               <i class="fab fa-facebook-f"></i>
             </a>
             <a href="#" class="email" onclick="shareViaEmail(event)">
@@ -903,17 +949,16 @@
     </section>
     
     <!-- JavaScript File -->
-    <script src="env.js"></script>
-    <script src="seo.js"></script>
-    <script src="script.js"></script>
+  <script defer src="env.js"></script>
+  <script defer src="script.js"></script>
     <!-- Feedback Carousel JavaScript - Load this after env.js and script.js -->
-    <script src="feedback-carousel.js"></script>
+  <script defer src="feedback-carousel.js"></script>
     <!-- Vehicle Owner Carousel JavaScript - Load this after feedback-carousel.js -->
-    <script src="vehicle-owner-carousel.js"></script>
+  <script defer src="vehicle-owner-carousel.js"></script>
     <!-- No Supabase Configuration needed -->
     <!-- AI Assistant JavaScript and CSS -->
     <link rel="stylesheet" href="ai-assistant.css">
-    <script src="ai-assistant.js"></script>
+  <script defer src="ai-assistant.js"></script>
 
 
 <!-- Footer Section -->
@@ -962,7 +1007,7 @@
                 </li>
                 <li>
                     <i class="fas fa-envelope"></i>
-                    <span class="email-link" onclick="openGmail('info@herapherigoods.in')" style="text-decoration: none; color: inherit;" onmouseover="this.style.textDecoration='underline'; this.style.color='white';" onmouseout="this.style.textDecoration='none'; this.style.color='inherit';">info@herapherigoods.in</span>
+                    <span class="email-link" data-user="info" data-domain="herapherigoods.in" style="text-decoration: none; color: inherit;" onmouseover="this.style.textDecoration='underline'; this.style.color='white';" onmouseout="this.style.textDecoration='none'; this.style.color='inherit';"></span>
                 </li>
                 <li>
                     <i class="fas fa-clock"></i>
@@ -972,24 +1017,24 @@
         </div>
 
         <!-- Our Services Column -->
-        <div class="footer-column">
-            <h3>Our Services</h3>
-                <p>Transport Vehicle Listings <img src="attached_assets/animation/transport vehicle listing.gif" alt="Transport Listings" class="service-icon" style="display: inline;"></p>
-                <p>Direct Contact with Owners of Transport Vehicles <img src="attached_assets/animation/Direct Contact with Owners.gif" alt="Direct Contact" class="service-icon" style="display: inline;"></p>
-                <p>Search & Filter Options <img src="attached_assets/animation/Search & Filter Options.gif" alt="Search & Filter" class="service-icon" style="display: inline;"></p>
-        </div>
+    <div class="footer-column">
+      <h3>Our Services</h3>
+        <p>Transport Vehicle Listings <img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/transport vehicle listing.gif" alt="Transport Listings" title="Transport Vehicle Listings" class="service-icon" style="display: inline;"></p>
+        <p>Direct Contact with Owners of Transport Vehicles <img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/Direct Contact with Owners.gif" alt="Direct Contact" title="Direct Contact with Owners" class="service-icon" style="display: inline;"></p>
+        <p>Search & Filter Options <img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/Search & Filter Options.gif" alt="Search & Filter" title="Search & Filter Options" class="service-icon" style="display: inline;"></p>
+    </div>
 
         <!-- Follow Us Column (last in the row) -->
         <div class="footer-column">
             <h3>Follow Us</h3>
             <div class="social-follow" aria-label="Follow Herapheri Goods on social media">
-                <a class="btn-social yt" href="https://youtube.com/@abhishekjha9870-k6b?si=K2n8Xz_COSUdRCg0" target="_blank" rel="noopener" title="YouTube">
+                <a class="btn-social yt" href="https://youtube.com/@abhishekjha9870-k6b?si=K2n8Xz_COSUdRCg0" target="_blank" rel="noopener noreferrer" title="YouTube">
                     <i class="fab fa-youtube"></i>
                 </a>
-                <a class="btn-social wa" href="https://chat.whatsapp.com/LMUfgwk7qwOCh7p4Gxy0tc" target="_blank" rel="noopener" title="WhatsApp Group">
+                <a class="btn-social wa" href="https://chat.whatsapp.com/LMUfgwk7qwOCh7p4Gxy0tc" target="_blank" rel="noopener noreferrer" title="WhatsApp Group">
                     <i class="fab fa-whatsapp"></i>
                 </a>
-                <a class="btn-social fb" href="https://www.facebook.com/share/1BQ8hdGTNo/" target="_blank" rel="noopener" title="Facebook">
+                <a class="btn-social fb" href="https://www.facebook.com/share/1BQ8hdGTNo/" target="_blank" rel="noopener noreferrer" title="Facebook">
                     <i class="fab fa-facebook-f"></i>
                 </a>
             </div>
@@ -1002,8 +1047,7 @@
     </div>
 </footer>
 
-    <!-- Google reCAPTCHA v2 -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <!-- Google reCAPTCHA v2 - delayed load: injected on first interaction with Rate Us -->
     <!-- Add Auth JS at the end of the body -->
 <script>
     // Function to open email compose, preferring Gmail app on mobile
@@ -1261,6 +1305,101 @@ Best regards,
     }
     });
 </script>
+
+<!-- Lightweight lazy loader for flip-card galleries and delayed reCAPTCHA -->
+<script>
+  (function(){
+    // Defer non-active flip-card images until visible or hovered
+    const swapImages = (root) => {
+      if (!root) return;
+      root.querySelectorAll('img[data-src]').forEach(img => {
+        if (!img.dataset.src) return;
+        img.src = img.dataset.src;
+        img.removeAttribute('data-src');
+        img.setAttribute('loading','lazy');
+        img.setAttribute('decoding','async');
+      });
+    };
+
+    // Observe each image-container once
+    const containers = document.querySelectorAll('.flip-card .image-container');
+    if ('IntersectionObserver' in window && containers.length) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            swapImages(entry.target);
+            io.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '200px' });
+      containers.forEach(c => io.observe(c));
+    } else {
+      // Fallback: swap after load
+      containers.forEach(c => swapImages(c));
+    }
+
+    // Also preload alternates on hover for instant flip effect
+    document.querySelectorAll('.flip-card').forEach(card => {
+      card.addEventListener('mouseenter', () => swapImages(card.querySelector('.image-container')), { once: true });
+    });
+
+    // Delay reCAPTCHA until user opens Rate Us
+    let recaptchaLoaded = false;
+    function loadRecaptchaOnce(){
+      if (recaptchaLoaded) return;
+      recaptchaLoaded = true;
+      const s = document.createElement('script');
+      // Use explicit render to ensure checkbox initializes after load
+      s.src = 'https://www.google.com/recaptcha/api.js?onload=onRecaptchaReady&render=explicit';
+      s.async = true; s.defer = true;
+      document.body.appendChild(s);
+    }
+    window.onRecaptchaReady = function(){
+      try {
+        document.querySelectorAll('.g-recaptcha').forEach(el => {
+          if (!el.getAttribute('data-rendered')) {
+            grecaptcha.render(el, { sitekey: el.getAttribute('data-sitekey') });
+            el.setAttribute('data-rendered','1');
+          }
+        });
+      } catch(e) { /* no-op */ }
+    };
+    // Trigger on clicking Rate Us button or when review content gets focus
+    const rateBtn = document.querySelector('.review-toggle');
+    if (rateBtn) rateBtn.addEventListener('click', loadRecaptchaOnce, { once: true });
+    const submitBtn = document.querySelector('.submit-review');
+    if (submitBtn) submitBtn.addEventListener('click', loadRecaptchaOnce, { once: true });
+  })();
+</script>
+
+<!-- Email obfuscation and rel fixes -->
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    // Reveal obfuscated emails
+    document.querySelectorAll('[data-user][data-domain]').forEach(function(el){
+      var email = el.getAttribute('data-user') + '@' + el.getAttribute('data-domain');
+      if (!el.textContent || el.textContent.trim() === '') {
+        el.textContent = email;
+      }
+      if (el.tagName && el.tagName.toLowerCase() === 'a') {
+        el.setAttribute('href', 'mailto:' + email);
+      }
+      if (!el.hasAttribute('onclick') && typeof window.openGmail === 'function') {
+        el.addEventListener('click', function(){ window.openGmail(email); });
+      }
+    });
+
+    // Ensure security rel on external links
+    document.querySelectorAll('a[target="_blank"]').forEach(function(a){
+      var rel = (a.getAttribute('rel') || '').toLowerCase();
+      if (!rel) {
+        a.setAttribute('rel','noopener noreferrer');
+      } else if (rel === 'noopener') {
+        a.setAttribute('rel','noopener noreferrer');
+      }
+    });
+  });
+  </script>
 
 </body>
 </html>

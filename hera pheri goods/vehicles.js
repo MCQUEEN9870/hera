@@ -1723,7 +1723,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusInfoHTML = `
                     <div class="modal-section" style="margin-top: 15px; background-color: #fff8e1; padding: 10px; border-radius: 20px;">
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <img src="attached_assets/images/new (1).webp" alt="New Vehicle" style="width: 30px; height: 30px;">
+                            <img src="attached_assets/images/new (1).webp" alt="New Vehicle" style="width: 30px; height: 30px; object-fit: contain;">
                             <div>
                                 <div style="font-weight: 600; color: #333;">New Vehicle Owner</div>
                                 <div style="font-size: 14px; color: #666;">This owner recently registered their vehicle with us.</div>
@@ -1739,7 +1739,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusInfoHTML = `
                     <div class="modal-section" style="margin-top: 15px; background-color: #e8f5e9; padding: 10px; border-radius: 8px; border-left: 4px solid #4caf50;">
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <img src="attached_assets/images/verify.webp" alt="Verified Vehicle" style="width: 30px; height: 30px;">
+                            <img src="attached_assets/images/verify.webp" alt="Verified Vehicle" style="width: 30px; height: 30px; object-fit: contain;">
                             <div>
                                 <div style="font-weight: 600; color: #333;">Verified by Us</div>
                                 <div style="font-size: 14px; color: #666;">This vehicle has been with us for over a month and has been verified.</div>

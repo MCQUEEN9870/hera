@@ -1,0 +1,3 @@
+# ads.txt for herapherigoods.in
+# Authorized digital sellers
+google.com, pub-9790279842280207, DIRECT, f08c47fec0942fa0

@@ -3,7 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Community Posts • Herapheri Goods</title>
+  <title>Post your Requirements, Services, Queries & More | Herapheri Goods</title>
+  <meta property="og:title" content="Post your Requirements, Services, Queries, Local Updates & More | Herapheri Goods">
+  <meta name="twitter:title" content="Post your Requirements, Services, Queries, Local Updates & More | Herapheri Goods">
+  <meta name="description" content="Create a 24‑hour post - Share transport vehicle requirements, Services or local updates. Let Vehicle owners find You - Realtime feed, no login required." />
+  <meta property="og:description" content="Create a 24‑hour post - Share transport vehicle requirements, Services or local updates. Let Vehicle owners find You - Realtime feed, no login required." />
+  <meta name="twitter:description" content="Create a 24‑hour post - Share transport vehicle requirements, Services or local updates. Let Vehicle owners find You - Realtime feed, no login required." />
+  <!-- Social Media Meta Tags -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://herapherigoods.in/posts" />
+  <meta property="og:site_name" content="Herapheri Goods" />
+  <meta property="og:image" content="attached_assets/images/1200x630.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="attached_assets/images/1200x630.jpg" />
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -972,7 +986,7 @@
           previews.forEach((src, idx) => {
             const item = document.createElement('div');
             item.className = 'preview-item';
-            item.innerHTML = `<img src="${src}"><button class="remove-img" data-idx="${idx}" aria-label="Remove">×</button>`;
+            item.innerHTML = `<img src="${src}" alt="Post attachment" title="Post attachment"><button class="remove-img" data-idx="${idx}" aria-label="Remove">×</button>`;
             previewGrid.appendChild(item);
           });
         }

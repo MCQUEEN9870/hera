@@ -12,7 +12,9 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refer & Earn and Refund Policy - Herapheri Goods</title>
+    <title>Refer & Earn and Refund Policy | Herapheri Goods</title>
+    <meta property="og:title" content="Refer & Earn and Refund Policy | Herapheri Goods">
+    <meta name="twitter:title" content="Refer & Earn and Refund Policy | Herapheri Goods">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- AOS (Animate On Scroll) library for animations -->
@@ -138,7 +140,7 @@
 </head>
 <body>
     <div class="content">
-        <img src="attached_assets\images\herapheri_logo-removebg-preview.webp" alt="Herapheri Logo" class="privacy-logo" data-aos="zoom-in" data-aos-duration="800">
+    <img src="attached_assets\images\herapheri_logo-removebg-preview.webp" alt="Herapheri Logo" title="Herapheri Goods Logo" class="privacy-logo" data-aos="zoom-in" data-aos-duration="800">
         <h1 class="refer-earn-policy-heading" data-aos="fade-down" data-aos-duration="1000">Refer & Earn and Refund Policy</h1>
         <div class="refer-earn-policy-content">
             <p class="effective-date" data-aos="flip-up" data-aos-duration="800">Effective Date: March 15, 2025</p>
@@ -213,7 +215,7 @@
                     <li>If the listing is not approved due to website policies, the full refund will be processed.</li>
                 </ul>
                  <ul data-aos="fade-up" data-aos-duration="800" data-aos-delay="1200">
-                    <li>If you face any issues regarding payments or refunds, please contact our support team at <strong class="highlight-text"><span onclick="openGmail('info@herapherigoods.in')" style="text-decoration: none; color: inherit;" onmouseover="this.style.textDecoration='underline'; this.style.color='black';" onmouseout="this.style.textDecoration='none'; this.style.color='inherit';">info@herapherigoods.in</span></strong> within 24 hours of the transaction.</li>
+                    <li>If you face any issues regarding payments or refunds, please contact our support team at <strong class="highlight-text"><span class="email-link" data-user="info" data-domain="herapherigoods.in" style="text-decoration: none; color: inherit;" onmouseover="this.style.textDecoration='underline'; this.style.color='black';" onmouseout="this.style.textDecoration='none'; this.style.color='inherit';"></span></strong> within 24 hours of the transaction.</li>
                 </ul>
             </div>
             
@@ -249,7 +251,7 @@
                 <ul class="contact-info">
                     <li><i class="fas fa-map-marker-alt"></i><span>Fatehabad, Agra, Uttar Pradesh, India</span></li>
                     <li><i class="fas fa-phone"></i><span>+91 9411292852</span></li>
-                    <li><i class="fas fa-envelope"></i><span onclick="openGmail('info@herapherigoods.in')" style="text-decoration: none; color: inherit;" onmouseover="this.style.textDecoration='underline'; this.style.color='white';" onmouseout="this.style.textDecoration='none'; this.style.color='inherit';">info@herapherigoods.in</span></li>
+                    <li><i class="fas fa-envelope"></i><span class="email-link" data-user="info" data-domain="herapherigoods.in" style="text-decoration: none; color: inherit;" onmouseover="this.style.textDecoration='underline'; this.style.color='white';" onmouseout="this.style.textDecoration='none'; this.style.color='inherit';"></span></li>
                     <li><i class="fas fa-clock"></i><span>Mon - Sat: 9:00 AM - 8:00 PM</span></li>
                 </ul>
             </div>
@@ -446,5 +448,27 @@ Best regards,
             document.head.appendChild(styleElement);
         });
     </script>
+        <script>
+        // Reveal obfuscated emails and ensure rel security
+        document.addEventListener('DOMContentLoaded', function(){
+            document.querySelectorAll('[data-user][data-domain]').forEach(function(el){
+                var email = el.getAttribute('data-user') + '@' + el.getAttribute('data-domain');
+                if (!el.textContent || el.textContent.trim() === '') {
+                    el.textContent = email;
+                }
+                if (el.tagName && el.tagName.toLowerCase() === 'a') {
+                    el.setAttribute('href', 'mailto:' + email);
+                }
+                if (!el.hasAttribute('onclick') && typeof window.openGmail === 'function') {
+                    el.addEventListener('click', function(){ window.openGmail(email); });
+                }
+            });
+            document.querySelectorAll('a[target="_blank"]').forEach(function(a){
+                var rel = (a.getAttribute('rel') || '').toLowerCase();
+                if (!rel) a.setAttribute('rel','noopener noreferrer');
+                else if (rel === 'noopener') a.setAttribute('rel','noopener noreferrer');
+            });
+        });
+        </script>
 </body>
 </html> 

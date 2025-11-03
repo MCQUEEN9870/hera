@@ -10,6 +10,28 @@
 
   gtag('config', 'G-V9X30VY879');
 </script>
+<script>
+// Reveal obfuscated emails and ensure security rel attributes
+document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('[data-user][data-domain]').forEach(function(el){
+        var email = el.getAttribute('data-user') + '@' + el.getAttribute('data-domain');
+        if (!el.textContent || el.textContent.trim() === '') {
+            el.textContent = email;
+        }
+        if (el.tagName && el.tagName.toLowerCase() === 'a') {
+            el.setAttribute('href', 'mailto:' + email);
+        }
+        if (!el.hasAttribute('onclick') && typeof window.openGmail === 'function') {
+            el.addEventListener('click', function(){ window.openGmail(email); });
+        }
+    });
+    document.querySelectorAll('a[target="_blank"]').forEach(function(a){
+        var rel = (a.getAttribute('rel') || '').toLowerCase();
+        if (!rel) a.setAttribute('rel','noopener noreferrer');
+        else if (rel === 'noopener') a.setAttribute('rel','noopener noreferrer');
+    });
+});
+</script>
  <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
@@ -19,7 +41,21 @@
  <!-- External CSS and Font Awesome for icons -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - Herapheri Goods</title>
+    <title>Contact Us | Herapheri Goods</title>
+    <meta property="og:title" content="Contact Us | Herapheri Goods">
+    <meta name="twitter:title" content="Contact Us | Herapheri Goods">
+    <meta name="description" content="Contact Herapheri Goods for support, feedback, or questions. Quick responses and helpful FAQs to guide you." />
+    <meta property="og:description" content="Contact Herapheri Goods for support, feedback, or questions. Quick responses and helpful FAQs to guide you." />
+    <meta name="twitter:description" content="Contact Herapheri Goods for support, feedback, or questions. Quick responses and helpful FAQs to guide you." />
+    <!-- Social Media Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://herapherigoods.in/contact-us" />
+    <meta property="og:site_name" content="Herapheri Goods" />
+    <meta property="og:image" content="attached_assets/images/1200x630.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="attached_assets/images/1200x630.jpg" />
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
@@ -341,7 +377,7 @@
 
     <!-- Hero Section with GIF Background -->
     <div class="contact-hero-section">
-        <img src="attached_assets/animation/contact us.gif" alt="Contact Us Animation" class="contact-hero-gif">
+    <img src="attached_assets/animation/contact us.gif" alt="Contact Us Animation" title="Contact Us Animation" class="contact-hero-gif">
         <div class="contact-hero-overlay"></div>
         <div class="contact-hero-title">
             <h1>Contact Us</h1>
@@ -654,7 +690,7 @@
                     </li>
                     <li>
                         <i class="fas fa-envelope"></i>
-                        <span class="email-link" onclick="openGmail('info@herapherigoods.in')" style="cursor: pointer; color: #fff">info@herapherigoods.in</span>
+                        <span class="email-link" data-user="info" data-domain="herapherigoods.in" style="cursor: pointer; color: #fff"></span>
                     </li>
                 </ul>
             </div>

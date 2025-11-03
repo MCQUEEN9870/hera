@@ -136,7 +136,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 
 .navbar-logo img {
   margin: 0;
-  max-width: 50x;
+    max-width: 50px;
   width: 20%;
   height: auto;
   object-fit: contain;
@@ -400,6 +400,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
   margin-right: 8px;
   vertical-align: middle;
   color: #666;
+    object-fit: contain;
 }
 
 .dropdown-content ul li a:hover .trailer-icon {
@@ -412,6 +413,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
   margin-right: 8px;
   vertical-align: middle;
   color: #666;
+    object-fit: contain;
 }
 
 .dropdown-content ul li a:hover .vehicle-icon {

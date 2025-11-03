@@ -12,7 +12,9 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy - Herapheri Goods</title>
+    <title>Privacy Policy | Herapheri Goods</title>
+    <meta property="og:title" content="Privacy Policy | Herapheri Goods">
+    <meta name="twitter:title" content="Privacy Policy | Herapheri Goods">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- AOS (Animate On Scroll) library for animations -->
@@ -112,7 +114,7 @@
 </head>
 <body>
     <div class="content">
-        <img src="attached_assets\images\herapheri_logo-removebg-preview.webp" alt="Herapheri Logo" class="privacy-logo" data-aos="zoom-in" data-aos-duration="800">
+    <img src="attached_assets\images\herapheri_logo-removebg-preview.webp" alt="Herapheri Logo" title="Herapheri Goods Logo" class="privacy-logo" data-aos="zoom-in" data-aos-duration="800">
         <h1 class="privacy-policy-heading" data-aos="fade-down" data-aos-duration="1000">Privacy Policy</h1>
         <div class="privacy-content">
             <p class="effective-date" data-aos="flip-up" data-aos-duration="800">Effective Date: August 15, 2025</p>
@@ -220,7 +222,7 @@
 
             <div class="policy-section" data-aos="fade-left" data-aos-duration="800" data-aos-delay="800">
                 <h2 data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="800">10. Children's Privacy</h2>
-                <p data-aos="fade-up" data-aos-duration="800" data-aos-delay="900">Our services are not intended for children under the age of 13. We do not knowingly collect personal information from children. If we become aware that we have inadvertently received personal information from a child under 13, we will take steps to delete such information as soon as possible. If you believe we might have any information from or about a child, please contact us at <a href="mailto:info@herapherigoods.in" class="highlight-text" onclick="openGmail('info@herapherigoods.in')">info@herapherigoods.in</a>.</p>
+                <p data-aos="fade-up" data-aos-duration="800" data-aos-delay="900">Our services are not intended for children under the age of 13. We do not knowingly collect personal information from children. If we become aware that we have inadvertently received personal information from a child under 13, we will take steps to delete such information as soon as possible. If you believe we might have any information from or about a child, please contact us at <a href="#" class="highlight-text email-link" data-user="info" data-domain="herapherigoods.in">Email us</a>.</p>
             </div>
 
             <div class="policy-section" data-aos="fade-left" data-aos-duration="800" data-aos-delay="900">
@@ -231,7 +233,7 @@
                     <li>Opt-out of marketing communications.</li>
                     <li>Request details about how your data is used.</li>
                 </ul>
-                <p data-aos="fade-up" data-aos-duration="800" data-aos-delay="1200">For any data-related queries, contact us at <a href="mailto:info@herapherigoods.in" class="highlight-text" onclick="openGmail('info@herapherigoods.in')">info@herapherigoods.in</a>.</p>
+                <p data-aos="fade-up" data-aos-duration="800" data-aos-delay="1200">For any data-related queries, contact us at <a href="#" class="highlight-text email-link" data-user="info" data-domain="herapherigoods.in">Email us</a>.</p>
             </div>
 
             <div class="policy-section" data-aos="fade-left" data-aos-duration="800" data-aos-delay="1000">
@@ -243,7 +245,7 @@
                 <h2 data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="1100">13. Contact Us</h2>
                 <p data-aos="fade-up" data-aos-duration="800" data-aos-delay="1200">If you have any questions regarding this Privacy Policy, you can contact us at:</p>
                 <ul data-aos="fade-up" data-aos-duration="800" data-aos-delay="1300">
-                    <li><strong>Email</strong>: <a href="mailto:info@herapherigoods.in" class="highlight-text" onclick="openGmail('info@herapherigoods.in')">info@herapherigoods.in</a></li>
+                    <li><strong>Email</strong>: <a href="#" class="highlight-text email-link" data-user="info" data-domain="herapherigoods.in">Email us</a></li>
                     <li><strong>Phone</strong>: +91 9411292852</li>
                     <li><strong>Address</strong>: Fatehabad, Agra, Uttar Pradesh, India</li>
                 </ul>
@@ -276,7 +278,7 @@
                 <ul class="contact-info">
                     <li><i class="fas fa-map-marker-alt"></i><span>Fatehabad, Agra, Uttar Pradesh, India</span></li>
                     <li><i class="fas fa-phone"></i><span>+91 9411292852</span></li>
-                    <li><i class="fas fa-envelope"></i><span onclick="openGmail('info@herapherigoods.in')" style="text-decoration: none; color: inherit;" onmouseover="this.style.textDecoration='underline'; this.style.color='white';" onmouseout="this.style.textDecoration='none'; this.style.color='inherit';">info@herapherigoods.in</span></li>
+                    <li><i class="fas fa-envelope"></i><span class="email-link" data-user="info" data-domain="herapherigoods.in" style="text-decoration: none; color: inherit;" onmouseover="this.style.textDecoration='underline'; this.style.color='white';" onmouseout="this.style.textDecoration='none'; this.style.color='inherit';"></span></li>
                     <li><i class="fas fa-clock"></i><span>Mon - Sat: 9:00 AM - 8:00 PM</span></li>
                 </ul>
             </div>
@@ -474,5 +476,27 @@ Best regards,
             document.head.appendChild(styleElement);
         });
     </script>
+        <script>
+        // Reveal obfuscated emails and ensure rel security
+        document.addEventListener('DOMContentLoaded', function(){
+            document.querySelectorAll('[data-user][data-domain]').forEach(function(el){
+                var email = el.getAttribute('data-user') + '@' + el.getAttribute('data-domain');
+                if (!el.textContent || el.textContent.trim() === '' || el.textContent.toLowerCase().includes('email')) {
+                    el.textContent = email;
+                }
+                if (el.tagName && el.tagName.toLowerCase() === 'a') {
+                    el.setAttribute('href', 'mailto:' + email);
+                }
+                if (!el.hasAttribute('onclick') && typeof window.openGmail === 'function') {
+                    el.addEventListener('click', function(){ window.openGmail(email); });
+                }
+            });
+            document.querySelectorAll('a[target="_blank"]').forEach(function(a){
+                var rel = (a.getAttribute('rel') || '').toLowerCase();
+                if (!rel) a.setAttribute('rel','noopener noreferrer');
+                else if (rel === 'noopener') a.setAttribute('rel','noopener noreferrer');
+            });
+        });
+        </script>
 </body>
 </html> 
