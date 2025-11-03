@@ -1193,7 +1193,8 @@
           'Even your crush writes longer texts than this.',
           'Minimum 50-500 characters required to post.',
           'We love short posts, but not this short.',
-          'Short posts are cool, but this one’s too short to help anyone.'
+          'Short posts are cool, but this one’s too short to help anyone.',
+          'कृपया कम से कम 50-500 अक्षर तक लिखें।'
         ];
         const realTips = [
           'Please write at least 50-500 characters.',
@@ -1202,7 +1203,8 @@
           'Please add more details to help transporters.',
           'We couldn’t publish this. Add more content.',
           'Only 50-500 characters allowed.',
-          'Please write between 50-500 characters.'
+          'Please write between 50-500 characters.',
+          'कृपया 50-500 अक्षर के बीच लिखें।'
         ];
         let tipClicks = 0;
         function showTip(message) {
@@ -1323,16 +1325,7 @@
           });
         });
 
-        // Show tooltip also on hover when invalid (desktop only)
-        postBtn.addEventListener('mouseenter', function() {
-          const len = textLength();
-          if (len >= 50 && len <= 500 && hasCategory()) return;
-          const useFunny = tipClicks % 2 === 0;
-          tipClicks++;
-          const list = useFunny ? funnyTips : realTips;
-          const msg = list[Math.floor(Math.random() * list.length)];
-          showTip(msg);
-        });
+        // Hover tips removed per request: no tooltip on hover, only on click validation
 
         // Category chip filtering
         const chipRow = document.getElementById('filters');
