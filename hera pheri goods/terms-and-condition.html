@@ -12,6 +12,16 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Critical CSS: prevent brief flash before main stylesheet loads -->
+    <style>
+        html { box-sizing: border-box; }
+        *, *::before, *::after { box-sizing: inherit; }
+        body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+        img { max-width: 100%; height: auto; display: block; }
+        .nav-links { list-style: none; margin: 0; padding: 0; display: flex; gap: 12px; }
+        .dropdown-content { display: none; }
+        .mobile-sidebar, .share-drawer .share-content, .review-content { display: none; }
+    </style>
     <title>Terms & Conditions | Herapheri Goods</title>
     <meta property="og:title" content="Terms & Conditions | Herapheri Goods">
     <meta name="twitter:title" content="Terms & Conditions | Herapheri Goods">
@@ -342,15 +352,21 @@ Best regards,
         // Reveal obfuscated emails and ensure rel security
         document.addEventListener('DOMContentLoaded', function(){
             document.querySelectorAll('[data-user][data-domain]').forEach(function(el){
-                var email = el.getAttribute('data-user') + '@' + el.getAttribute('data-domain');
-                if (!el.textContent || el.textContent.trim() === '') {
-                    el.textContent = email;
-                }
+                var at = String.fromCharCode(64);
+                var email = el.getAttribute('data-user') + at + el.getAttribute('data-domain');
+                // Keep visible text generic; avoid exposing plaintext email in DOM
                 if (el.tagName && el.tagName.toLowerCase() === 'a') {
                     el.setAttribute('href', 'mailto:' + email);
+                    if (!el.getAttribute('title')) el.setAttribute('title', 'Email us');
+                    if (!el.textContent || el.textContent.trim() === '') el.textContent = 'Email us';
+                } else {
+                    el.setAttribute('role','link');
+                    el.setAttribute('tabindex','0');
+                    if (!el.textContent || el.textContent.trim() === '') el.textContent = 'Email us';
                 }
                 if (!el.hasAttribute('onclick') && typeof window.openGmail === 'function') {
                     el.addEventListener('click', function(){ window.openGmail(email); });
+                    el.addEventListener('keydown', function(e){ if (e.key === 'Enter') window.openGmail(email); });
                 }
             });
             document.querySelectorAll('a[target="_blank"]').forEach(function(a){

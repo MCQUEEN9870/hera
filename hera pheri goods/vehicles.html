@@ -12,6 +12,16 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Critical CSS: prevent brief flash before main stylesheet loads -->
+    <style>
+        html { box-sizing: border-box; }
+        *, *::before, *::after { box-sizing: inherit; }
+        body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+        img { max-width: 100%; height: auto; display: block; }
+        .nav-links { list-style: none; margin: 0; padding: 0; display: flex; gap: 12px; }
+        .dropdown-content { display: none; }
+        .mobile-sidebar, .share-drawer .share-content, .review-content { display: none; }
+    </style>
     <title>Find Transport Vehicles Near You - Get Owner Details Free</title>
     <meta property="og:title" content="Find Transport Vehicles Near You | Herapheri Goods">
     <meta name="twitter:title" content="Find Transport Vehicles Near You | Herapheri Goods">
@@ -932,18 +942,8 @@
 <body>
     <!-- Navigation Bar Section -->
     <nav class="navbar" style ="height: 115px;">
-        <!-- Logo Section -->
-        <div class="navbar-logo logo">
-            <a href="index">
-                <img src="#" alt="Herapheri Goods Logo" title="Herapheri Goods Logo" class="logo-img" />
-            </a>
-        </div>
-
-        <!-- Navigation Links -->
         <ul class="nav-links">
-            
-            
-            <li>
+           <li>
                 <a href="index" class="nav-item"><span>Home</span></a>
             </li>
             
@@ -951,7 +951,7 @@
             <li id="authSection" style="display: none;">
                 <a href="driver-dashboard" class="nav-item"> 
                     <span>
-                        <img src="attached_assets/images/user.webp" class="profile-icon" alt="User profile" title="User profile">
+                        <img loading="lazy" decoding="async" src="attached_assets/images/user.webp" class="profile-icon" alt="User profile" title="User profile">
                     </span>
                 </a>
             </li>

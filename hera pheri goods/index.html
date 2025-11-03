@@ -18,18 +18,20 @@
   
   <!-- AdSense site verification -->
   <meta name="google-adsense-account" content="ca-pub-9790279842280207">
+  
+  
  
   <!-- Preconnects to speed up third-party hosts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <title>Herapherigoods - Register & Find Transport Vehicles in India – Free, No Brokers</title>
-  <meta property="og:title" content="Herapherigoods - Register & Find Transport Vehicles in India for free - No Brokers" />
-  <meta name="twitter:title" content="Herapherigoods - Register & Find Transport Vehicles in India for free - No Brokers" />
-  <meta name="description" content="Herapherigoods - Register Transport vehicle and Find trucks, tempos/autos, JCBs, maxx, packers&movers, and more just by pincode. Contact To Vehicle owner Directly — no commission." />
-  <meta property="og:description" content="Herapherigoods - Register Transport vehicle and Find trucks, tempos/autos, JCBs, maxx, packers&movers, and more just by pincode. Contact To Vehicle owner Directly — no commission." />
-  <meta name="twitter:description" content="Herapherigoods - Register Transport vehicle and Find trucks, tempos/autos, JCBs, maxx, packers&movers, and more just by pincode. Contact To Vehicle owner Directly — no commission." />
-  
+  <title>Herapherigoods - List & Find Transport Vehicles in India - Free</title>
+  <meta property="og:title" content="Herapherigoods - List & Find Transport Vehicles in India for free - No Brokers" />
+  <meta name="twitter:title" content="Herapherigoods - List & Find Transport Vehicles in India for free - No Brokers" />
+  <meta name="description" content="Herapherigoods - List Transport vehicle Free and Find trucks, tempos/autos, JCBs, maxx, packers&movers, and more just by pincode." />
+  <meta property="og:description" content="Herapherigoods - List Transport vehicle Free and Find trucks, tempos/autos, JCBs, maxx, packers&movers, and more just by pincode. Contact To Vehicle owner Directly." />
+  <meta name="twitter:description" content="Herapherigoods - List Transport vehicle Free and Find trucks, tempos/autos, JCBs, maxx, packers&movers, and more just by pincode. Contact To Vehicle owner Directly." />
+
   <!-- Social Media Meta Tags -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://herapherigoods.in/" />
@@ -50,25 +52,20 @@
     <link rel="manifest" href="site.webmanifest">
     
     <!-- External CSS and Font Awesome for icons -->
-  <!-- Load main CSS non-blocking with preload+swap -->
-  <link rel="preload" href="style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="style.css"></noscript>
+  <!-- Load main CSS in the standard blocking way -->
+  <link rel="stylesheet" href="style.css">
     
-  <!-- Load Font Awesome non-blocking -->
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+  <!-- Load Font Awesome normally -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
  
-    <!-- Load Google Fonts CSS non-blocking with preload+swap -->
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet"></noscript>
+    <!-- Load Google Fonts CSS normally -->
+    <link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet">
     
     <!-- GSAP library for animations -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     
-    <!-- AOS (Animate On Scroll) library for scroll animations -->
-    <!-- Load AOS CSS non-blocking -->
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" /></noscript>
+  <!-- AOS (Animate On Scroll) library for scroll animations -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     
   <!-- Google AdSense (loads async, non-blocking) -->
@@ -329,6 +326,7 @@
           alt="Herapheri Goods Logo"
           title="Herapheri Goods Logo"
           class="logo-img"
+          decoding="async" fetchpriority="high"
         />
         <span class="brand-wordmark">Herapheri Goods</span>
       </div>
@@ -417,7 +415,7 @@
               <h3 title="Used for shifting homes, delivering parcels, and other transport services in cities."><i class="fas fa-boxes-packing"></i>Service-Based Vehicles</h3>
               <ul>
                 <!-- Packer&Movers Vehicle List Items -->
-                <li><a href="vehicles?type=Packer&Movers" title="For house shifting, office relocation, or furniture transport. Select this if you provide loading/unloading services too."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\Packers.webp" alt="Packer&Movers" title="Packers & Movers" class="vehicle-icon">Packer&Movers<img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\movers.webp" alt="Packer&Movers" title="Packers & Movers" class="vehicle-icon"></a></li>
+                <li><a href="vehicles?type=Packer&Movers" title="For house shifting, office relocation, or furniture transport. Select this if you provide loading/unloading services too."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\Packers.webp" alt="Packer" title="Packers & Movers" class="vehicle-icon">Packer&Movers<img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\movers.webp" alt="Movers" title="Packers & Movers" class="vehicle-icon"></a></li>
                 <li><a href="vehicles?type=Parcel Delivery" title="For local & city-to-city parcel deliveries. If you deliver packages, documents, small cargo, select this. "><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\delivery-man.webp" alt="Parcel Delivery" title="Parcel Delivery" class="vehicle-icon"> Parcel Delivery</a></li>
               </ul>
             </div>
@@ -446,7 +444,7 @@
         <li id="authSection" style="display: none;">
             <a href="driver-dashboard" title="View your profile and manage your vehicles" class="nav-item"> 
               <span>
-                <img src="attached_assets/images/user.webp" class="profile-icon" alt="User profile" title="User profile">
+                <img loading="lazy" decoding="async" src="attached_assets/images/user.webp" class="profile-icon" alt="User profile" title="User profile">
               </span>
             </a>
         </li>
@@ -487,10 +485,10 @@
     </aside>
 <main>
     <!-- Main Content Block -->
-    <div class="hero-section">
+    <div class="hero-section" id="hero-section">
       <!-- Hero Background GIF -->
       <div class="hero-background">
-  <img src="attached_assets/animation/original-956409b077ef559b755248f8c2291d51.gif" alt="Transport Animation" title="Transport Animation" class="hero-gif">
+  <img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/original-956409b077ef559b755248f8c2291d51.gif" alt="Transport Animation" title="Transport Animation" class="hero-gif">
       </div>
       
       <!-- Hero Content Overlay -->
@@ -505,12 +503,12 @@
             <div class="hero-features">
               <!-- List Vehicle Feature -->
               <div class="feature">
-                <img src="attached_assets/animation/animated truck.gif" alt="Animated Truck" title="List Your Vehicle" class="feature-icon">
+                <img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/animated truck.gif" alt="Animated Truck" title="List Your Vehicle" class="feature-icon">
                 <span>List Your Vehicle</span>
               </div>
               <!-- Earn More Feature -->
               <div class="feature">
-                <img src="attached_assets/animation/earn more.gif" alt="Earn More" title="Earn More" class="feature-icon">
+                <img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/earn more.gif" alt="Earn More" title="Earn More" class="feature-icon">
                 <span>Earn More</span>
               </div>
             </div>
@@ -529,7 +527,7 @@
           <!-- Find Vehicle Content -->
           <div class="find-vehicle-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
             <h2>Find Nearby Transport Vehicle</h2>
-            <p>Search for available transport vehicles according to your need in your area and get information about the vehicle</p>
+            <p>Search for available transport vehicles according to your need in your area and get information of transport vehicle owner directly - Free, No commission.</p>
             <!-- Find Vehicle Button -->
             <button class="find-vehicle-btn" onclick="window.location.href = 'vehicles.html'"><i class="fas fa-search"></i> Find Vehicle</button>
           </div>
@@ -548,7 +546,7 @@
     <div class="platform-description">
       <div class="description-container">
         <div class="platform-heading" data-aos="fade-down" data-aos-duration="800">
-          <img src="attached_assets\animation\Aapka-Apna-Transport-Network-t-unscreen.gif" alt="Truck Animation" title="Aapka Apna Transport Network animation" class="heading-animation">
+          <img loading="lazy" decoding="async" src="attached_assets\animation\Aapka-Apna-Transport-Network-t-unscreen.gif" alt="Truck Animation" title="Aapka Apna Transport Network animation" class="heading-animation">
           <h2>Herapheri Goods – Aapka Apna Transport Network!</h2>
         </div>
         <p class="main-description" data-aos="fade-up" data-aos-duration="800">Do you need transportation for your goods, want to send items, or require any kind of delivery service? Herapheri Goods is a free listing platform that directly connects transport vehicle owners with customers—without any third-party commissions!</p>
@@ -985,7 +983,7 @@
             <h3>Quick Links</h3>
             <ul>
                 <li><a href="#" class="scroll-to-top"><i class="fas fa-chevron-right"></i> Home</a></li>
-                <li><a href="#registration-section" class="scroll-link"><i class="fas fa-chevron-right"></i> Register your Transport Vehicle</a></li>
+                <li><a href="#hero-section" class="scroll-link"><i class="fas fa-chevron-right"></i> Register your Transport Vehicle</a></li>
                 <li><a href="#find-vehicle-section" class="scroll-link"><i class="fas fa-chevron-right"></i> Find Vehicle</a></li>
                 <li><a href="privacy-policy"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
                 <li><a href="terms-and-condition"><i class="fas fa-chevron-right"></i> Terms & Conditions</a></li>
@@ -1007,7 +1005,7 @@
                 </li>
                 <li>
                     <i class="fas fa-envelope"></i>
-                    <span class="email-link" data-user="info" data-domain="herapherigoods.in" style="text-decoration: none; color: inherit;" onmouseover="this.style.textDecoration='underline'; this.style.color='white';" onmouseout="this.style.textDecoration='none'; this.style.color='inherit';"></span>
+                    <span class="email-link" data-user="info" data-domain="herapherigoods.in" style="text-decoration: none; color: inherit; cursor: pointer;" onmouseover="this.style.textDecoration='underline'; this.style.color='white';" onmouseout="this.style.textDecoration='none'; this.style.color='inherit';">Email us</span>
                 </li>
                 <li>
                     <i class="fas fa-clock"></i>
@@ -1248,7 +1246,7 @@ Best regards,
 
       // Show only if not logged in and not seen this session
       if (!isLoggedIn && !hasSeen) {
-        setTimeout(openTutorial, 5500); // ~5-6 seconds
+        setTimeout(openTutorial, 10000);
       }
     } catch (err) {
       console.warn('Tutorial popup init failed:', err);
@@ -1278,7 +1276,7 @@ Best regards,
               setTimeout(() => { nudging = false; }, 450);
             }, 650);
           }
-        }, 6000);
+        }, 10000);
       }
 
       function stopNudge() {
@@ -1375,17 +1373,25 @@ Best regards,
 <!-- Email obfuscation and rel fixes -->
 <script>
   document.addEventListener('DOMContentLoaded', function(){
-    // Reveal obfuscated emails
+    // Reveal obfuscated emails without showing plaintext address
     document.querySelectorAll('[data-user][data-domain]').forEach(function(el){
-      var email = el.getAttribute('data-user') + '@' + el.getAttribute('data-domain');
-      if (!el.textContent || el.textContent.trim() === '') {
-        el.textContent = email;
-      }
+      var at = String.fromCharCode(64);
+      var email = el.getAttribute('data-user') + at + el.getAttribute('data-domain');
+      // Do NOT replace visible text with the email; keep existing label (e.g., "Email us")
       if (el.tagName && el.tagName.toLowerCase() === 'a') {
         el.setAttribute('href', 'mailto:' + email);
+        if (!el.getAttribute('title')) el.setAttribute('title', 'Email us');
+      } else {
+        // Make spans/divs act like a link
+        el.setAttribute('role','link');
+        el.setAttribute('tabindex','0');
+        if (!el.textContent || el.textContent.trim() === '') {
+          el.textContent = 'Email us';
+        }
       }
       if (!el.hasAttribute('onclick') && typeof window.openGmail === 'function') {
         el.addEventListener('click', function(){ window.openGmail(email); });
+        el.addEventListener('keydown', function(e){ if (e.key === 'Enter') window.openGmail(email); });
       }
     });
 
