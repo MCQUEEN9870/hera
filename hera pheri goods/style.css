@@ -962,7 +962,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     }
     
     .hero-content h1 {
-        font-size: 2.8rem;
+        font-size: 3.2rem;
         margin-bottom: 15px;
     }
     
@@ -2614,6 +2614,364 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     
     .card-btn {
         padding: 8px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Why Choose Herapheri Goods Section */
+.why-choose-section {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 80px 0;
+    overflow: hidden;
+}
+
+.why-choose-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Section Header with Hero Image */
+.why-choose-header {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 80px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.why-hero-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    object-position: center 30%;
+    max-height: 400px;
+}
+
+.why-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(26, 35, 126, 0.85) 0%, rgba(255, 152, 0, 0.75) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px;
+}
+
+.why-hero-overlay h2 {
+    font-size: 4rem;
+    color: white;
+    margin: 0 0 20px 0;
+    letter-spacing: 1px;
+    font-family: "Agu Display", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "MORF" 0;
+}
+
+.why-hero-overlay p {
+    font-size: 1.5rem;
+    color: white;
+    margin: 0;
+    font-weight: 400;
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.why-hero-overlay strong {
+    font-weight: 700;
+    color: #ffd54f;
+}
+
+/* Feature Cards Wrapper */
+.why-features-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+}
+
+/* Individual Feature Card - No box, transparent background */
+.why-feature-card {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    background: transparent;
+    padding: 40px 0;
+    transition: transform 0.3s ease;
+    position: relative;
+}
+
+/* Left Image Layout - Image first, then content */
+.why-feature-card.left-image {
+    flex-direction: row;
+}
+
+.why-feature-card.left-image .why-feature-image {
+    order: 1;
+}
+
+.why-feature-card.left-image .why-feature-content {
+    order: 2;
+}
+
+/* Right Image Layout - Content first, then image */
+.why-feature-card.right-image {
+    flex-direction: row;
+}
+
+.why-feature-card.right-image .why-feature-content {
+    order: 1;
+}
+
+.why-feature-card.right-image .why-feature-image {
+    order: 2;
+}
+
+/* Feature Image */
+.why-feature-image {
+    flex: 0 0 45%;
+    position: relative;
+}
+
+.why-feature-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    object-fit: cover;
+    max-height: 350px;
+}
+
+.why-feature-image img:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+/* Feature Content */
+.why-feature-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.why-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(26, 35, 126, 0.4);
+}
+
+.why-icon i {
+    font-size: 2.2rem;
+    color: white;
+}
+
+.why-feature-content h3 {
+    font-size: 2.5rem;
+    color: #1a237e;
+    margin: 0;
+    font-weight: 800;
+    line-height: 1.2;
+    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+    font-family: "Big Shoulders Stencil", sans-serif;
+}
+
+.why-feature-content p {
+    font-size: 1.15rem;
+    color: #37474f;
+    line-height: 1.8;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.3);
+    padding: 15px;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+}
+
+/* Each line in paragraph for AOS animation */
+.why-feature-content p span {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.why-feature-content p span:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .why-feature-card {
+        padding: 40px;
+        gap: 40px;
+    }
+    
+    .why-hero-overlay h2 {
+        font-size: 2.8rem;
+    }
+    
+    .why-hero-overlay p {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 968px) {
+    .why-choose-section {
+        padding: 60px 0;
+    }
+    
+    .why-choose-header {
+        margin-bottom: 60px;
+    }
+    
+    .why-hero-overlay h2 {
+        font-size: 2.2rem;
+    }
+    
+    .why-hero-overlay p {
+        font-size: 1.1rem;
+    }
+    
+    .why-features-wrapper {
+        gap: 40px;
+    }
+    
+    .why-feature-card {
+        padding: 30px;
+        gap: 30px;
+    }
+    
+    .why-feature-content h3 {
+        font-size: 1.8rem;
+    }
+    
+    .why-feature-content p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .why-choose-section {
+        padding: 40px 0;
+    }
+    
+    .why-choose-header {
+        margin-bottom: 40px;
+        border-radius: 15px;
+    }
+    
+    .why-hero-image {
+        max-height: 250px;
+        /* Slightly smaller shift on mobile to keep text readable */
+        transform: translateY(12px);
+        object-position: center 50%;
+    }
+    
+    .why-hero-overlay {
+        padding: 20px;
+    }
+    
+    .why-hero-overlay h2 {
+        font-size: 1.8rem;
+    }
+    
+    .why-hero-overlay p {
+        font-size: 1rem;
+    }
+    
+    .why-features-wrapper {
+        gap: 30px;
+    }
+    
+    /* Stack on mobile */
+    .why-feature-card,
+    .why-feature-card.left-image,
+    .why-feature-card.right-image {
+        flex-direction: column;
+        padding: 30px 0;
+        gap: 25px;
+    }
+    
+    /* Reset order on mobile - always show image first */
+    .why-feature-card.left-image .why-feature-image,
+    .why-feature-card.right-image .why-feature-image {
+        order: 1;
+    }
+    
+    .why-feature-card.left-image .why-feature-content,
+    .why-feature-card.right-image .why-feature-content {
+        order: 2;
+    }
+    
+    .why-feature-image {
+        flex: 1;
+        width: 100%;
+    }
+    
+    .why-feature-image img {
+        max-height: 250px;
+    }
+    
+    .why-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .why-icon i {
+        font-size: 1.6rem;
+    }
+    
+    .why-feature-content h3 {
+        font-size: 1.5rem;
+    }
+    
+    .why-feature-content p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+}
+
+@media (max-width: 480px) {
+    .why-choose-section {
+        padding: 30px 0;
+    }
+    
+    .why-hero-overlay h2 {
+        font-size: 1.5rem;
+    }
+    
+    .why-hero-overlay p {
+        font-size: 0.9rem;
+    }
+    
+    .why-feature-card {
+        padding: 20px;
+        border-radius: 15px;
+    }
+    
+    .why-feature-image img {
+        border-radius: 10px;
+        max-height: 200px;
+    }
+    
+    .why-feature-content h3 {
+        font-size: 1.3rem;
+    }
+    
+    .why-feature-content p {
         font-size: 0.9rem;
     }
 }

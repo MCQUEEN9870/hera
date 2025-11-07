@@ -908,4 +908,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
+// ==========================================
+// Why Choose Section - Using AOS for line-by-line text animation
+// ==========================================
+// All animations are handled by AOS data attributes in HTML
 

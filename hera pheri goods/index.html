@@ -60,9 +60,16 @@
  
     <!-- Load Google Fonts CSS normally -->
     <link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Agu+Display&display=swap" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Agu+Display&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:opsz,wght@10..72,100..900&display=swap" rel="stylesheet">
     
     <!-- GSAP library for animations -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     
   <!-- AOS (Animate On Scroll) library for scroll animations -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
@@ -554,36 +561,6 @@
         </div>
         <p class="main-description" data-aos="fade-up" data-aos-duration="800">Do you need transportation for your goods, want to send items, or require any kind of delivery service? Herapheri Goods is a free listing platform that directly connects transport vehicle owners with customers—without any third-party commissions!</p>
         
-        <div class="features-section" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
-          <h3>🏆 Why Choose Herapheri Goods?</h3>
-          <div class="features-grid">
-            <div class="feature-item" data-aos="fade-up" data-aos-delay="300">
-              <i class="fas fa-handshake"></i>
-              <p>Direct Connection with Transport Owners – No brokers or middlemen! You can directly contact to trusted truck, mini truck, auto, e-rickshaw, JCB, crane owners, and other transport vehicles in your area.</p>
-            </div>
-            <div class="feature-item" data-aos="fade-up" data-aos-delay="400">
-              <i class="fas fa-truck-loading"></i>
-              <p>All Types of Transport Vehicles Available – From small deliveries to heavy-duty shifting, we have solutions for all types of commercial and personal goods transport. "Truck, Auto, Crane, Packers & Movers, and more – Everything You Need is Here!"</p>
-            </div>
-            <div class="feature-item" data-aos="fade-up" data-aos-delay="500">
-              <i class="fas fa-bolt"></i>
-              <p>Fast & Hassle-Free Process – Simply search for the vehicle you need, contact the owner, and finalize the best deal. No extra charges!</p>
-            </div>
-            <div class="feature-item" data-aos="fade-up" data-aos-delay="600">
-              <i class="fas fa-percentage"></i>
-              <p>No Hidden Fees, No Commission – Your connection is direct with the vehicle owner, so you get the best price and service.</p>
-            </div>
-            <div class="feature-item" data-aos="fade-up" data-aos-delay="700">
-              <i class="fas fa-list"></i>
-              <p>Free Listing for Transport Owners – If you own a truck, mini truck, crane, other transport vehicles you can list your vehicle for free and reach to more new customers.</p>
-            </div>
-            <div class="feature-item" data-aos="fade-up" data-aos-delay="800">
-              <i class="fas fa-chart-line"></i>
-              <p>Paid Listing Feature – Transport vehicle owners can promote their listing to reach more customers and increase their income.</p>
-            </div>
-          </div>
-        </div>
-
         <div class="how-it-works" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
           <h3>🚛 How Herapheri Goods Works?</h3>
           <div class="steps-grid">
@@ -782,6 +759,134 @@
           </div>
         </div>
     </div>
+
+    <!-- Why Choose Herapheri Goods Section -->
+    <section class="why-choose-section">
+      <div class="why-choose-container">
+        <!-- Section Header with Hero Image -->
+        <div class="why-choose-header" data-aos="fade-down" data-aos-duration="1200" data-aos-offset="300">
+          <img src="attached_assets/images/why-choose-herapheri-goods.webp" alt="Why Choose Herapheri Goods" title="Why Choose Herapheri Goods" class="why-hero-image" loading="lazy">
+          <div class="why-hero-overlay">
+            <h2 data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="300" data-aos-offset="300">Why Choose Herapheri Goods ?</h2>
+            <p data-aos="fade-up" data-aos-duration="800" data-aos-delay="600" data-aos-offset="300">Because we make it <strong>free</strong> and <strong>easy</strong> — customers <strong>find</strong> trusted transport vehicles, and vehicle owners <strong>list</strong> their vehicles to reach the right demand.</p>
+          </div>
+        </div>
+
+        <!-- Feature Cards with Alternating Layout -->
+        <div class="why-features-wrapper">
+          
+          <!-- Feature 1: Direct Connection (Image Left) -->
+          <div class="why-feature-card left-image">
+            <div class="why-feature-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="350">
+              <img src="attached_assets/images/direct-connection.webp" alt="Direct Connection" title="Direct Connection with Transport Owners" loading="lazy">
+            </div>
+            <div class="why-feature-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="300" data-aos-offset="350">
+              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500" data-aos-offset="350">
+                <i class="fas fa-handshake"></i>
+              </div>
+              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="600" data-aos-offset="350">Direct Connection</h3>
+              <p>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="700" data-aos-offset="350">Direct Connection with Transport Owners – No brokers or middlemen!</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="850" data-aos-offset="350">Customers can directly contact <strong>Verified</strong> trucks, mini trucks, autos, e-rickshaws, JCBs, crane, and other transport vehicle owners in your area.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="1000" data-aos-offset="350"><strong>List your vehicle</strong> at the right locations so customers can find you exactly when they need you — helping you get more trust and more bookings.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="1150" data-aos-offset="350">Simple. Transparent. No extra charges.</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 2: All Types (Image Right) -->
+          <div class="why-feature-card right-image">
+            <div class="why-feature-content" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="350">
+              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300" data-aos-offset="350">
+                <i class="fas fa-truck-loading"></i>
+              </div>
+              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="400" data-aos-offset="350">Various Categories</h3>
+              <p>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="350"><strong>Various Types of Transport Vehicles Available</strong> – From small local deliveries to long-distance shifting, <strong>Herapheri</strong> Goods connects you with every type of transport vehicles - From mini trucks and tempos to heavy-duty trailers, JCBs, cranes, even Packers&Movers, food or emergency vehicles, and more!</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="650" data-aos-offset="350">Whatever your goods, wherever your location, find the right vehicle instantly – all in one platform.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="800" data-aos-offset="350">One website, all transport solutions!</span>
+              </p>
+            </div>
+            <div class="why-feature-image" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200" data-aos-offset="350">
+              <img src="attached_assets/images/all-types.webp" alt="All Types of Vehicles" title="All Types of Transport Vehicles" loading="lazy">
+            </div>
+          </div>
+
+          <!-- Feature 3: Fast & Hassle-Free (Image Left) -->
+          <div class="why-feature-card left-image">
+            <div class="why-feature-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="350">
+              <img src="attached_assets/images/fast-&-hassle-free.webp" alt="Fast and Hassle-Free" title="Fast & Hassle-Free Process" loading="lazy">
+            </div>
+            <div class="why-feature-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="300" data-aos-offset="350">
+              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500" data-aos-offset="350">
+                <i class="fas fa-bolt"></i>
+              </div>
+              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="600" data-aos-offset="350">Quick Deals</h3>
+              <p>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="700" data-aos-offset="350"><strong>Fast & Hassle-Free Process</strong> – Search, connect, and close the deal quickly!</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="850" data-aos-offset="350"><strong>No lengthy registrations</strong>, no middlemen — Just find the right vehicle, contact the owner directly, and finalize your booking in minutes.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="1000" data-aos-offset="350">Save time. Save money. Get moving faster!</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 4: No Hidden Fees (Image Right) -->
+          <div class="why-feature-card right-image">
+            <div class="why-feature-content" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="350">
+              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300" data-aos-offset="350">
+                <i class="fas fa-percentage"></i>
+              </div>
+              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="400" data-aos-offset="350">No 3rd Party</h3>
+              <p>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="350"><strong>No Hidden Fees, No Commission</strong> – Your deal is directly with verified vehicle owners — no agents, no extra charges.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="650" data-aos-offset="350">Enjoy transparent pricing and fair communication, so you always know exactly what you’re paying for.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="800" data-aos-offset="350">Because trust, clarity, and affordability should come standard in every transaction.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="900" data-aos-offset="350">Trust made simple.</span>
+              </p>
+            </div>
+            <div class="why-feature-image" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200" data-aos-offset="350">
+              <img src="attached_assets/images/no-hidden-fees.webp" alt="No Hidden Fees" title="No Hidden Fees or Commission" loading="lazy">
+            </div>
+          </div>
+
+          <!-- Feature 5: Free Listing (Image Left) -->
+          <div class="why-feature-card left-image">
+            <div class="why-feature-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="350">
+              <img src="attached_assets/images/free-listing.webp" alt="Free Listing" title="Free Listing for Transport Owners" loading="lazy">
+            </div>
+            <div class="why-feature-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="300" data-aos-offset="350">
+              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500" data-aos-offset="350">
+                <i class="fas fa-list"></i>
+              </div>
+              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="600" data-aos-offset="350">Free For Vehicle Owners</h3>
+              <p>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="700" data-aos-offset="350">Free Listing for Transport Owners – If you own a truck, mini truck, crane, or other transport vehicles, List it completely free on Herapheri Goods and let nearby customers find you instantly.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="850" data-aos-offset="350">No subscription. No hidden charges. Just genuine connections that help you grow your Service faster — without spending a single rupee.</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 6: Paid Listing (Image Right) -->
+          <div class="why-feature-card right-image">
+            <div class="why-feature-content" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="350">
+              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300" data-aos-offset="350">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="400" data-aos-offset="350">Boost Your Reach</h3>
+              <p>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="350">Boost Your Reach with <strong>Featured Listings</strong></span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="650" data-aos-offset="350">Want more customers to notice your vehicles first? Upgrade to a featured listing and appear at the <strong>top of search results</strong> in your area.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="800" data-aos-offset="350">Gain higher visibility, attract more direct bookings, and increase your income — all while staying ahead of the competition.</span>
+              </p>
+            </div>
+            <div class="why-feature-image" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200" data-aos-offset="350">
+              <img src="attached_assets/images/paid-listing.webp" alt="Paid Listing Feature" title="Paid Listing to Boost Visibility" loading="lazy">
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
 
     <!-- Review Slide Bar -->
     <div class="review-sidebar">
@@ -1408,6 +1513,16 @@ Best regards,
       }
     });
   });
+  </script>
+
+  <!-- Debug GSAP Loading -->
+  <script>
+    window.addEventListener('load', function() {
+      console.log('Page fully loaded');
+      console.log('GSAP available:', typeof gsap !== 'undefined');
+      console.log('ScrollTrigger available:', typeof ScrollTrigger !== 'undefined');
+      console.log('Why Choose section exists:', document.querySelector('.why-choose-section') !== null);
+    });
   </script>
 
 </body>
