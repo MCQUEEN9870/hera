@@ -930,6 +930,48 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     transform: translateY(-3px);
     box-shadow: 0 12px 35px rgba(255, 165, 0, 0.6);
 }
+
+/* Click-It animation wrapper: overlay the gif ON the button (right side) */
+.btn-with-click-anim {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-with-click-anim .click-it-anim {
+    position: absolute;
+    right: 12px;
+    top: 28%;
+    transform: translateY(-50%);
+    width: 56px;
+    height: auto;
+    pointer-events: none; /* ensure button remains fully clickable */
+    user-select: none;
+    z-index: 3;
+    animation: subtleFloat 2.8s ease-in-out infinite;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35));
+}
+
+.btn-with-click-anim .click-it-anim.small {
+    width: 42px;
+    animation-duration: 3.4s;
+}
+
+/* Add extra right padding so text doesn't overlap the animation */
+.btn-with-click-anim .hero-btn { padding-right: 96px; }
+.btn-with-click-anim .find-vehicle-btn { padding-right: 72px; }
+
+@keyframes subtleFloat {
+    0%, 100% { transform: translateY(0) rotate(-2deg) scale(1); opacity: 0.95; }
+    50% { transform: translateY(-10px) rotate(2deg) scale(1.03); opacity: 1; }
+}
+
+/* Responsive adjustments for click-it */
+@media (max-width: 768px) {
+    .btn-with-click-anim .click-it-anim { width: 46px; right: 10px; }
+    .btn-with-click-anim .click-it-anim.small { width: 45px; height: auto; right: 10px; }
+    .btn-with-click-anim .hero-btn { padding-right: 76px; }
+    .btn-with-click-anim .find-vehicle-btn { padding-right: 60px; }
+}
 @media (max-width: 768px) {
     .hero-background {
         width: 100%;
@@ -1097,11 +1139,12 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     color: white;
     border: none;
     padding: 15px 40px;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     border-radius: 30px;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(255, 165, 0, 0.2);
+    font-weight: 600;
 }
 
 .find-vehicle-btn:hover {
@@ -1850,7 +1893,263 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     margin: 0;
 }
 
-/* How It Works Section */
+/* How It Works Section - Redesigned */
+.how-it-works-section {
+    padding: 100px 0;
+    background-image: url('attached_assets/images/how-it-works.webp');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    position: relative;
+    /* Full screen background - no container constraint */
+    width: 100vw;
+    margin: 0;
+    margin-left: calc(-50vw + 50%);
+}
+
+.how-it-works-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    /* Match hero overlay - simple dark transparent overlay */
+    background: rgba(0, 0, 0, 0.35) !important;
+    z-index: 1;
+}
+
+.how-it-works-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 2;
+}
+
+.how-it-works-header {
+    text-align: center;
+    margin-bottom: 80px;
+}
+
+.how-it-works-header h2 {
+    font-size: 5.5rem;
+    color: white;
+    margin: 0 0 20px 0;
+    font-family: "Agu Display", serif;
+    font-weight: 400;
+    text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.how-it-works-header p {
+    font-size: 2rem;
+    color: #ffd54f;
+    margin: 0;
+    font-weight: 500;
+    
+}
+
+.how-it-works-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 40px;
+    padding: 20px 0;
+}
+
+.how-step-card {
+    position: relative;
+    height: 450px;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    perspective: 1000px;
+}
+
+.how-step-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.how-step-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: cover; /* legacy support if inline style remains somewhere */
+    background-position: center;
+    transition: transform 0.6s ease;
+}
+
+.how-step-card:hover .how-step-bg {
+    transform: scale(1);
+}
+
+/* Ensure lazy-loaded <img> inside how-step-bg fills the card */
+.how-step-bg img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: transform 0.6s ease;
+}
+
+.how-step-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Match hero overlay - simple dark transparent overlay */
+    background: rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 30px;
+    text-align: center;
+    transition: background 0.4s ease;
+}
+
+.how-step-card:hover .how-step-overlay {
+    /* Slightly darker on hover */
+    background: rgba(0, 0, 0, 0.45);
+}
+
+/* Remove step number - hide it */
+.how-step-number {
+    display: none;
+}
+
+/* Remove step icon - hide it */
+.how-step-icon {
+    display: none;
+}
+
+.how-step-overlay h3 {
+    font-size: 2rem;
+    color: white;
+    margin: 0 0 20px 0;
+    font-weight: 700;
+    text-shadow: 2px 3px 6px rgba(0, 0, 0, 0.4);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-style: preserve-3d;
+}
+
+.how-step-card:hover .how-step-overlay h3 {
+    transform: translateZ(80px) translateY(-20px) scale(1.1);
+    text-shadow: 
+        4px 6px 12px rgba(0, 0, 0, 0.6),
+        8px 12px 24px rgba(0, 0, 0, 0.4),
+        12px 18px 36px rgba(0, 0, 0, 0.3),
+        0 0 40px rgba(255, 213, 79, 0.3);
+}
+
+.how-step-overlay p {
+    font-size: 1.2rem;
+    color: white;
+    line-height: 1.4;
+    margin: 0;
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s;
+    transform-style: preserve-3d;
+}
+
+.how-step-card:hover .how-step-overlay p {
+    transform: translateZ(60px) translateY(-10px) scale(1.05);
+    text-shadow: 
+        3px 5px 10px rgba(0, 0, 0, 0.6),
+        6px 10px 20px rgba(0, 0, 0, 0.4),
+        0 0 30px rgba(255, 213, 79, 0.2);
+}
+
+.how-step-overlay p strong {
+    color: #ffd54f;
+    font-weight: 700;
+}
+
+/* Responsive Design for How It Works */
+@media (max-width: 1024px) {
+    .how-it-works-header h2 {
+        font-size: 2.8rem;
+    }
+
+    .how-it-works-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+
+    .how-step-card {
+        height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .how-it-works-section {
+        padding: 60px 0;
+        background-attachment: scroll;
+    }
+
+    .how-it-works-header {
+        margin-bottom: 50px;
+    }
+
+    .how-it-works-header h2 {
+        font-size: 2.2rem;
+    }
+
+    .how-it-works-header p {
+        font-size: 1.1rem;
+    }
+
+    .how-it-works-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .how-step-card {
+        height: 350px;
+    }
+
+    .how-step-overlay {
+        padding: 30px 20px;
+    }
+
+    .how-step-number {
+        width: 50px;
+        height: 50px;
+        font-size: 1.6rem;
+    }
+
+    .how-step-icon {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+    }
+
+    .how-step-icon i {
+        font-size: 2.5rem;
+    }
+
+    .how-step-overlay h3 {
+        font-size: 1.6rem;
+        margin-bottom: 15px;
+    }
+
+    .how-step-overlay p {
+        font-size: 1rem;
+    }
+}
+
+/* Old How It Works Section - Keep for compatibility */
 .how-it-works {
     margin-bottom: 60px;
 }

@@ -522,8 +522,11 @@
                 <span>Earn More</span>
               </div>
             </div>
-            <!-- Hero Button -->
-            <button class="hero-btn" id="registerNowBtn">Register Now</button>
+            <!-- Hero Button with Click-It animation -->
+            <div class="btn-with-click-anim">
+              <button class="hero-btn" id="registerNowBtn">Register Now</button>
+              <img src="attached_assets/animation/click-it.gif" alt="Click hint animation" class="click-it-anim" loading="lazy" decoding="async" />
+            </div>
           </div>
         </div>
       </div>
@@ -538,8 +541,11 @@
           <div class="find-vehicle-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
             <h2>Find Nearby Transport Vehicle</h2>
             <p>Search for available transport vehicles according to your need in your area and get information of transport vehicle owner directly - Free, No commission.</p>
-            <!-- Find Vehicle Button -->
-            <button class="find-vehicle-btn" onclick="window.location.href = 'vehicles.html'"><i class="fas fa-search"></i> Find Vehicle</button>
+            <!-- Find Vehicle Button with Click-It animation (small, right side) -->
+            <div class="btn-with-click-anim">
+              <button class="find-vehicle-btn" onclick="window.location.href = 'vehicles.html'"><i class="fas fa-search"></i> Find Vehicle</button>
+              <img src="attached_assets/animation/click-it.gif" alt="Click hint animation" class="click-it-anim small" loading="lazy" decoding="async" />
+            </div>
           </div>
           <!-- Find Vehicle Image -->
           <div class="find-vehicle-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="200">
@@ -561,28 +567,6 @@
         </div>
         <p class="main-description" data-aos="fade-up" data-aos-duration="800">Do you need transportation for your goods, want to send items, or require any kind of delivery service? Herapheri Goods is a free listing platform that directly connects transport vehicle owners with customers—without any third-party commissions!</p>
         
-        <div class="how-it-works" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
-          <h3>🚛 How Herapheri Goods Works?</h3>
-          <div class="steps-grid">
-            <div class="step-item" data-aos="fade-up" data-aos-delay="500">
-              <div class="step-number">1️⃣</div>
-              <p>Customers – Choose the vehicle category according to your transportation requirement and see the available options.</p>
-            </div>
-            <div class="step-item" data-aos="fade-up" data-aos-delay="600">
-              <div class="step-number">2️⃣</div>
-              <p>Direct Contact – Contact any transport vehicle owner directly and discuss your requirements.</p>
-            </div>
-            <div class="step-item" data-aos="fade-up" data-aos-delay="700">
-              <div class="step-number">3️⃣</div>
-              <p>Best Deal Finalize – Choose the best service according to your budget and requirements—no middleman!</p>
-            </div>
-            <div class="step-item" data-aos="fade-up" data-aos-delay="800">
-              <div class="step-number">4️⃣</div>
-              <p>Transport as soon as possible! "Zaroorat Ho Jaha, Herapheri Ho Waha!" </p>
-            </div>
-          </div>
-        </div>
-
         <div class="cta-section" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
           <p>If you are a transport vehicle owner, list your vehicle for free and reach to more new customers! 📢</p>
           <p class="highlight">Now transportation is easy, cheap, and stress-free!</p>
@@ -759,6 +743,65 @@
           </div>
         </div>
     </div>
+
+    <!-- How It Works Section - Redesigned (Full Width) -->
+    <section class="how-it-works-section">
+      <div class="how-it-works-container">
+        <div class="how-it-works-header" data-aos="fade-down" data-aos-duration="1000" data-aos-offset="200">
+          <h2>How Herapheri Goods Works ?</h2>
+          <p>Simple steps to connect and transport your goods hassle-free</p>
+        </div>
+
+        <div class="how-it-works-grid">
+          <!-- Step 1: Choose Vehicle Category -->
+          <div class="how-step-card" data-aos="zoom-in" data-aos-duration="800" data-aos-offset="110" data-aos-anchor-placement="top-center">
+            <div class="how-step-bg">
+              <img src="attached_assets/images/vehicle-categories.webp" alt="Choose Vehicle Category" loading="lazy" decoding="async" fetchpriority="low">
+            </div>
+            <div class="how-step-overlay">
+              <h3>Register Your Vehicle</h3>
+              <p>Own a transport vehicle?
+              List it on HerapheriGoods.in in just a few minutes — no charges, no hidden commissions.
+              Whether it’s a truck, tempo, auto, JCB, Crane services, Packers & Movers or refrigerated van, registration is completely free and open to all verified owners.  
+              Start building your online presence today — absolutely free!</p>
+            </div>
+          </div>
+
+          <!-- Step 2: Direct Contact -->
+          <div class="how-step-card" data-aos="zoom-in" data-aos-duration="800" data-aos-offset="110" data-aos-anchor-placement="top-center">
+            <div class="how-step-bg">
+              <img src="attached_assets/images/direct-contact.webp" alt="Direct Contact with Owners" loading="lazy" decoding="async" fetchpriority="low">
+            </div>
+            <div class="how-step-overlay">
+              <h3>Direct Contact</h3>
+              <p>Contact any transport vehicle owner directly and discuss your requirements—no middleman involved!</p>
+            </div>
+          </div>
+
+          <!-- Step 3: Best Deal Finalize -->
+          <div class="how-step-card" data-aos="zoom-in" data-aos-duration="800" data-aos-offset="110" data-aos-anchor-placement="top-center">
+            <div class="how-step-bg">
+              <img src="attached_assets/images/best-deal.webp" alt="Best Deal Finalize" loading="lazy" decoding="async" fetchpriority="low">
+            </div>
+            <div class="how-step-overlay">
+              <h3>Best Deal Finalize</h3>
+              <p>Choose the best service according to your budget and requirements. Negotiate directly for the best price!</p>
+            </div>
+          </div>
+
+          <!-- Step 4: Transport Instantly -->
+          <div class="how-step-card" data-aos="zoom-in" data-aos-duration="800" data-aos-offset="110" data-aos-anchor-placement="top-center">
+            <div class="how-step-bg">
+              <img src="attached_assets/images/transport-instantly.webp" alt="Transport Instantly" loading="lazy" decoding="async" fetchpriority="low">
+            </div>
+            <div class="how-step-overlay">
+              <h3>Transport Instantly</h3>
+              <p>Transport as soon as possible! <strong>"Zaroorat Ho Jaha, Herapheri Ho Waha!"</strong></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- Why Choose Herapheri Goods Section -->
     <section class="why-choose-section">
