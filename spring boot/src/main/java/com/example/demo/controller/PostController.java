@@ -4,7 +4,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,21 +54,7 @@ public class PostController {
     ) {
         return ResponseEntity.ok(postService.list(category, updatedAfter));
     }
-
-    // Presence aliases under /api/posts to avoid proxy-path 404s
-    @GetMapping(path = "/presence/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public org.springframework.web.servlet.mvc.method.annotation.SseEmitter presenceStream(@RequestParam(name = "page", defaultValue = "posts") String page,
-            com.example.demo.service.PresenceService presenceService) {
-        return presenceService.add(page);
-    }
-
-    @GetMapping(path = "/presence/count")
-    public java.util.Map<String, Object> presenceCount(@RequestParam(name = "page", defaultValue = "posts") String page,
-            com.example.demo.service.PresenceService presenceService) {
-        return java.util.Map.of("page", page, "count", presenceService.count(page));
-    }
-
-    // Upload a single post image, returns { url: "..." }
+// Upload a single post image, returns { url: "..." }
     @PostMapping(path = "/upload-image", consumes = { "multipart/form-data" })
     public ResponseEntity<?> uploadPostImage(@RequestPart("image") MultipartFile image) {
         try {
