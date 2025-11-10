@@ -1139,6 +1139,42 @@
     <script src="env.js"></script>
     <script src="seo.js"></script>
     <script src="vehicles.js"></script>
+        <script>
+            // Geo bootstrap for static frontend: auto-fill pincode and city after landing
+            (function(){
+                try {
+                    var apiBase = (window.API_BASE_URL || '').replace(/\/$/, '');
+                    if (!apiBase) { console.warn('Geo bootstrap: API base not set'); return; }
+                    fetch(apiBase + '/api/geo/bootstrap', { headers: { 'Accept': 'application/json' } })
+                        .then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
+                        .then(function(data){
+                            console.log('Geo bootstrap (static):', data);
+                            var pinInput = document.getElementById('pincode');
+                            var cityInput = document.getElementById('city');
+                            var applied = false;
+                            if (pinInput && !pinInput.value && data && data.postal) { pinInput.value = data.postal; applied=true; }
+                            var provider = (data && data.provider) ? String(data.provider).toLowerCase() : '';
+                            if (cityInput && !cityInput.value) {
+                                if (data && data.district) { cityInput.value = data.district; applied = true; }
+                                else if (data && data.ipCity && provider !== 'local' && provider !== 'ipapi-noip') {
+                                    cityInput.value = data.ipCity; applied = true;
+                                }
+                            }
+                            if (!applied) {
+                                // Fallback client-only lookup for local/private IP situation
+                                fetch('https://ipapi.co/json/')
+                                  .then(r => r.json())
+                                  .then(ipd => {
+                                      if (pinInput && !pinInput.value && ipd && ipd.postal) pinInput.value = ipd.postal;
+                                      if (cityInput && !cityInput.value && ipd && ipd.city) cityInput.value = ipd.city;
+                                  })
+                                  .catch(()=>{});
+                            }
+                        })
+                        .catch(function(e){ console.warn('Geo bootstrap failed (static):', e); });
+                } catch(e){ console.warn('Geo bootstrap error (static):', e); }
+            })();
+        </script>
     
     <script>
         // Smart URL conversion - automatically adds .html for local development

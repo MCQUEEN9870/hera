@@ -22,14 +22,16 @@
 </head>
 <body>
     <h1 th:text="${heading}">Herapheri Goods</h1>
+    <p class="tagline" th:text="${tagline}">Register or find transport vehicles – simple • free • direct.</p>
     <p><a th:href="${frontendUrl}" rel="nofollow">Open full page</a></p>
+    <!-- Redirect only when explicitly requested via ?app=1 to avoid cloaking risk -->
     <script th:inline="javascript">
         /*<![CDATA[*/
         (function(){
             try {
-                var ua = navigator.userAgent || '';
-                var isBot = /bot|crawl|spider|slurp|bingpreview|duckduckbot|baiduspider|yandex|semrush|ahrefs|facebookexternalhit|twitterbot|embedly|pinterest|linkedinbot/i.test(ua);
-                if(!isBot){
+                var params = new URLSearchParams(window.location.search || '');
+                var enableAppRedirect = params.get('app') === '1';
+                if (enableAppRedirect) {
                     window.location.replace('[[${frontendUrl}]]');
                 }
             } catch(_){ }

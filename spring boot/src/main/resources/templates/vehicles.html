@@ -22,14 +22,15 @@
 </head>
 <body>
     <h1 th:text="${heading}">Find Vehicles</h1>
+    <p class="tagline" th:text="${tagline}">Find verified vehicles – enter pincode, no login, free.</p>
     <p><a th:href="${frontendUrl}" rel="nofollow">Open full page</a></p>
+    <!-- Optional redirect only if ?app=1 provided -->
     <script th:inline="javascript">
         /*<![CDATA[*/
         (function(){
             try {
-                var ua = navigator.userAgent || '';
-                var isBot = /bot|crawl|spider|slurp|bingpreview|duckduckbot|baiduspider|yandex|semrush|ahrefs|facebookexternalhit|twitterbot|embedly|pinterest|linkedinbot/i.test(ua);
-                if(!isBot){
+                var params = new URLSearchParams(window.location.search || '');
+                if (params.get('app') === '1') {
                     window.location.replace('[[${frontendUrl}]]');
                 }
             } catch(_){ }
@@ -37,7 +38,56 @@
         /*]]>*/
     </script>
     <main>
-        <p>Browse transport vehicles.</p>
+            <p>Browse transport vehicles.</p>
+            <script>
+            (function(){
+                // Only run in browser; fetch geo bootstrap to auto-fill form fields if present
+                fetch('/api/geo/bootstrap')
+                   .then(r => r.json())
+                   .then(data => {
+                       console.log('Geo bootstrap', data);
+                       var pinInput = document.getElementById('pincode');
+                       var cityInput = document.getElementById('city');
+                       var applied = false;
+                       if (pinInput && !pinInput.value && data.postal) {
+                           pinInput.value = data.postal; applied = true;
+                       }
+                       // Prefer district from India Post. Use ipCity only if provider is trusted (not local/ipapi-noip)
+                       var provider = data.provider || '';
+                       if (cityInput && !cityInput.value) {
+                           if (data.district) { cityInput.value = data.district; applied = true; }
+                           else if (data.ipCity && provider.toLowerCase() !== 'local' && provider.toLowerCase() !== 'ipapi-noip') {
+                               cityInput.value = data.ipCity; applied = true;
+                           }
+                       }
+                       // Client-side fallback if server couldn't resolve due to localhost/private IP
+                       if (!applied) {
+                           fetch('https://ipapi.co/json/')
+                             .then(r => r.json())
+                             .then(ipd => {
+                                 if (pinInput && !pinInput.value && ipd && ipd.postal) pinInput.value = ipd.postal;
+                                 if (cityInput && !cityInput.value && ipd && ipd.city) cityInput.value = ipd.city;
+                             })
+                             .catch(() => {});
+                       }
+                       // If URL has type param, pre-select category (Tempo, Truck etc.)
+                       var params = new URLSearchParams(window.location.search);
+                       var type = params.get('type');
+                       if (type) {
+                           var typeSelect = document.getElementById('vehicleType');
+                           if (typeSelect) {
+                               for (var i=0;i<typeSelect.options.length;i++) {
+                                   if (typeSelect.options[i].value.toLowerCase() === String(type).toLowerCase()) {
+                                       typeSelect.selectedIndex = i;
+                                       break;
+                                   }
+                               }
+                           }
+                       }
+                   })
+                   .catch(e => console.warn('Geo bootstrap failed', e));
+            })();
+            </script>
     </main>
 </body>
 </html>

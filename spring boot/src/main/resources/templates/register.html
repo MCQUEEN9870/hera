@@ -22,14 +22,15 @@
 </head>
 <body>
     <h1 th:text="${heading}">Register Your Vehicle</h1>
+    <p class="tagline" th:text="${tagline}">Apna vehicle free mein register karein – bina document, direct customers.</p>
     <p><a th:href="${frontendUrl}" rel="nofollow">Open full page</a></p>
+    <!-- Optional redirect only if ?app=1 provided -->
     <script th:inline="javascript">
         /*<![CDATA[*/
         (function(){
             try {
-                var ua = navigator.userAgent || '';
-                var isBot = /bot|crawl|spider|slurp|bingpreview|duckduckbot|baiduspider|yandex|semrush|ahrefs|facebookexternalhit|twitterbot|embedly|pinterest|linkedinbot/i.test(ua);
-                if(!isBot){
+                var params = new URLSearchParams(window.location.search || '');
+                if (params.get('app') === '1') {
                     window.location.replace('[[${frontendUrl}]]');
                 }
             } catch(_){ }

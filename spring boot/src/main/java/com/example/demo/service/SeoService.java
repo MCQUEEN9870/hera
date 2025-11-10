@@ -14,12 +14,13 @@ import com.example.demo.util.VehicleUtil;
 public class SeoService {
 
     public record SeoMeta(
-            String title,
-            String description,
-            String keywords,
-            String heading,
-            String canonicalUrl,
-            String jsonLd
+        String title,
+        String description,
+        String keywords,
+        String heading,
+        String canonicalUrl,
+        String jsonLd,
+        String tagline
     ) {}
 
     public SeoMeta buildMeta(String path,
@@ -72,8 +73,9 @@ public class SeoService {
 
         String keywords = buildKeywords(normalizedCity, normalizedType);
         String jsonLd = buildJsonLd(path, intent, baseUrl);
+        String tagline = buildTagline(intent, normalizedType, normalizedCity, requestParams != null ? requestParams.get("q") : null);
 
-        return new SeoMeta(title, description, keywords, heading, canonicalUrl, jsonLd);
+        return new SeoMeta(title, description, keywords, heading, canonicalUrl, jsonLd, tagline);
     }
 
     private String normalizeCity(String cityParam) {
@@ -156,6 +158,51 @@ public class SeoService {
             .toString();
 
         return "[" + website + "," + org + "," + faq + "]";
+    }
+
+    private String buildTagline(String intent, String type, String city, String q) {
+        String typeProper = (type == null || type.isBlank()) ? "Transport Vehicle" : toTitle(type);
+        String typePlural = pluralize(typeProper);
+        String cityStr = (city != null && !city.isBlank()) ? (" in " + city) : "";
+
+        // If user query available (optional, not from Google), lightly tailor
+        String qHint = (q != null && !q.isBlank()) ? q.trim() : null;
+
+        if (intent != null && intent.equalsIgnoreCase("register")) {
+            if (qHint != null && qHint.toLowerCase(Locale.ROOT).contains("register")) {
+                return "Apna " + typeProper + cityStr + " free mein register karein – bina document, seedhe graahak.";
+            }
+            return "List your " + typeProper + cityStr + " – 60 second signup, no docs now, direct enquiries.";
+        }
+
+        if (intent != null && intent.equalsIgnoreCase("find") || (qHint != null && qHint.toLowerCase(Locale.ROOT).contains("near me"))) {
+            return "Find verified " + typePlural + cityStr + " – enter pincode, no login, free.";
+        }
+
+        // Generic fallback
+        return "Register or find transport vehicles" + cityStr + " – simple • free • direct.";
+    }
+
+    private static String toTitle(String s) {
+        if (s == null) return null;
+        String t = s.trim().replace('-', ' ');
+        if (t.isEmpty()) return t;
+        String[] parts = t.split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (String p : parts) {
+            if (p.isEmpty()) continue;
+            sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1).toLowerCase(Locale.ROOT)).append(' ');
+        }
+        return sb.toString().trim();
+    }
+
+    private static String pluralize(String word) {
+        if (word == null || word.isBlank()) return "Vehicles";
+        String w = word.trim();
+        if (w.toLowerCase(Locale.ROOT).endsWith("truck")) return w + "s";
+        if (w.toLowerCase(Locale.ROOT).endsWith("van")) return w + "s";
+        if (w.toLowerCase(Locale.ROOT).endsWith("bus")) return w + "es";
+        return w + "s";
     }
 
     private static String encode(String s) {
