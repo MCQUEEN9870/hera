@@ -1017,6 +1017,9 @@
                             <button type="button" id="verifyPincodeBtn" class="verify-pincode-btn">
                                      Verify
                             </button>
+                            <button type="button" id="detectLocationBtn" class="verify-pincode-btn" title="Use GPS to detect pincode">
+                                     Use my location
+                            </button>
                         </div>
                         <div class="location-note">Please verify pincode first</div>
                     </div>
@@ -1169,6 +1172,25 @@
                                       if (cityInput && !cityInput.value && ipd && ipd.city) cityInput.value = ipd.city;
                                   })
                                   .catch(()=>{});
+                            }
+
+                            // GPS detection for accurate postal
+                            var detectBtn = document.getElementById('detectLocationBtn');
+                            if (detectBtn && 'geolocation' in navigator) {
+                                detectBtn.addEventListener('click', function(){
+                                    detectBtn.disabled = true;
+                                    navigator.geolocation.getCurrentPosition(function(pos){
+                                        var lat = pos.coords.latitude, lon = pos.coords.longitude;
+                                        fetch(apiBase + '/api/geo/reverse?lat=' + encodeURIComponent(lat) + '&lon=' + encodeURIComponent(lon))
+                                           .then(r=>r.json())
+                                           .then(g=>{
+                                               if (g.postal && pinInput) pinInput.value = g.postal;
+                                               if (g.district && cityInput) cityInput.value = g.district;
+                                           })
+                                           .catch(()=>{})
+                                           .finally(()=>{ detectBtn.disabled = false; });
+                                    }, function(){ detectBtn.disabled = false; }, { timeout: 6000, enableHighAccuracy:false });
+                                });
                             }
                         })
                         .catch(function(e){ console.warn('Geo bootstrap failed (static):', e); });

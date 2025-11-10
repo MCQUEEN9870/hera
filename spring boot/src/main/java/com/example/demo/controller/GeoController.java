@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.service.GeoIpService;
 import com.example.demo.service.PostalLookupService;
 import com.example.demo.service.PostalLookupService.PostalInfo;
+import com.example.demo.service.ReverseGeocodeService;
+import com.example.demo.service.ReverseGeocodeService.ReverseInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +27,13 @@ public class GeoController {
 
     private final GeoIpService geoIpService;
     private final PostalLookupService postalLookupService;
+    private final ReverseGeocodeService reverseGeocodeService;
     private static final Logger log = LoggerFactory.getLogger(GeoController.class);
 
-    public GeoController(GeoIpService geoIpService, PostalLookupService postalLookupService) {
+    public GeoController(GeoIpService geoIpService, PostalLookupService postalLookupService, ReverseGeocodeService reverseGeocodeService) {
         this.geoIpService = geoIpService;
         this.postalLookupService = postalLookupService;
+        this.reverseGeocodeService = reverseGeocodeService;
     }
 
     @GetMapping("/bootstrap")
@@ -88,5 +92,27 @@ public class GeoController {
         out.put("X-Real-IP", request.getHeader("X-Real-IP"));
         out.put("User-Agent", request.getHeader("User-Agent"));
         return ResponseEntity.ok(out);
+    }
+
+    /**
+     * Reverse geocode GPS coordinates to postal, district, state using OSM Nominatim.
+     */
+    @GetMapping("/reverse")
+    public ResponseEntity<Map<String,Object>> reverse(double lat, double lon) {
+        Map<String,Object> out = new HashMap<>();
+        try {
+            ReverseInfo info = reverseGeocodeService.reverse(lat, lon);
+            if (info != null) {
+                out.put("postal", info.postal());
+                out.put("city", info.city());
+                out.put("district", info.district());
+                out.put("state", info.state());
+            }
+            return ResponseEntity.ok(out);
+        } catch (Exception ex) {
+            out.put("error", ex.getClass().getSimpleName());
+            out.put("message", ex.getMessage());
+            return ResponseEntity.ok(out);
+        }
     }
 }
