@@ -34,27 +34,39 @@ public class GeoController {
 
     @GetMapping("/bootstrap")
     public ResponseEntity<Map<String,Object>> bootstrap(HttpServletRequest request) {
-        String ip = clientIp(request);
-    var geo = geoIpService.resolve(ip);
-        PostalInfo postalInfo = null;
-        if (geo.postal() != null && !geo.postal().isBlank()) {
-            postalInfo = postalLookupService.resolve(geo.postal());
-        }
         Map<String,Object> payload = new HashMap<>();
-    payload.put("ip", ip);
-    payload.put("ipCity", geo.city());
-    payload.put("postal", geo.postal());
-    payload.put("country", geo.country());
-    payload.put("provider", geo.provider());
-    payload.put("geoError", geo.error());
-        payload.put("district", postalInfo != null ? postalInfo.district() : null);
-        payload.put("state", postalInfo != null ? postalInfo.state() : null);
-        // Front-end convenience: bestCity picks district first then ipCity
-        String bestCity = postalInfo != null && postalInfo.district() != null && !postalInfo.district().isBlank()
-                ? postalInfo.district() : geo.city();
-        payload.put("bestCity", bestCity);
-        log.info("Geo bootstrap: ip={} ipCity={} postal={} district={} state={}", ip, geo.city(), geo.postal(), postalInfo != null ? postalInfo.district() : null, postalInfo != null ? postalInfo.state() : null);
-        return ResponseEntity.ok(payload);
+        try {
+            String ip = clientIp(request);
+            var geo = geoIpService.resolve(ip);
+            PostalInfo postalInfo = null;
+            if (geo.postal() != null && !geo.postal().isBlank()) {
+                postalInfo = postalLookupService.resolve(geo.postal());
+            }
+            payload.put("ip", ip);
+            payload.put("ipCity", geo.city());
+            payload.put("postal", geo.postal());
+            payload.put("country", geo.country());
+            payload.put("provider", geo.provider());
+            payload.put("geoError", geo.error());
+            payload.put("district", postalInfo != null ? postalInfo.district() : null);
+            payload.put("state", postalInfo != null ? postalInfo.state() : null);
+            // Front-end convenience: bestCity picks district first then ipCity
+            String bestCity = postalInfo != null && postalInfo.district() != null && !postalInfo.district().isBlank()
+                    ? postalInfo.district() : geo.city();
+            payload.put("bestCity", bestCity);
+            log.info("Geo bootstrap: ip={} ipCity={} postal={} district={} state={} provider={} error={}",
+                    ip, geo.city(), geo.postal(),
+                    postalInfo != null ? postalInfo.district() : null,
+                    postalInfo != null ? postalInfo.state() : null,
+                    geo.provider(), geo.error());
+            return ResponseEntity.ok(payload);
+        } catch (Exception ex) {
+            payload.put("error", "bootstrap-failed");
+            payload.put("message", ex.getMessage());
+            payload.put("stackHint", ex.getClass().getSimpleName());
+            log.warn("Geo bootstrap failed: {}", ex.toString());
+            return ResponseEntity.ok(payload); // return 200 with error payload to avoid white-label page
+        }
     }
 
     private String clientIp(HttpServletRequest request) {
@@ -65,5 +77,16 @@ public class GeoController {
         String xri = request.getHeader("X-Real-IP");
         if (xri != null && !xri.isBlank()) return xri.trim();
         return request.getRemoteAddr();
+    }
+
+    @GetMapping("/echo")
+    public ResponseEntity<Map<String,Object>> echo(HttpServletRequest request) {
+        Map<String,Object> out = new HashMap<>();
+        out.put("remoteAddr", request.getRemoteAddr());
+        out.put("CF-Connecting-IP", request.getHeader("CF-Connecting-IP"));
+        out.put("X-Forwarded-For", request.getHeader("X-Forwarded-For"));
+        out.put("X-Real-IP", request.getHeader("X-Real-IP"));
+        out.put("User-Agent", request.getHeader("User-Agent"));
+        return ResponseEntity.ok(out);
     }
 }

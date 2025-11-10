@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/",
                     "/error",
+                    "/api/geo/**",
                     "/api/vehicles/**",
                     "/api/registration-images/**",
                     "/api/get-feedback",
