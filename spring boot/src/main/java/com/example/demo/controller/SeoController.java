@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.service.SeoService;
 import com.example.demo.service.SeoService.SeoMeta;
-import com.example.demo.service.GeoIpService;
 import com.example.demo.service.PostalLookupService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,16 +23,14 @@ import jakarta.servlet.http.HttpServletRequest;
 public class SeoController {
 
     private final SeoService seoService;
-    private final GeoIpService geoIpService;
     private final PostalLookupService postalLookupService;
     private static final Logger log = LoggerFactory.getLogger(SeoController.class);
     
     @Value("${app.frontendBaseUrl:https://www.herapherigoods.in}")
     private String frontendBaseUrl;
 
-    public SeoController(SeoService seoService, GeoIpService geoIpService, PostalLookupService postalLookupService) {
+    public SeoController(SeoService seoService, PostalLookupService postalLookupService) {
         this.seoService = seoService;
-        this.geoIpService = geoIpService;
         this.postalLookupService = postalLookupService;
     }
 
@@ -105,7 +102,7 @@ public class SeoController {
             if (v != null && v.length > 0) params.put(k, v[0]);
         });
 
-        // Auto-resolve location if city missing: prefer explicit pincode > GeoIP postal > GeoIP city
+        // Auto-resolve location if city missing: prefer explicit pincode only (removed IP heuristics)
         String finalCity = city;
         String pincode = params.get("pincode");
         if (finalCity == null || finalCity.isBlank()) {
@@ -116,29 +113,6 @@ public class SeoController {
                     derivedCity = info.district();
                 }
                 log.info("SEO build: pincode={} -> district={} state={}", pincode, info != null ? info.district() : null, info != null ? info.state() : null);
-            }
-            if (derivedCity == null) {
-                String clientIp = getClientIpAddress(request);
-                var geo = geoIpService.resolve(clientIp);
-                if (geo != null) {
-                    if (geo.postal() != null && !geo.postal().isBlank()) {
-                        var info = postalLookupService.resolve(geo.postal());
-                        if (info != null && info.district() != null && !info.district().isBlank()) {
-                            derivedCity = info.district();
-                        }
-                        log.info("SEO build: geo.postal={} -> district={}", geo.postal(), derivedCity);
-                    }
-                    // Only trust raw geo.city if provider is not local or ipapi-noip
-                    if (derivedCity == null && geo.city() != null && !geo.city().isBlank()) {
-                        String provider = null;
-                        try { provider = geo.provider(); } catch (Throwable t) { }
-                        boolean trusted = provider == null || (!"local".equalsIgnoreCase(provider) && !"ipapi-noip".equalsIgnoreCase(provider));
-                        if (trusted) {
-                            derivedCity = geo.city();
-                        }
-                        log.info("SEO build: clientIp={} geo.city={} provider={} trusted={} finalDerived={}", clientIp, geo.city(), provider, trusted, derivedCity);
-                    }
-                }
             }
             if (derivedCity != null && !derivedCity.isBlank()) {
                 finalCity = derivedCity;
@@ -185,20 +159,6 @@ public class SeoController {
         return sb.toString();
     }
 
-    /**
-     * Get client IP considering reverse proxies.
-     */
-    private String getClientIpAddress(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            return xForwardedFor.split(",")[0].trim();
-        }
-        String xRealIp = request.getHeader("X-Real-IP");
-        if (xRealIp != null && !xRealIp.isEmpty()) {
-            return xRealIp;
-        }
-        return request.getRemoteAddr();
-    }
 }
 
 

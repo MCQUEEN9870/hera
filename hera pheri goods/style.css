@@ -2328,14 +2328,9 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     text-align: center;
 }
 
-.auth-header {
-    margin-bottom: 30px;
-}
-
 .auth-logo {
     width: 300px;
     height: auto;
-    margin-bottom: 20px;
 }
 
 .auth-header h2 {
@@ -2357,7 +2352,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 
 .form-group {
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: 0px;
     width: 100%;
 }
 

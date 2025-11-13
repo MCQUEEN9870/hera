@@ -3,9 +3,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const vehicleSearchForm = document.getElementById('vehicleSearchForm');
     const vehicleTypeSelect = document.getElementById('vehicleType');
     const stateSelect = document.getElementById('state');
+    // City input no longer exists; use district select if present
     const cityInput = document.getElementById('city');
+    const districtSelect = document.getElementById('district');
     const pincodeInput = document.getElementById('pincode');
-    const verifyPincodeBtn = document.getElementById('verifyPincodeBtn');
+    // pincodeMeta and verify button removed per latest UX
     const vehiclesGrid = document.getElementById('vehiclesGrid');
     const resultsCount = document.getElementById('resultsCount');
     const noResults = document.getElementById('noResults');
@@ -39,20 +41,19 @@ document.addEventListener('DOMContentLoaded', function() {
         authSection.style.display = 'block';
     }
     
-    // Set city and state fields as readonly
-    cityInput.setAttribute('readonly', 'readonly');
-    stateSelect.removeAttribute('disabled');
-    stateSelect.setAttribute('readonly', 'readonly');
-    
-    // Add visual indication that these fields can't be edited directly
-    cityInput.style.backgroundColor = '#ffffff';
-    stateSelect.style.backgroundColor = '#ffffff';
-    
-    // Prevent state select from being changed by user
-    stateSelect.addEventListener('mousedown', function(e) {
-        e.preventDefault();
-        return false;
-    });
+    // Guided flow controls state enablement; don't force-enable here
+    if (cityInput) { try { cityInput.setAttribute('readonly', 'readonly'); } catch(_){} }
+    // stateSelect enable/disable is handled by vehicles.html wizard
+
+    // Track whether location was verified by pincode
+    let locationVerified = false;
+    // Guard to avoid clearing meta when we programmatically set district after verify
+    let suppressMetaClear = false;
+    window.locationVerified = false;
+    // Prevent duplicate auto-verifications
+    let isVerifyingPincode = false;
+    // Track the last verified pincode to avoid clearing verification on programmatic or identical input
+    let lastVerifiedPin = null;
     
     // Parse URL parameters to pre-fill the form
     const urlParams = new URLSearchParams(window.location.search);
@@ -122,14 +123,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 100);
     }
-    if (urlParams.has('state')) {
+    if (urlParams.has('state') && stateSelect) {
         stateSelect.value = urlParams.get('state');
     }
-    if (urlParams.has('city')) {
-        cityInput.value = urlParams.get('city');
+    // Map old city param to new district if present
+    if (urlParams.has('city') && districtSelect) {
+        districtSelect.value = urlParams.get('city');
     }
-    if (urlParams.has('pincode')) {
-        pincodeInput.value = urlParams.get('pincode');
+    if (urlParams.has('pincode') && pincodeInput) {
+        if ('value' in pincodeInput) pincodeInput.value = urlParams.get('pincode');
     }
     
     // If parameters are present in URL, just prompt user to verify pincode
@@ -139,53 +141,95 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
     
-    // Handle pincode input validation
-    pincodeInput.addEventListener('input', function() {
+    // Handle pincode input validation + auto-verify
+    if (pincodeInput && pincodeInput.tagName === 'INPUT') pincodeInput.addEventListener('input', function() {
         this.value = this.value.replace(/[^0-9]/g, '');
         if (this.value.length > 6) {
             this.value = this.value.slice(0, 6);
         }
-    });
-
-    // Verify pincode button click event
-    verifyPincodeBtn.addEventListener('click', function() {
-        const pincodeValue = pincodeInput.value.trim();
-        
-        console.log('Verifying pincode:', pincodeValue);
-        
-        if (pincodeValue && /^\d{6}$/.test(pincodeValue)) {
-            // Change button text to show loading
-            const originalBtnText = verifyPincodeBtn.innerHTML;
-            verifyPincodeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            verifyPincodeBtn.disabled = true;
-            
-            // Call India Post API to verify pincode
-            fetch(`https://api.postalpincode.in/pincode/${pincodeValue}`)
-                .then(response => {
-                    console.log('Pincode API response status:', response.status);
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Pincode API response:', data);
-                    verifyPincodeBtn.innerHTML = originalBtnText;
-                    verifyPincodeBtn.disabled = false;
-                    
-                    // Process API response
-                    handlePincodeResponse(data, pincodeValue);
-                })
-                .catch(error => {
-                    console.error('Error verifying pincode:', error);
-                    verifyPincodeBtn.innerHTML = originalBtnText;
-                    verifyPincodeBtn.disabled = false;
-                    showToast('Error verifying pincode. Please try again.', 'error');
-                    
-                    // Try manual validation as fallback
-                    handleManualPincodeValidation(pincodeValue);
-                });
-        } else {
-            showToast('Please enter a valid 6-digit pincode', 'error');
+        // Auto-verify when 6 digits entered
+        const val = this.value.trim();
+        const six = /^\d{6}$/.test(val);
+        if (six && !window.locationVerified && !isVerifyingPincode) {
+            verifyPincode(val);
         }
     });
+
+    // Clear meta info when user edits pincode
+    if (pincodeInput) {
+        const clearMetaOnEdit = () => {
+            const currentVal = (pincodeInput.value || '').trim();
+            // If user selected from list, window.locationVerified may be true but lastVerifiedPin unset
+            if (window.locationVerified === true && (lastVerifiedPin === null || lastVerifiedPin === undefined)) {
+                lastVerifiedPin = currentVal;
+                return; // keep verified state
+            }
+            if (lastVerifiedPin && currentVal === lastVerifiedPin) {
+                // Value unchanged; keep verified state
+                return;
+            }
+            // Value changed by user; invalidate verification
+            locationVerified = false;
+            window.locationVerified = false;
+            try {
+                if (pincodeInput) {
+                    pincodeInput.classList.remove('pin-verified');
+                    // Also clear any inline verified styles to be extra safe
+                    pincodeInput.style.borderColor = '';
+                    pincodeInput.style.boxShadow = '';
+                }
+            } catch(_) {}
+        };
+        pincodeInput.addEventListener('input', clearMetaOnEdit);
+        pincodeInput.addEventListener('change', clearMetaOnEdit);
+    }
+    // Also clear meta when district changes (location context changed)
+    if (districtSelect) {
+        districtSelect.addEventListener('change', function(){
+            if (suppressMetaClear) {
+                // One-shot skip: we just set district programmatically after verify
+                suppressMetaClear = false;
+                return;
+            }
+            locationVerified = false;
+            window.locationVerified = false;
+        });
+    }
+
+    // Direct verification function (replaces removed Verify button)
+    function verifyPincode(pincodeValue) {
+        console.log('Verifying pincode:', pincodeValue);
+        // If already verified for the same pin, skip
+        if (window.locationVerified && lastVerifiedPin && pincodeValue === lastVerifiedPin) {
+            console.log('Pincode already verified, skipping re-verification');
+            return;
+        }
+        if (!pincodeValue || !/^\d{6}$/.test(pincodeValue)) {
+            showToast('Please enter a valid 6-digit pincode', 'error');
+            return;
+        }
+        isVerifyingPincode = true;
+        fetch(`https://api.postalpincode.in/pincode/${pincodeValue}`)
+            .then(response => {
+                console.log('Pincode API response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Pincode API response:', data);
+                handlePincodeResponse(data, pincodeValue);
+                isVerifyingPincode = false;
+            })
+            .catch(error => {
+                console.error('Error verifying pincode:', error);
+                // Only show error if verification isn't already complete
+                if (!window.locationVerified && !locationVerified) {
+                    showToast('Error verifying pincode. Please try again.', 'error');
+                } else {
+                    console.log('Verification already completed, ignoring late error');
+                }
+                isVerifyingPincode = false;
+            });
+    }
     
     // Function to handle pincode API response
     function handlePincodeResponse(data, pincodeValue) {
@@ -201,15 +245,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     break;
                 }
             }
+            // Mark verified immediately so downstream change handlers don't clear values
+            locationVerified = true;
+            window.locationVerified = true;
+            lastVerifiedPin = pincodeValue;
+
+            // Ensure pincode input preserves user's value
+            try { if (pincodeInput && (!pincodeInput.value || pincodeInput.value !== pincodeValue)) { pincodeInput.value = pincodeValue; } } catch(_) {}
+
+            // Trigger state change so district options populate (handled by vehicles.html wizard)
+            try { stateSelect.dispatchEvent(new Event('change')); } catch(_) {}
             
-            // Set city
-            cityInput.value = postOffice.District || postOffice.Division || postOffice.Region || postOffice.Block;
-            
-            // Add visual confirmation
-            cityInput.style.borderColor = '#4CAF50';
-            cityInput.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
-            stateSelect.style.borderColor = '#4CAF50';
-            stateSelect.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
+            // Set district/city if present in DOM
+            const districtName = postOffice.District || postOffice.Division || postOffice.Region || postOffice.Block;
+            if (cityInput) cityInput.value = districtName || '';
+            if (districtSelect && districtName) {
+                // Wait briefly for district list to populate after state change
+                setTimeout(() => {
+                    try {
+                        districtSelect.value = districtName;
+                        suppressMetaClear = true; // prevent clearing meta due to our own change
+                        districtSelect.dispatchEvent(new Event('change'));
+                    } catch(_) {}
+                }, 300);
+            }
+            // Already marked verified above
             
             // Update location note
             const locationNote = document.querySelector('.location-note');
@@ -217,6 +277,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 locationNote.innerHTML = 'Location verified';
                 locationNote.style.color = '#ffffff';
             }
+
+            // Meta line under pincode removed as per request
+
+            // Hide any open suggestions and chevron after verification
+            try {
+                const pinSug = document.getElementById('pincodeSuggestions');
+                if (pinSug) { pinSug.style.display = 'none'; pinSug.innerHTML = ''; }
+                const chevron = document.getElementById('pincodeChevron');
+                if (chevron) chevron.style.display = 'none';
+                if (pincodeInput) pincodeInput.placeholder = 'Enter pincode';
+            } catch(_) {}
             
             // Log successful verification
             console.log('Pincode verification successful:', {
@@ -227,159 +298,42 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Show success message
             showToast('Pincode verified successfully!', 'success');
+            // Add green border indicator
+            try {
+                if (pincodeInput) {
+                    pincodeInput.classList.add('pin-verified');
+                    // Apply inline styles as a fallback in case CSS specificity blocks the class
+                    pincodeInput.style.borderColor = '#10b981';
+                    pincodeInput.style.boxShadow = '0 0 0 4px rgba(16,185,129,0.15)';
+                }
+            } catch(_) {}
             
             // Don't automatically trigger search after verification anymore
             // Let the user click the search button themselves
         } else {
             console.log('API response indicates failure or no data:', data);
-            
-            // Try manual verification as fallback
-            handleManualPincodeValidation(pincodeValue);
+            // Do not auto-approximate; require correct verification or selection
+            if (!window.locationVerified && !locationVerified) {
+                showToast('Could not verify pincode. Please recheck or select from dropdown.', 'error');
+            }
         }
     }
     
-    // Function to handle manual pincode validation
-    function handleManualPincodeValidation(pincode) {
-        if (!pincode || !/^\d{6}$/.test(pincode)) {
-            console.log('Invalid pincode format for manual validation:', pincode);
-            showToast('Invalid pincode format. Please enter a valid 6-digit pincode.', 'error');
-            return;
-        }
-        
-        console.log('Attempting manual pincode validation for:', pincode);
-        
-        // Try to infer state from first 2 digits of pincode
-        const statePrefix = pincode.substring(0, 2);
-        let state = '';
-        
-        // Map of pincode prefixes to states
-        const pincodeStateMap = {
-            '11': 'Delhi',
-            '12': 'Haryana',
-            '13': 'Punjab',
-            '14': 'Punjab',
-            '15': 'Punjab',
-            '16': 'Punjab',
-            '17': 'Himachal Pradesh',
-            '18': 'Jammu and Kashmir',
-            '19': 'Jammu and Kashmir',
-            '20': 'Uttar Pradesh',
-            '21': 'Uttar Pradesh',
-            '22': 'Uttar Pradesh',
-            '23': 'Uttar Pradesh',
-            '24': 'Uttar Pradesh',
-            '25': 'Uttar Pradesh',
-            '26': 'Uttar Pradesh',
-            '27': 'Uttar Pradesh',
-            '28': 'Uttar Pradesh',
-            '30': 'Rajasthan',
-            '31': 'Rajasthan',
-            '32': 'Rajasthan',
-            '33': 'Rajasthan',
-            '34': 'Rajasthan',
-            '36': 'Gujarat',
-            '37': 'Gujarat',
-            '38': 'Gujarat',
-            '39': 'Gujarat',
-            '40': 'Maharashtra',
-            '41': 'Maharashtra',
-            '42': 'Maharashtra',
-            '43': 'Maharashtra',
-            '44': 'Maharashtra',
-            '45': 'Maharashtra',
-            '50': 'Telangana',
-            '51': 'Andhra Pradesh',
-            '52': 'Andhra Pradesh',
-            '53': 'Karnataka',
-            '56': 'Karnataka',
-            '57': 'Karnataka',
-            '60': 'Tamil Nadu',
-            '61': 'Tamil Nadu',
-            '62': 'Tamil Nadu',
-            '63': 'Tamil Nadu',
-            '64': 'Tamil Nadu',
-            '67': 'Kerala',
-            '68': 'Kerala',
-            '69': 'Kerala',
-            '70': 'West Bengal',
-            '71': 'West Bengal',
-            '72': 'Tripura',
-            '73': 'Assam',
-            '74': 'Bihar',
-            '75': 'Bihar',
-            '76': 'Odisha',
-            '77': 'Odisha',
-            '78': 'North Eastern',
-            '79': 'Jharkhand',
-            '80': 'Madhya Pradesh',
-            '81': 'Madhya Pradesh',
-            '82': 'Madhya Pradesh',
-            '83': 'Chhattisgarh',
-            '90': 'Uttar Pradesh',
-            '91': 'Uttar Pradesh',
-            '99': 'Military Postal Service'
-        };
-        
-        state = pincodeStateMap[statePrefix] || '';
-        
-        if (state) {
-            // Try to find the state in the dropdown
-            for (let i = 0; i < stateSelect.options.length; i++) {
-                if (stateSelect.options[i].value === state) {
-                    stateSelect.selectedIndex = i;
-                    break;
-                }
-            }
-            
-            // Set generic city value
-            cityInput.value = "Unknown";
-            
-            // Add visual confirmation
-            cityInput.style.borderColor = '#4CAF50';
-            cityInput.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
-            stateSelect.style.borderColor = '#4CAF50';
-            stateSelect.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
-            
-            // Update location note
-            const locationNote = document.querySelector('.location-note');
-            if (locationNote) {
-                locationNote.innerHTML = 'Location verified (approximate)';
-                locationNote.style.color = '#ffffff';
-            }
-            
-            console.log('Manual pincode validation successful:', {
-                pincode: pincode,
-                state: state,
-                city: 'Unknown'
-            });
-            
-            // Show success message
-            showToast('Pincode verified (approximated location)!', 'success');
-            
-            // Don't automatically trigger search after verification anymore
-            // Let the user click the search button themselves
-        } else {
-            // Reset and show error
-            console.log('Could not determine state from pincode:', pincode);
-            cityInput.value = '';
-            stateSelect.selectedIndex = 0;
-            showToast('Could not verify pincode. Please check and try again.', 'error');
-        }
-    }
+    // Manual approximate pincode handling removed by request
     
-    // Function to show toast message
+    // Function to show toast message (use global if available to avoid duplication)
     function showToast(message, type = 'success') {
+        if (window.showToast) return window.showToast(message, type);
+        const old = document.getElementById('globalToast');
+        if (old) old.remove();
         const toast = document.createElement('div');
+        toast.id = 'globalToast';
         toast.className = `toast ${type}`;
         toast.textContent = message;
+        toast.style.cssText = 'position:fixed;bottom:30px;right:30px;background:#333;color:#fff;padding:14px 20px;border-radius:10px;z-index:10000;';
         document.body.appendChild(toast);
-        
-        // Use longer duration for error messages
         const duration = type === 'error' ? 6000 : 3000;
-        
-        setTimeout(() => {
-            document.body.removeChild(toast);
-        }, duration);
+        setTimeout(() => { toast.remove(); }, duration);
     }
     
     // Search form submission
@@ -388,57 +342,39 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Get form values
         const vehicleType = vehicleTypeSelect.value;
-        const state = stateSelect.value;
-        const city = cityInput.value;
-        const pincode = pincodeInput.value.trim();
+        const state = stateSelect ? stateSelect.value : '';
+        const city = (cityInput ? cityInput.value : (districtSelect ? districtSelect.value : ''));
+        const pincode = (pincodeInput && 'value' in pincodeInput) ? pincodeInput.value.trim() : '';
         
         console.log('Form submitted with values:', { vehicleType, state, city, pincode });
         console.log('Form validation starting...');
         
-        // Validate inputs - require pincode verification
-        if (!pincode) {
-            console.log('Error: Pincode empty');
-            showToast('Please enter and verify a pincode first', 'error');
-            pincodeInput.focus();
+        // Require either verified pincode or state+district path
+        const hasStateDistrict = state && city && state !== '' && city !== '';
+        const validPin = /^\d{6}$/.test(pincode);
+        const globalVerified = !!(window.locationVerified || locationVerified);
+        // If user entered a pincode and it's not verified yet, try once and ask to press Search again
+        if (validPin && !globalVerified && !isVerifyingPincode) {
+            verifyPincode(pincode);
+            showToast('Verifying pincode... please wait','info');
             return;
         }
-        
-        // Make sure pincode is 6 digits for India
-        if (!/^\d{6}$/.test(pincode)) {
-            console.log('Error: Invalid pincode format: ' + pincode);
-            showToast('Please enter a valid 6-digit pincode', 'error');
-            pincodeInput.focus();
+        // If a verified pincode is present, inform the user we're searching with it
+        if (validPin && globalVerified) {
+            showToast('Finding verified vehicles for you... please wait a few seconds','success');
+        }
+        // Require pincode selection when state & district chosen but no pincode
+        if (!validPin && hasStateDistrict) {
+            showToast('Please select your pincode first', 'error');
+            try { pincodeInput.focus(); } catch(_) {}
             return;
         }
-        
-        // Validate the location is verified
-        const isLocationVerified = cityInput.style.borderColor === 'rgb(76, 175, 80)' || 
-                                  stateSelect.style.borderColor === 'rgb(76, 175, 80)';
-        
-        console.log('Location verification status:', { 
-            isLocationVerified,
-            cityBorderColor: cityInput.style.borderColor,
-            stateBorderColor: stateSelect.style.borderColor
-        });
-        
-        if (!isLocationVerified) {
-            console.log('Error: Location not verified');
-            showToast('Please verify your pincode first by clicking the Verify button', 'error');
-            document.getElementById('verifyPincodeBtn').focus();
-            return;
-        }
-        
-        // Validate inputs (at least one field should be filled)
-        if (!vehicleType || vehicleType === '') {
-            console.log('Error: No vehicle type selected');
-            showToast('Please select a vehicle type', 'error');
-            vehicleTypeSelect.focus();
-            return;
-        }
+        // Ensure vehicle type chosen
+        if (!vehicleType) { showToast('Select a vehicle type','error'); vehicleTypeSelect.focus(); return; }
         
         console.log('Form validation passed, proceeding with search...');
         
-        // Show loading overlay
+    // Show loading overlay
         loadingOverlay.style.display = 'flex';
         
         // Log search criteria for debugging
@@ -559,6 +495,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Show error toast with specific message based on error
             let errorMessage = 'Server error. Please try again later.';
+            if (error && (error.name === 'AbortError' || /Failed to fetch|Network/i.test(error.message || ''))) {
+                errorMessage = 'Server is not running or unreachable.';
+            }
             showToast(errorMessage, 'error');
             
             // Show no results
@@ -1025,7 +964,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (!imgContainer.querySelector('.premium-badge')) {
                                 const premiumBadge = document.createElement('div');
                                 premiumBadge.className = 'premium-badge';
-                                premiumBadge.innerHTML = '<img src="attached_assets/animation/premium-unscreen.gif" alt="Premium Vehicle">';
+                                premiumBadge.innerHTML = '<video autoplay loop muted playsinline preload="auto" aria-label="Premium Vehicle"><source src="attached_assets/animation/premium-vehicle.webm" type="video/webm"></video>';
                                 imgContainer.appendChild(premiumBadge);
                                 
                                 const premiumRibbon = document.createElement('div');
@@ -1098,7 +1037,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add premium badge with GIF
             const premiumBadge = document.createElement('div');
             premiumBadge.className = 'premium-badge';
-            premiumBadge.innerHTML = '<img src="attached_assets/animation/premium-unscreen.gif" alt="Premium Vehicle">';
+            premiumBadge.innerHTML = '<video autoplay loop muted playsinline preload="auto" aria-label="Premium Vehicle"><source src="attached_assets/animation/premium-vehicle.webm" type="video/webm"></video>';
             imgContainer.appendChild(premiumBadge);
             
             // Add premium ribbon

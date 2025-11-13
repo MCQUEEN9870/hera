@@ -344,7 +344,7 @@
       <ul class="nav-links">
         <!-- Truck Type Dropdown Menu -->
         <li class="dropdown">
-          <a href="#" class="nav-item truck-type-btn" title="Find the right vehicle for your transport needs."><span>Vehicle Type</span></a>
+          <a href="#" class="nav-item truck-type-btn" title="Find the right vehicle for your transport needs."><span>Find Vehicle</span></a>
           <div class="dropdown-content">
             <!-- Small Commercial Vehicles Category -->
             <div class="category">
@@ -484,7 +484,7 @@
         <button class="mobile-close" aria-label="Close menu">&times;</button>
       </div>
       <ul class="mobile-nav-links">
-        <li><a href="vehicles" class="mobile-nav-item">Vehicle Type</a></li>
+  <li><a href="vehicles" class="mobile-nav-item">Find Vehicle</a></li>
         <li><a href="contact-us" class="mobile-nav-item">Contact Us</a></li>
         <li><a href="posts" class="mobile-nav-item">Posts</a></li>
         <li><a href="driver-dashboard" id="profileLink" class="mobile-nav-item">My Profile</a></li>
@@ -513,19 +513,22 @@
             <div class="hero-features">
               <!-- List Vehicle Feature -->
               <div class="feature">
-                <img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/animated truck.gif" alt="Animated Truck" title="List Your Vehicle" class="feature-icon">
+                <video loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/Register-your-truck.webm" alt="Register-your-truck" title="List Your Vehicle" class="feature-icon"></video>
                 <span>List Your Vehicle</span>
               </div>
               <!-- Earn More Feature -->
               <div class="feature">
-                <img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/earn more.gif" alt="Earn More" title="Earn More" class="feature-icon">
+                <video loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/Earn-more.webm" alt="Earn More" title="Earn More" class="feature-icon"></video>
                 <span>Earn More</span>
               </div>
             </div>
             <!-- Hero Button with Click-It animation -->
             <div class="btn-with-click-anim">
               <button class="hero-btn" id="registerNowBtn">Register Now</button>
-              <img src="attached_assets/animation/click-it.gif" alt="Click hint animation" class="click-it-anim" loading="lazy" decoding="async" />
+              <video autoplay loop muted playsinline class="click-it-anim" loading="lazy" decoding="async">
+                <source src="attached_assets/animation/click-it.webm" type="video/webm">
+                Your browser does not support the video tag.
+              </video>
             </div>
           </div>
         </div>
@@ -544,13 +547,13 @@
             <!-- Find Vehicle Button with Click-It animation (small, right side) -->
             <div class="btn-with-click-anim">
               <button class="find-vehicle-btn" onclick="window.location.href = 'vehicles.html'"><i class="fas fa-search"></i> Find Vehicle</button>
-              <img src="attached_assets/animation/click-it.gif" alt="Click hint animation" class="click-it-anim small" loading="lazy" decoding="async" />
+              <video src="attached_assets/animation/click-it.webm" alt="Click hint animation" class="click-it-anim small" loading="lazy" decoding="async"></video>
             </div>
           </div>
           <!-- Find Vehicle Image -->
           <div class="find-vehicle-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="200">
             <video autoplay loop muted playsinline class="find-vehicle-video">
-              <source src="attached_assets/animation/Animation - 1741161878467.webm" type="video/webm">
+              <source src="attached_assets/animation/Find-transport-vehicle.webm" type="video/webm">
               Your browser does not support the video tag.
             </video>
           </div>
@@ -562,7 +565,7 @@
     <div class="platform-description">
       <div class="description-container">
         <div class="platform-heading" data-aos="fade-down" data-aos-duration="800">
-          <img loading="lazy" decoding="async" src="attached_assets\animation\Aapka-Apna-Transport-Network-t-unscreen.gif" alt="Truck Animation" title="Aapka Apna Transport Network animation" class="heading-animation">
+          <video loading="lazy" decoding="async" src="attached_assets\animation\register-transport-vehicle.webm" alt="Truck Animation" title="Aapka Apna Transport Network animation" class="heading-animation"></video>
           <h2>Herapheri Goods – Aapka Apna Transport Network!</h2>
         </div>
         <p class="main-description" data-aos="fade-up" data-aos-duration="800">Do you need transportation for your goods, want to send items, or require any kind of delivery service? Herapheri Goods is a free listing platform that directly connects transport vehicle owners with customers—without any third-party commissions!</p>
@@ -576,6 +579,26 @@
         <!-- Vehicle Categories Section with Flip Cards -->
         <div class="vehicle-categories-section">
           <h2 class="section-title">Our Vehicle Categories</h2>
+          <!-- Inline city selector to deepen category links without adding a new section -->
+          <div class="inline-city-selector" style="margin:10px 0 18px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <label for="homeCitySelect" style="font-weight:600; color:#333;">Choose city</label>
+            <select id="homeCitySelect" style="padding:8px 10px; border:1px solid #ddd; border-radius:8px; min-width:180px;">
+              <option value="" selected>All India</option>
+              <option>Delhi</option>
+              <option>Mumbai</option>
+              <option>Bengaluru</option>
+              <option>Hyderabad</option>
+              <option>Chennai</option>
+              <option>Kolkata</option>
+              <option>Pune</option>
+              <option>Ahmedabad</option>
+              <option>Jaipur</option>
+              <option>Lucknow</option>
+              <option>Noida</option>
+              <option>Gurgaon</option>
+            </select>
+            <span style="font-size:12px;color:#666;">Tip: Pick a city, then click a category to open city+type results.</span>
+          </div>
           <div class="flip-cards-container">
             <!-- First row of flip cards -->
             <div class="flip-cards-row">
@@ -584,17 +607,17 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img data-src="attached_assets/vehicle category/tata ace.webp" alt="Small Commercial Vehicles" title="Small Commercial Vehicles" class="lazy-swap">
-                      <img src="attached_assets/vehicle category/cng loader.webp" loading="lazy" decoding="async" alt="Small Commercial Vehicles" title="Small Commercial Vehicles" class="active">
-                      <img data-src="attached_assets/vehicle category/e-rickshaw tirri.webp" alt="Small Commercial Vehicles" title="Small Commercial Vehicles" class="lazy-swap">
-                      <img data-src="attached_assets/vehicle category/vikram.webp" alt="Small Commercial Vehicles" title="Small Commercial Vehicles" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/tata ace.webp" alt="Tata Ace (Chhota Hathi)" title="Popular choice for small business deliveries" class="lazy-swap">
+                      <img src="attached_assets/vehicle category/cng loader.webp" loading="lazy" decoding="async" alt="Auto Loader (CNG Loader)" title="better for medium sized goods within the city" class="active">
+                      <img data-src="attached_assets/vehicle category/e-rickshaw tirri.webp" alt="E-Rickshaw Loader (Tuk-Tuk)" title="Eco friendly option for local cargo" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/vikram.webp" alt="Vikram Tempo" title="For local goods movement" class="lazy-swap">
                     </div>
                     <h3>Small Commercial Vehicles</h3>
                   </div>
                   <div class="flip-card-back">
                     <h3>Small Commercial Vehicles</h3>
                     <p>Perfect for city deliveries and small cargo transport</p>
-                    <a href="#" class="card-btn" data-category="small">View Vehicles</a>
+                    <a href="#" class="card-btn" data-category="small" data-type="Tata Ace (Chhota Hathi)">View Vehicles</a>
                   </div>
                 </div>
               </div>
@@ -604,16 +627,16 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/canter.webp" loading="lazy" decoding="async" alt="Medium Commercial Vehicles" title="Medium Commercial Vehicles" class="active">
-                      <img data-src="attached_assets/vehicle category/pickup.webp" alt="Medium Commercial Vehicles" title="Medium Commercial Vehicles" class="lazy-swap">
-                      <img data-src="attached_assets/vehicle category/maxx.webp" alt="Medium Commercial Vehicles" title="Medium Commercial Vehicles" class="lazy-swap">
+                      <img src="attached_assets/vehicle category/canter.webp" loading="lazy" decoding="async" alt="Mini Truck (Eicher Canter)" title="Perfect for city to city" class="active">
+                      <img data-src="attached_assets/vehicle category/pickup.webp" alt="Bolero Pickup (MaXX)" title="Strong and suitable for various terrains" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/maxx.webp" alt="Bolero Pickup (MaXX)" title="Strong and suitable for various terrains" class="lazy-swap">
                     </div>
                     <h3>Medium Commercial Vehicles</h3>
                   </div>
                   <div class="flip-card-back">
                     <h3>Medium Commercial Vehicles</h3>
                     <p>Ideal for intercity transport and medium-sized loads</p>
-                    <a href="#" class="card-btn" data-category="medium">View Vehicles</a>
+                    <a href="#" class="card-btn" data-category="medium" data-type="Mini Truck (Eicher Canter)">View Vehicles</a>
                   </div>
                 </div>
               </div>
@@ -623,12 +646,12 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/14 wheeler.webp" loading="lazy" decoding="async" alt="Heavy Commercial Vehicles" title="Heavy Commercial Vehicles" class="active">
-                      <img data-src="attached_assets/vehicle category/container truck.webp" alt="Heavy Commercial Vehicles" title="Heavy Commercial Vehicles" class="lazy-swap">
-                      <img data-src="attached_assets/vehicle category/closed body truck.webp" alt="Heavy Commercial Vehicles" title="Heavy Commercial Vehicles" class="lazy-swap">
-                      <img data-src="attached_assets/vehicle category/container truck 2.webp" alt="Heavy Commercial Vehicles" title="Heavy Commercial Vehicles" class="lazy-swap">
-                      <img data-src="attached_assets/vehicle category/dumper.webp" alt="Heavy Commercial Vehicles" title="Heavy Commercial Vehicles" class="lazy-swap">
-                      <img data-src="attached_assets/vehicle category/flatbed.webp" alt="Heavy Commercial Vehicles" title="Heavy Commercial Vehicles" class="lazy-swap">
+                      <img src="attached_assets/vehicle category/14 wheeler.webp" loading="lazy" decoding="async" alt="12 wheeler and onwards" title="used for very large and heavy shipping like in industries" class="active">
+                      <img data-src="attached_assets/vehicle category/container truck.webp" alt="container truck" title="safe choice for important and secured goods" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/closed body truck.webp" alt="Closed Body Truck" title="Protection from weather and theft" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/container truck 2.webp" alt="container truck" title="safe choice for important and secured goods" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/dumper.webp" alt="Tipper Truck (Dumper Truck)" title="used for carrying loose materials like sand or gravels" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/flatbed.webp" alt="Flatbed Truck" title="ideal for over-sized cargo and delivery" class="lazy-swap">
                       
                     </div>
                     <h3>Heavy Commercial Vehicles</h3>
@@ -636,7 +659,7 @@
                   <div class="flip-card-back">
                     <h3>Heavy Commercial Vehicles</h3>
                     <p>For long-distance transport and heavy loads</p>
-                    <a href="#" class="card-btn" data-category="heavy">View Vehicles</a>
+                    <a href="#" class="card-btn" data-category="heavy" data-type="12 wheeler and onwards">View Vehicles</a>
                   </div>
                 </div>
               </div>
@@ -646,18 +669,18 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/crane 2.webp" loading="lazy" decoding="async" alt="Special Utility Vehicles" title="Special Utility Vehicles" class="active">
-                      <img data-src="attached_assets/vehicle category/JCB.webp" alt="Special Utility Vehicles" title="Special Utility Vehicles" class="lazy-swap">
-                      <img data-src="attached_assets/vehicle category/dumper truck.webp" alt="Special Utility Vehicles" title="Special Utility Vehicles" class="lazy-swap">
-                      <img data-src="attached_assets/vehicle category/garbage truck 1.webp" alt="Special Utility Vehicles" title="Special Utility Vehicles" class="lazy-swap">
-                      <img data-src="attached_assets/vehicle category/waste collector.webp" alt="Special Utility Vehicles" title="Special Utility Vehicles" class="lazy-swap">
+                      <img src="attached_assets/vehicle category/crane 2.webp" loading="lazy" decoding="async" alt="Crane" title="Used for lifting or moving heavy objects" class="active">
+                      <img data-src="attached_assets/vehicle category/JCB.webp" alt="J.C.B" title="For excavation and construction tasks" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/dumper truck.webp" alt="Tipper Truck (Dumper Truck)" title="Used for carrying loose materials like sand or gravels" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/garbage truck 1.webp" alt="Garbage Truck" title="Special Utility Vehicles" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/waste collector.webp" alt="Special Utility Vehicles" title="For waste collection and disposal" class="lazy-swap">
                     </div>
                     <h3>Special Utility Vehicles</h3>
                   </div>
                   <div class="flip-card-back">
                     <h3>Special Utility Vehicles</h3>
                     <p>Specialized vehicles for specific transport needs</p>
-                    <a href="#" class="card-btn" data-category="special">View Vehicles</a>
+                    <a href="#" class="card-btn" data-category="special" data-type="Tipper Truck (Dumper Truck)">View Vehicles</a>
                   </div>
                 </div>
               </div>
@@ -670,16 +693,16 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/ac truck.webp" loading="lazy" decoding="async" alt="AC Transport" title="Refrigerated & AC Transport" class="active">
-                      <img data-src="attached_assets/vehicle category/AC truck 2.webp" alt="AC Transport" title="Refrigerated & AC Transport" class="lazy-swap">
-                      <img data-src="attached_assets/vehicle category/refrigerated van.webp" alt="AC Transport" title="Refrigerated & AC Transport" class="lazy-swap">
+                      <img src="attached_assets/vehicle category/ac truck.webp" loading="lazy" decoding="async" alt="Refrgerated Truck" title="Larger trucks for transporting frozen or chilled goods over long distances." class="active">
+                      <img data-src="attached_assets/vehicle category/AC truck 2.webp" alt="Refrigerated Truck" title="Larger trucks for transporting frozen or chilled goods over long distances." class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/refrigerated van.webp" alt="Refrigerated Van" title="Keep dairy, icecream, and food cool for short trips" class="lazy-swap">
                     </div>
                     <h3>Refrigerated & AC Transport </h3>
                   </div>
                   <div class="flip-card-back">
                     <h3>Refrigerated & AC Transport </h3>
                     <p>Transport of food, beverages, ice-creams and other perishable goods</p>
-                    <a href="#" class="card-btn" data-category="packers">View Services</a>
+                    <a href="#" class="card-btn" data-category="packers" data-type="Refrigerated Trucks">View Services</a>
                   </div>
                 </div>
               </div>
@@ -689,15 +712,15 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/delievery.webp" loading="lazy" decoding="async" alt="Delivery Services" title="Delivery Services" class="active">
-                      <img data-src="attached_assets/vehicle category/packers and movers.webp" alt="Delivery Services" title="Delivery Services" class="lazy-swap">
+                      <img src="attached_assets/vehicle category/delievery.webp" loading="lazy" decoding="async" alt="Parcel delivery" title="For local and city to city parcel deliveries." class="active">
+                      <img data-src="attached_assets/vehicle category/packers and movers.webp" alt="Packers &  Movers" title="For house shifting, office realocation, or furniture transport." class="lazy-swap">
                     </div>
                     <h3>Delivery Services</h3>
                   </div>
                   <div class="flip-card-back">
                     <h3>Delivery Services</h3>
                     <p>Fast and reliable delivery solutions for your goods</p>
-                    <a href="#" class="card-btn" data-category="delivery">View Services</a>
+                    <a href="#" class="card-btn" data-category="delivery" data-type="Parcel Delivery">View Services</a>
                   </div>
                 </div>
               </div>
@@ -707,16 +730,16 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-              <img src="attached_assets/vehicle category/drink truck.webp" loading="lazy" decoding="async" alt="Food & Beverage Vehicles" title="Food & Beverage Vehicles" class="active">
-            <img data-src="attached_assets/vehicle category/food truck 2.webp" alt="Food & Beverage Vehicles" title="Food & Beverage Vehicles" class="lazy-swap">
-            <img data-src="attached_assets/vehicle category/food truck 3.webp" alt="Food & Beverage Vehicles" title="Food & Beverage Vehicles" class="lazy-swap">
+              <img src="attached_assets/vehicle category/drink truck.webp" loading="lazy" decoding="async" alt="Drink-based-vehicle" title="Food & Beverage Vehicles" class="active">
+            <img data-src="attached_assets/vehicle category/food truck 2.webp" alt="Food & Beverage Vehicles" title="Food-based-vehicle" class="lazy-swap">
+            <img data-src="attached_assets/vehicle category/food truck 3.webp" alt="Food & Beverage Vehicles" title="Food-based-vehicle" class="lazy-swap">
                     </div>
                     <h3>Food & Beverage Vehicles</h3>
                   </div>
                   <div class="flip-card-back">
                     <h3>Food & Beverage Vehicles</h3>
                     <p>Mobile food and beverage services for events and locations</p>
-                    <a href="#" class="card-btn" data-category="food">View Services</a>
+                    <a href="#" class="card-btn" data-category="food" data-type="Food trucks">View Services</a>
                   </div>
                 </div>
               </div>
@@ -726,16 +749,16 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/ambulance 3.webp" loading="lazy" decoding="async" alt="Emergency Vehicles" title="Emergency Vehicles" class="active">
-                      <img data-src="attached_assets/vehicle category/ambulance2.webp" alt="Emergency Vehicles" title="Emergency Vehicles" class="lazy-swap">
-                      <img data-src="attached_assets/vehicle category/tow truck.webp" alt="Emergency Vehicles" title="Emergency Vehicles" class="lazy-swap">
+                      <img src="attached_assets/vehicle category/ambulance 3.webp" loading="lazy" decoding="async" alt="Ambulances" title="For patient and medical emergencies" class="active">
+                      <img data-src="attached_assets/vehicle category/ambulance2.webp" alt="Ambulance" title="For patient and medical emergencies" class="lazy-swap">
+                      <img data-src="attached_assets/vehicle category/tow truck.webp" alt="Tow Truck" title="For towing and recovery vehicles" class="lazy-swap">
                     </div>
                     <h3>Emergency Vehicles</h3>
                   </div>
                   <div class="flip-card-back">
                     <h3>Emergency Vehicles</h3>
                     <p>Ambulances, tow trucks, and other emergency response vehicles</p>
-                    <a href="#" class="card-btn" data-category="emergency">View Services</a>
+                    <a href="#" class="card-btn" data-category="emergency" data-type="Ambulance">View Services</a>
                   </div>
           </div>
           </div>
@@ -986,6 +1009,8 @@
       </div>
     </div>
 
+    
+
     <!-- User Info Modal for Non-Signed-In Users -->
     <div id="userInfoModal" class="modal">
       <div class="modal-content">
@@ -1108,6 +1133,79 @@
     <!-- AI Assistant JavaScript and CSS -->
     <link rel="stylesheet" href="ai-assistant.css">
   <script defer src="ai-assistant.js"></script>
+  
+  <!-- Category deep link helper: convert card clicks to /vehicles/{City}/{Type} using the city selector above -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      const select = document.getElementById('homeCitySelect');
+      function encodePath(s){ return encodeURIComponent(s).replace(/%20/g,'+').replace(/\(/g,'%28').replace(/\)/g,'%29'); }
+      // Normalize common alt/text labels to canonical vehicle types
+      const typeMap = {
+        'container truck': 'Container Truck',
+        'closed body truck': 'Closed Body Truck',
+        'open body truck': 'Open Body Truck (6 wheeler)',
+        'flatbed truck': 'Flatbed Truck',
+        'tata ace (chhota hathi)': 'Tata Ace (Chhota Hathi)',
+        'auto loader (cng loader)': 'Auto Loader (CNG loader)',
+        'e-rickshaw loader (tuk-tuk)': 'E-Rickshaw Loader (Tuk-Tuk)',
+        'mini truck (eicher canter)': 'Mini Truck (Eicher Canter)',
+        'bolero pickup (maxx)': 'Bolero Pickup (MaXX)',
+        '12 wheeler and onwards': '12 wheeler and onwards',
+        '8 wheeler': '8 wheeler',
+        '6 wheeler': '6 wheeler',
+        'tipper truck (dumper truck)': 'Tipper Truck (Dumper Truck)',
+        'garbage truck': 'Garbage Truck',
+        'crane': 'Crane',
+        'jcb': 'JCB', 'j.c.b': 'JCB',
+        'refrigerated truck': 'Refrigerated Trucks',
+        'refrigerated trucks': 'Refrigerated Trucks',
+        'refrigerated van': 'Refrigerated Vans',
+        'refrigerated vans': 'Refrigerated Vans',
+        'parcel delivery': 'Parcel Delivery',
+        'packers &  movers': 'Packer&Movers',
+        'packers and movers': 'Packer&Movers',
+        'tow truck': 'Tow-Truck', 'tow-truck': 'Tow-Truck',
+        'ambulance': 'Ambulance', 'ambulances': 'Ambulance',
+        'drink-based-vehicle': 'Beverage trucks',
+        'food-based-vehicle': 'Food trucks',
+        'vikram tempo': 'Vikram Tempo'
+      };
+      document.querySelectorAll('.vehicle-categories-section a.card-btn[data-type]').forEach(btn => {
+        btn.addEventListener('click', function(e){
+          e.preventDefault();
+          const card = this.closest('.flip-card');
+          let type = this.getAttribute('data-type') || '';
+          // Prefer the currently active image ALT as the type if present
+          const activeImg = card ? card.querySelector('.image-container img.active') : null;
+          const activeAlt = activeImg ? (activeImg.getAttribute('alt') || '').trim() : '';
+          if (activeAlt) {
+            const key = activeAlt.toLowerCase();
+            type = typeMap[key] || activeAlt; // map common labels; else use as-is
+          }
+          if (!type) return; // safety
+          const city = (select && select.value) ? select.value.trim() : '';
+          const isLocal = window.location.protocol === 'file:';
+          if (city) {
+            let url;
+            if (isLocal) {
+              // On file://, use query style so vehicles.html loads correctly
+              const base = window.buildUrl ? window.buildUrl('vehicles') : 'vehicles.html';
+              url = `${base}?city=${encodeURIComponent(city)}&type=${encodeURIComponent(type)}`;
+            } else {
+              const clean = `/vehicles/${encodeURIComponent(city)}/${encodePath(type)}`;
+              url = window.buildUrl ? window.buildUrl(clean) : clean;
+            }
+            window.location.href = url;
+          } else {
+            // All-India fallback: preserve existing type-only search
+            const q = `vehicles?type=${encodeURIComponent(type)}`;
+            const url = window.buildUrl ? window.buildUrl('vehicles') + `?type=${encodeURIComponent(type)}` : q;
+            window.location.href = url;
+          }
+        });
+      });
+    });
+  </script>
 
 
 <!-- Footer Section -->
@@ -1168,9 +1266,24 @@
         <!-- Our Services Column -->
     <div class="footer-column">
       <h3>Our Services</h3>
-        <p>Transport Vehicle Listings <img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/transport vehicle listing.gif" alt="Transport Listings" title="Transport Vehicle Listings" class="service-icon" style="display: inline;"></p>
-        <p>Direct Contact with Owners of Transport Vehicles <img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/Direct Contact with Owners.gif" alt="Direct Contact" title="Direct Contact with Owners" class="service-icon" style="display: inline;"></p>
-        <p>Search & Filter Options <img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/Search & Filter Options.gif" alt="Search & Filter" title="Search & Filter Options" class="service-icon" style="display: inline;"></p>
+      <p>
+        Transport Vehicle Listings
+        <video class="service-icon" autoplay loop muted playsinline preload="auto" style="display:inline-block;vertical-align:middle;" aria-label="Transport Listings">
+          <source src="attached_assets/animation/Transport-vehicle-listing.webm" type="video/webm">
+        </video>
+      </p>
+      <p>
+        Direct Contact with Owners of Transport Vehicles
+        <video class="service-icon" autoplay loop muted playsinline preload="auto" style="display:inline-block;vertical-align:middle;" aria-label="Direct Contact">
+          <source src="attached_assets/animation/Direct-Contact.webm" type="video/webm">
+        </video>
+      </p>
+      <p>
+        Search & Filter Options
+        <video class="service-icon" autoplay loop muted playsinline preload="auto" style="display:inline-block;vertical-align:middle;" aria-label="Search & Filter Options">
+          <source src="attached_assets/animation/Search%26Filter-Options.webm" type="video/webm">
+        </video>
+      </p>
     </div>
 
         <!-- Follow Us Column (last in the row) -->

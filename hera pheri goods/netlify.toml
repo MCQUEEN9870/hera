@@ -1,5 +1,5 @@
 [build]
-  publish = "Hera-pheri-goods"
+  publish = "hera pheri goods"
 
 [build.processing]
   skip_processing = false
@@ -32,24 +32,23 @@
   status = 200
   force = true
 
-# Backend SSR rewrites for SEO discovery
-# Serve sitemap statically from Netlify (no proxy)
-
+# Vehicles deep-links should render the SPA vehicles page
 [[redirects]]
   from = "/vehicles/*"
-  to = "https://api.herapherigoods.in/vehicles/:splat"
+  to = "/vehicles.html"
   status = 200
   force = true
 
+# Register subpaths (if any) should land on register page too
 [[redirects]]
   from = "/register/*"
-  to = "https://api.herapherigoods.in/register/:splat"
+  to = "/register.html"
   status = 200
   force = true
 
 [[redirects]]
   from = "/city/*"
-  to = "https://api.herapherigoods.in/city/:splat"
+  to = "/index.html"
   status = 200
   force = true
 
