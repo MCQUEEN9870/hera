@@ -261,9 +261,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Prevent panel from closing when clicking inside
-    floatingPanel.addEventListener('click', (e) => {
-        e.stopPropagation();
-    });
+    if (floatingPanel) {
+        floatingPanel.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
 
     // Handle escape key
     document.addEventListener('keydown', (e) => {
@@ -874,6 +876,12 @@ const vehicleDropdown = document.querySelector('.vehicle-dropdown');
 const vehicleOptions = document.querySelectorAll('input[name="vehicleType"]');
 const locationSelection = document.querySelector('.location-selection');
 
+// Toggle dropdown
+if (vehicleSelectBtn && vehicleDropdown) {
+    vehicleSelectBtn.addEventListener('click', () => {
+        vehicleDropdown.classList.toggle('active');
+    });
+}
 
 
 // Close dropdown when clicking outside
