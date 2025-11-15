@@ -140,14 +140,8 @@ document.querySelectorAll(".nav-item").forEach((item) => {
     });
 });
 
-// NOTE: Removed a duplicate mobile-only toggle that was also toggling the
-// dropdown on click. On real devices the two handlers fired and canceled
-// each other (open then immediately close). The unified handler below
-// works for both desktop and mobile.
 
-// ==========================================
 // Truck Type Dropdown Toggle
-// ==========================================
 document.addEventListener('DOMContentLoaded', function() {
     const truckTypeBtn = document.querySelector('.truck-type-btn');
     const dropdown = document.querySelector('.dropdown');
@@ -880,12 +874,7 @@ const vehicleDropdown = document.querySelector('.vehicle-dropdown');
 const vehicleOptions = document.querySelectorAll('input[name="vehicleType"]');
 const locationSelection = document.querySelector('.location-selection');
 
-// Toggle dropdown
-if (vehicleSelectBtn && vehicleDropdown) {
-    vehicleSelectBtn.addEventListener('click', () => {
-        vehicleDropdown.classList.toggle('active');
-    });
-}
+
 
 // Close dropdown when clicking outside
 document.addEventListener('click', (e) => {
