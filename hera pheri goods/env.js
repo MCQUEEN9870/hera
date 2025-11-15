@@ -92,9 +92,8 @@ window.isLocalEnvironment = isLocalEnvironment;
         const controller = new AbortController();
         const t = setTimeout(() => controller.abort(), 3000);
         try {
-            // Try presence count API first (public), then posts API as fallback
+            // Probe a stable public endpoint that should exist
             const urls = [
-                b.replace(/\/$/, '') + '/api/presence/count?page=posts',
                 b.replace(/\/$/, '') + '/api/posts'
             ];
             

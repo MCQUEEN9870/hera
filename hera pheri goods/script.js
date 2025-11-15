@@ -187,10 +187,18 @@ if (!__perf.reduced && !__perf.saveData) {
     runIdle(() => {
         if (typeof gsap === 'undefined') return;
         try {
-            gsap.from(".logo", { duration: 1.2, opacity: 0, y: -24, ease: "power2.out" });
-            gsap.to(".registration-block", { duration: 0.4, opacity: 1, ease: "power2.in" });
-            gsap.to(".registration-section", { duration: 0.5, opacity: 1, y: 0, ease: "power2.out", delay: 0.1 });
-            gsap.to(".find-vehicle-section", { duration: 0.5, opacity: 1, y: 0, ease: "power2.out", delay: 0.2 });
+            if (document.querySelector('.logo')) {
+                gsap.from('.logo', { duration: 1.2, opacity: 0, y: -24, ease: 'power2.out' });
+            }
+            if (document.querySelector('.registration-block')) {
+                gsap.to('.registration-block', { duration: 0.4, opacity: 1, ease: 'power2.in' });
+            }
+            if (document.querySelector('.registration-section')) {
+                gsap.to('.registration-section', { duration: 0.5, opacity: 1, y: 0, ease: 'power2.out', delay: 0.1 });
+            }
+            if (document.querySelector('.find-vehicle-section')) {
+                gsap.to('.find-vehicle-section', { duration: 0.5, opacity: 1, y: 0, ease: 'power2.out', delay: 0.2 });
+            }
         } catch(_){}
     }, 1200);
 }
@@ -206,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let isTransitioning = false;
 
     // Toggle panel on click
-    panelToggle.addEventListener('click', (e) => {
+    if (panelToggle && floatingPanel) panelToggle.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         
@@ -228,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Close panel
-    closePanel.addEventListener('click', (e) => {
+    if (closePanel && floatingPanel) closePanel.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         
@@ -245,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Close panel when clicking outside
     document.addEventListener('click', (e) => {
-        if (isExpanded && !floatingPanel.contains(e.target)) {
+        if (isExpanded && floatingPanel && !floatingPanel.contains(e.target)) {
             if (isTransitioning) return;
             
             isTransitioning = true;
@@ -873,28 +881,33 @@ const vehicleOptions = document.querySelectorAll('input[name="vehicleType"]');
 const locationSelection = document.querySelector('.location-selection');
 
 // Toggle dropdown
-vehicleSelectBtn.addEventListener('click', () => {
-    vehicleDropdown.classList.toggle('active');
-});
+if (vehicleSelectBtn && vehicleDropdown) {
+    vehicleSelectBtn.addEventListener('click', () => {
+        vehicleDropdown.classList.toggle('active');
+    });
+}
 
 // Close dropdown when clicking outside
 document.addEventListener('click', (e) => {
-    if (!vehicleSelectBtn.contains(e.target) && !vehicleDropdown.contains(e.target)) {
-        vehicleDropdown.classList.remove('active');
+    if (vehicleSelectBtn && vehicleDropdown) {
+        if (!vehicleSelectBtn.contains(e.target) && !vehicleDropdown.contains(e.target)) {
+            vehicleDropdown.classList.remove('active');
+        }
     }
 });
 
 // Handle vehicle selection
-vehicleOptions.forEach(option => {
-    option.addEventListener('change', (e) => {
-        const selectedVehicle = e.target.value;
-        vehicleSelectBtn.querySelector('span').textContent = selectedVehicle;
-        vehicleDropdown.classList.remove('active');
-
-        // Show the location selection section
-        locationSelection.style.display = 'block';
+if (vehicleOptions && vehicleOptions.length && vehicleSelectBtn && vehicleDropdown && locationSelection) {
+    vehicleOptions.forEach(option => {
+        option.addEventListener('change', (e) => {
+            const selectedVehicle = e.target.value;
+            const span = vehicleSelectBtn.querySelector('span');
+            if (span) span.textContent = selectedVehicle;
+            vehicleDropdown.classList.remove('active');
+            locationSelection.style.display = 'block';
+        });
     });
-});
+}
 
 // Function to handle profile link based on user contact
 // Check if user is logged in
