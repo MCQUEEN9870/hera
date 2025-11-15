@@ -2,14 +2,10 @@
 <html lang="en">
   <head>
     
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-V9X30VY879"></script>
+    <!-- Google tag (gtag.js) – lazy-loaded to reduce unused JS -->
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-V9X30VY879');
+  function gtag(){ dataLayer.push(arguments); }
 </script>
     
     <!-- Basic meta tags for character encoding and responsive design -->
@@ -19,12 +15,12 @@
   <!-- AdSense site verification -->
   <meta name="google-adsense-account" content="ca-pub-9790279842280207">
   
-  
- 
-  <!-- Preconnects to speed up third-party hosts -->
+   <!--Preconnects to speed up third-party hosts (deduplicated) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://api.herapherigoods.in" crossorigin>
+  <link rel="dns-prefetch" href="//fundingchoicesmessages.google.com">
   <title>Herapherigoods - List & Find Transport Vehicles in India</title>
   <meta property="og:title" content="Herapherigoods - List & Find Transport Vehicles in India" />
   <meta name="twitter:title" content="Herapherigoods - List & Find Transport Vehicles in India" />
@@ -42,7 +38,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="attached_assets/images/1200x630.jpg" />
 
-    <!-- Favicons -->
+   <!-- Favicons -->
      <link rel="icon" type="image/x-icon" href="/favicon.ico">
      <link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
      <link rel="icon" type="image/png" href="/android-chrome-512x512.png" sizes="512x512"> 
@@ -52,39 +48,88 @@
     <link rel="manifest" href="site.webmanifest">
     
     <!-- External CSS and Font Awesome for icons -->
-  <!-- Load main CSS in the standard blocking way -->
-  <link rel="stylesheet" href="style.css">
+  <!-- Load main CSS (cache-busted to bypass long immutable cache) -->
+  <link rel="stylesheet" href="style.css?v=20251114">
     
-  <!-- Load Font Awesome normally -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Load Font Awesome asynchronously to avoid render-blocking -->
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+  <!-- Enforce font-display: swap for Font Awesome webfonts (Lighthouse recommendation) -->
+  <style>
+    @font-face {
+      font-family: "Font Awesome 6 Free";
+      font-style: normal;
+      font-weight: 900;
+      font-display: swap;
+      src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-solid-900.woff2") format("woff2");
+    }
+    @font-face {
+      font-family: "Font Awesome 6 Free";
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-regular-400.woff2") format("woff2");
+    }
+    @font-face {
+      font-family: "Font Awesome 6 Brands";
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-brands-400.woff2") format("woff2");
+    }
+  </style>
  
-    <!-- Load Google Fonts CSS normally -->
-    <link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Agu+Display&display=swap" rel="stylesheet"><link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Agu+Display&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:opsz,wght@10..72,100..900&display=swap" rel="stylesheet">
+    <!-- Google Fonts: consolidated into one async load (display=swap) -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cookie&family=Agu+Display&family=Big+Shoulders+Stencil:opsz,wght@10..72,100..900&family=Stack+Sans+Notch:wght@200..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Cookie&family=Agu+Display&family=Big+Shoulders+Stencil:opsz,wght@10..72,100..900&family=Stack+Sans+Notch:wght@200..700&display=swap" rel="stylesheet"></noscript>
     
     <!-- GSAP library for animations -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     
-  <!-- AOS (Animate On Scroll) library for scroll animations -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
+  <!-- AOS (Animate On Scroll) CSS loaded asynchronously -->
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" /></noscript>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     
-  <!-- Google AdSense (loads async, non-blocking) -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9790279842280207" crossorigin="anonymous"></script>
-    <script>
-      
+  <!-- Google AdSense: lazy-loaded after first interaction or when idle -->
+  <script>
+    (function(){
+      var loaded = false;
+      function loadAds(){
+        if (loaded) return; loaded = true;
+        var s = document.createElement('script');
+        s.async = true;
+        s.crossOrigin = 'anonymous';
+        s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9790279842280207';
+        document.head.appendChild(s);
+      }
+      // Lazy-load Google Analytics after interaction or when idle
+      var gaLoaded = false;
+      function loadGA(){
+        if (gaLoaded) return; gaLoaded = true;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-V9X30VY879';
+        s.onload = function(){ try { gtag('js', new Date()); gtag('config', 'G-V9X30VY879'); } catch(e){} };
+        document.head.appendChild(s);
+      }
+      if ('requestIdleCallback' in window){
+        requestIdleCallback(loadAds, { timeout: 6000 });
+        requestIdleCallback(loadGA,  { timeout: 6000 });
+      } else {
+        window.addEventListener('load', function(){ setTimeout(loadAds, 6000); setTimeout(loadGA, 6000); });
+      }
+      ['scroll','mousemove','touchstart','keydown'].forEach(function(ev){
+        window.addEventListener(ev, function once(){ loadAds(); loadGA(); }, { once:true, passive:true });
+      });
+      // Keep AOS init on DOM ready
       window.addEventListener('DOMContentLoaded', function(){
         if (window.AOS && typeof AOS.init === 'function') {
           try { AOS.init({ once: true }); } catch(e){}
         }
       });
-    </script>
+    })();
+  </script>
     
     <!-- Modal Styles -->
     <style>
@@ -209,7 +254,7 @@
       }
       .tutorial-illustration {
         width: 100%;
-        max-width: 380px;
+        max-width: 240px;
         display: block;
         margin: 10px auto 16px;
         border-radius: 12px;
@@ -344,7 +389,7 @@
       <ul class="nav-links">
         <!-- Truck Type Dropdown Menu -->
         <li class="dropdown">
-          <a href="#" class="nav-item truck-type-btn" title="Find the right vehicle for your transport needs."><span>Find Vehicle</span></a>
+          <a href="#" class="nav-item truck-type-btn" title="Find the right vehicle for your transport needs."><span>Find Vehicles</span></a>
           <div class="dropdown-content">
             <!-- Small Commercial Vehicles Category -->
             <div class="category">
@@ -495,8 +540,8 @@
     <div class="hero-section" id="hero-section">
       <!-- Hero Background GIF -->
       <div class="hero-background">
-  <video class="hero-gif" autoplay muted loop playsinline preload="auto" aria-label="Transport Animation" title="Transport Animation">
-            <source src="attached_assets/animation/original-956409b077ef559b755248f8c2291d51.webm" type="video/webm">
+  <video class="hero-gif" autoplay muted loop playsinline preload="metadata" aria-label="Transport Animation" title="Transport Animation">
+            <source media="(min-width: 768px)" src="attached_assets/animation/original-956409b077ef559b755248f8c2291d51.webm" type="video/webm">
             Sorry, your browser doesn't support embedded videos.
           </video>
         </div>
@@ -513,22 +558,19 @@
             <div class="hero-features">
               <!-- List Vehicle Feature -->
               <div class="feature">
-                <video loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/Register-your-truck.webm" alt="Register-your-truck" title="List Your Vehicle" class="feature-icon"></video>
+                <video loading="lazy" decoding="async" fetchpriority="low" data-src="attached_assets/animation/Register-your-truck.webm" alt="Register-your-truck" title="List Your Vehicle" class="feature-icon lazy-video" autoplay loop muted playsinline preload="metadata"></video>
                 <span>List Your Vehicle</span>
               </div>
               <!-- Earn More Feature -->
               <div class="feature">
-                <video loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/animation/Earn-more.webm" alt="Earn More" title="Earn More" class="feature-icon"></video>
+                <video loading="lazy" decoding="async" fetchpriority="low" data-src="attached_assets/animation/Earn-more.webm" alt="Earn More" title="Earn More" class="feature-icon lazy-video" autoplay loop muted playsinline preload="metadata"></video>
                 <span>Earn More</span>
               </div>
             </div>
             <!-- Hero Button with Click-It animation -->
             <div class="btn-with-click-anim">
               <button class="hero-btn" id="registerNowBtn">Register Now</button>
-              <video autoplay loop muted playsinline class="click-it-anim" loading="lazy" decoding="async">
-                <source src="attached_assets/animation/click-it.webm" type="video/webm">
-                Your browser does not support the video tag.
-              </video>
+              <video autoplay loop muted playsinline class="click-it-anim lazy-video" loading="lazy" decoding="async" preload="none" data-src="attached_assets/animation/click-it.webm"></video>
             </div>
           </div>
         </div>
@@ -547,15 +589,12 @@
             <!-- Find Vehicle Button with Click-It animation (small, right side) -->
             <div class="btn-with-click-anim">
               <button class="find-vehicle-btn" onclick="window.location.href = 'vehicles.html'"><i class="fas fa-search"></i> Find Vehicle</button>
-              <video src="attached_assets/animation/click-it.webm" alt="Click hint animation" class="click-it-anim small" loading="lazy" decoding="async"></video>
+              <video data-src="attached_assets/animation/click-it.webm" alt="Click hint animation" class="click-it-anim small lazy-video" loading="lazy" decoding="async" preload="none"></video>
             </div>
           </div>
           <!-- Find Vehicle Image -->
           <div class="find-vehicle-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="200">
-            <video autoplay loop muted playsinline class="find-vehicle-video">
-              <source src="attached_assets/animation/Find-transport-vehicle.webm" type="video/webm">
-              Your browser does not support the video tag.
-            </video>
+            <video autoplay loop muted playsinline class="find-vehicle-video lazy-video" preload="none" data-src="attached_assets/animation/Find-transport-vehicle.webm"></video>
           </div>
         </div>
       </div>
@@ -565,16 +604,12 @@
     <div class="platform-description">
       <div class="description-container">
         <div class="platform-heading" data-aos="fade-down" data-aos-duration="800">
-          <video loading="lazy" decoding="async" src="attached_assets\animation\register-transport-vehicle.webm" alt="Truck Animation" title="Aapka Apna Transport Network animation" class="heading-animation"></video>
+          <video loading="lazy" decoding="async" data-src="attached_assets\animation\register-transport-vehicle.webm" alt="register-transport-vehicle" title="Aapka Apna Transport Network animation" class="heading-animation lazy-video" autoplay loop muted playsinline preload="metadata"></video>
           <h2>Herapheri Goods – Aapka Apna Transport Network!</h2>
         </div>
         <p class="main-description" data-aos="fade-up" data-aos-duration="800">Do you need transportation for your goods, want to send items, or require any kind of delivery service? Herapheri Goods is a free listing platform that directly connects transport vehicle owners with customers—without any third-party commissions!</p>
         
-        <div class="cta-section" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
-          <p>If you are a transport vehicle owner, list your vehicle for free and reach to more new customers! 📢</p>
-          <p class="highlight">Now transportation is easy, cheap, and stress-free!</p>
-          <p class="tagline">👉 Herapheri Goods – Where there's need arise, Herapheri surprise!</p>
-        </div>
+        <!-- CTA section removed as requested -->
 
         <!-- Vehicle Categories Section with Flip Cards -->
         <div class="vehicle-categories-section">
@@ -1008,10 +1043,7 @@
         </div>
       </div>
     </div>
-
-    
-
-    <!-- User Info Modal for Non-Signed-In Users -->
+<!-- User Info Modal for Non-Signed-In Users -->
     <div id="userInfoModal" class="modal">
       <div class="modal-content">
         <span class="close-modal">&times;</span>
@@ -1045,17 +1077,17 @@
     </div>
 
     <!-- Tutorial Popup Modal (Homepage) -->
-    <div id="tutorialPopup" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div id="tutorialPopup" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="scroll down">
       <div class="modal-content tutorial-content">
         <h3 style="margin-top: 4px;">New here? Watch a quick tutorial</h3>
         <p style="color:#555; margin: 8px 0 10px;">
           वाहन रजिस्टर करना सीखें! नीचे दिए गए वीडियो को देखें और जानें की कैसे आप अपने ट्रक, मिनी ट्रक, टेम्पो, या अन्य ट्रांसपोर्ट वाहन को हमारे प्लेटफ़ॉर्म पर मुफ्त में रजिस्टर कर सकते हैं।
         </p>
   <a class="tutorial-illustration-link" href="https://youtu.be/FREi_Lb4gWY?si=pA-zy8ryJQ_TEgzC" target="_blank" rel="noopener noreferrer">
-          <img src="attached_assets/images/yt.webp" alt="Herapheri Goods Tutorial" title="Watch Herapheri Goods tutorial on YouTube" class="tutorial-illustration" loading="lazy">
+          <img data-src="attached_assets/images/yt.webp" alt="Herapheri Goods Tutorial" title="Watch Herapheri Goods tutorial on YouTube" class="tutorial-illustration" loading="lazy" decoding="async" width="380" height="214">
         </a>
         <div class="tutorial-actions">
-          <a class="watch-btn" href="https://youtu.be/FREi_Lb4gWY" target="_blank" rel="noopener noreferrer">Watch Tutorial</a>
+          <a class="watch-btn" href="https://youtu.be/FREi_Lb4gWY" target="_blank" rel="noopener noreferrer">वीडियो देखें (कैसे रजिस्टर करें)</a>
           <button class="skip-btn" type="button">Skip <<</button>
         </div>
       </div>
@@ -1063,21 +1095,21 @@
 
     <!-- Social Share Drawer -->
     <div class="share-drawer">
-      <button class="share-toggle">
+      <button class="share-toggle" type="button" aria-label="Open share options" aria-expanded="false" aria-controls="share-content" title="Share options">
         <i class="fas fa-share-alt"></i>
       </button>
       
-      <div class="share-content">
+      <div class="share-content" id="share-content" aria-hidden="true">
         <div class="social-bar">
           <div class="social-icons">
-            <a href="https://wa.me/?text=Check%20out%20Herapheri%20Goods%20-%20Your%20one-stop%20platform%20for%20finding%20reliable%20transport%20vehicle%20owners!%20No%20middlemen,%20no%20extra%20charges.%20Visit%20https://herapherigoods.in" target="_blank" rel="noopener noreferrer" class="whatsapp">
-              <i class="fab fa-whatsapp"></i>
+            <a href="https://wa.me/?text=Check%20out%20Herapheri%20Goods%20-%20Your%20one-stop%20platform%20for%20finding%20reliable%20transport%20vehicle%20owners!%20No%20middlemen,%20no%20extra%20charges.%20Visit%20https://herapherigoods.in" target="_blank" rel="noopener noreferrer" class="whatsapp share-icon" aria-label="Share on WhatsApp" title="Share on WhatsApp">
+              <i class="fab fa-whatsapp" aria-hidden="true"></i>
             </a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=https://herapherigoods.in&quote=Herapheri%20Goods%20-%20Find%20reliable%20transport%20vehicle%20owners%20directly!" target="_blank" rel="noopener noreferrer" class="facebook">
-              <i class="fab fa-facebook-f"></i>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://herapherigoods.in&quote=Herapheri%20Goods%20-%20Find%20reliable%20transport%20vehicle%20owners%20directly!" target="_blank" rel="noopener noreferrer" class="facebook share-icon" aria-label="Share on Facebook" title="Share on Facebook">
+              <i class="fab fa-facebook-f" aria-hidden="true"></i>
             </a>
-            <a href="#" class="email" onclick="shareViaEmail(event)">
-              <i class="fas fa-envelope"></i>
+            <a href="#" class="email share-icon" aria-label="Share via Email" title="Share via Email" onclick="shareViaEmail(event)">
+              <i class="fas fa-envelope" aria-hidden="true"></i>
             </a>
           </div>
         </div>
@@ -1130,8 +1162,9 @@
     <!-- Vehicle Owner Carousel JavaScript - Load this after feedback-carousel.js -->
   <script defer src="vehicle-owner-carousel.js"></script>
     <!-- No Supabase Configuration needed -->
-    <!-- AI Assistant JavaScript and CSS -->
-    <link rel="stylesheet" href="ai-assistant.css">
+    <!-- AI Assistant CSS loaded asynchronously to avoid blocking -->
+    <link rel="preload" as="style" href="ai-assistant.css" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="ai-assistant.css"></noscript>
   <script defer src="ai-assistant.js"></script>
   
   <!-- Category deep link helper: convert card clicks to /vehicles/{City}/{Type} using the city selector above -->
@@ -1233,7 +1266,7 @@
             <ul>
                 <li><a href="#" class="scroll-to-top"><i class="fas fa-chevron-right"></i> Home</a></li>
                 <li><a href="#hero-section" class="scroll-link"><i class="fas fa-chevron-right"></i> Register your Transport Vehicle</a></li>
-                <li><a href="#find-vehicle-section" class="scroll-link"><i class="fas fa-chevron-right"></i> Find Vehicle</a></li>
+                <li><a href="#find-vehicle-section" class="scroll-link"><i class="fas fa-chevron-right"></i> Find vehicle</a></li>
                 <li><a href="privacy-policy"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
                 <li><a href="terms-and-condition"><i class="fas fa-chevron-right"></i> Terms & Conditions</a></li>
                 <li><a href="refer-and-refund-policy"><i class="fas fa-chevron-right"></i> Refer & Earn and Refund Policy</a></li>
@@ -1268,28 +1301,22 @@
       <h3>Our Services</h3>
       <p>
         Transport Vehicle Listings
-        <video class="service-icon" autoplay loop muted playsinline preload="auto" style="display:inline-block;vertical-align:middle;" aria-label="Transport Listings">
-          <source src="attached_assets/animation/Transport-vehicle-listing.webm" type="video/webm">
-        </video>
+        <video class="service-icon lazy-video" autoplay loop muted playsinline preload="none" style="display:inline-block;vertical-align:middle;" aria-label="Transport Listings" data-src="attached_assets/animation/Transport-vehicle-listing.webm"></video>
       </p>
       <p>
         Direct Contact with Owners of Transport Vehicles
-        <video class="service-icon" autoplay loop muted playsinline preload="auto" style="display:inline-block;vertical-align:middle;" aria-label="Direct Contact">
-          <source src="attached_assets/animation/Direct-Contact.webm" type="video/webm">
-        </video>
+        <video class="service-icon lazy-video" autoplay loop muted playsinline preload="none" style="display:inline-block;vertical-align:middle;" aria-label="Direct Contact" data-src="attached_assets/animation/Direct-Contact.webm"></video>
       </p>
       <p>
         Search & Filter Options
-        <video class="service-icon" autoplay loop muted playsinline preload="auto" style="display:inline-block;vertical-align:middle;" aria-label="Search & Filter Options">
-          <source src="attached_assets/animation/Search%26Filter-Options.webm" type="video/webm">
-        </video>
+        <video class="service-icon lazy-video" autoplay loop muted playsinline preload="none" style="display:inline-block;vertical-align:middle;" aria-label="Search & Filter Options" data-src="attached_assets/animation/Search%26Filter-Options.webm"></video>
       </p>
     </div>
 
         <!-- Follow Us Column (last in the row) -->
         <div class="footer-column">
             <h3>Follow Us</h3>
-            <div class="social-follow" aria-label="Follow Herapheri Goods on social media">
+            <div class="social-follow">
                 <a class="btn-social yt" href="https://youtube.com/@abhishekjha9870-k6b?si=K2n8Xz_COSUdRCg0" target="_blank" rel="noopener noreferrer" title="YouTube">
                     <i class="fab fa-youtube"></i>
                 </a>
@@ -1479,42 +1506,38 @@ Best regards,
             });
         }
 
-    // Homepage Tutorial Popup: show after ~5.5s for non-logged-in users, once per session
+    // Homepage Tutorial Popup: auto-open after ~15s for non-logged-in users; image loads on demand.
     try {
       const tutorialPopup = document.getElementById('tutorialPopup');
       const skipBtn = tutorialPopup?.querySelector('.skip-btn');
-
       const seenKey = 'seenTutorialPopup';
       const hasSeen = sessionStorage.getItem(seenKey) === '1';
 
+      function loadTutorialImage(){
+        const img = tutorialPopup?.querySelector('img[data-src]');
+        if (img && !img.src) { img.src = img.dataset.src; }
+      }
       function openTutorial() {
         if (!tutorialPopup) return;
+        loadTutorialImage();
         tutorialPopup.style.display = 'block';
         tutorialPopup.setAttribute('aria-hidden', 'false');
       }
-
       function closeTutorial() {
         if (!tutorialPopup) return;
         tutorialPopup.style.display = 'none';
         tutorialPopup.setAttribute('aria-hidden', 'true');
-        // mark as seen for this session
         sessionStorage.setItem(seenKey, '1');
       }
-
-      // Dismiss handlers
-      skipBtn?.addEventListener('click', closeTutorial);
-      // Clicking outside content closes
-      tutorialPopup?.addEventListener('click', (e) => {
-        if (e.target === tutorialPopup) closeTutorial();
-      });
-
-      // Show only if not logged in and not seen this session
-      if (!isLoggedIn && !hasSeen) {
-        setTimeout(openTutorial, 10000);
+      // Auto-open after delay but keep image small to avoid LCP becoming this modal
+      if (!isLoggedIn && !hasSeen){
+        const startAuto = () => setTimeout(openTutorial, 15000);
+        if ('requestIdleCallback' in window) requestIdleCallback(startAuto, { timeout: 16000 });
+        else window.addEventListener('load', startAuto, { once: true });
       }
-    } catch (err) {
-      console.warn('Tutorial popup init failed:', err);
-    }
+      skipBtn?.addEventListener('click', closeTutorial);
+      tutorialPopup?.addEventListener('click', (e) => { if (e.target === tutorialPopup) closeTutorial(); });
+    } catch (err) { console.warn('Tutorial popup init failed:', err); }
 
     // Gentle scroll nudge when user is at very top to hint more content below
     try {
@@ -1605,6 +1628,32 @@ Best regards,
       card.addEventListener('mouseenter', () => swapImages(card.querySelector('.image-container')), { once: true });
     });
 
+    // Lazy-load videos with data-src when they enter the viewport
+    const lazyVideos = Array.from(document.querySelectorAll('video.lazy-video[data-src]'));
+    const loadVideo = (v) => {
+      if (!v || !v.dataset.src) return;
+      v.src = v.dataset.src;
+      v.removeAttribute('data-src');
+      // For Safari, ensure play starts if autoplay is set
+      if (v.autoplay) {
+        const play = v.play && v.play.bind(v);
+        if (typeof play === 'function') {
+          const p = play();
+          if (p && typeof p.catch === 'function') { p.catch(()=>{}); }
+        }
+      }
+    };
+    if ('IntersectionObserver' in window && lazyVideos.length){
+      const vio = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+          if (e.isIntersecting) { loadVideo(e.target); vio.unobserve(e.target); }
+        });
+      }, { rootMargin: '200px' });
+      lazyVideos.forEach(v=>vio.observe(v));
+    } else {
+      lazyVideos.forEach(loadVideo);
+    }
+
     // Delay reCAPTCHA until user opens Rate Us
     let recaptchaLoaded = false;
     function loadRecaptchaOnce(){
@@ -1676,7 +1725,7 @@ Best regards,
     window.addEventListener('load', function() {
       console.log('Page fully loaded');
       console.log('GSAP available:', typeof gsap !== 'undefined');
-      console.log('ScrollTrigger available:', typeof ScrollTrigger !== 'undefined');
+      // ScrollTrigger not used any more; removed to save bytes
       console.log('Why Choose section exists:', document.querySelector('.why-choose-section') !== null);
     });
   </script>

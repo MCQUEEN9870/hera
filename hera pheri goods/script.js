@@ -1,11 +1,22 @@
+// Lightweight perf helpers
+const __perf = {
+  reduced: (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || false,
+  saveData: (typeof navigator !== 'undefined' && navigator.connection && (navigator.connection.saveData || /2g/.test(navigator.connection.effectiveType || ''))) || false
+};
+function runIdle(fn, timeout){
+  if (typeof requestIdleCallback === 'function') requestIdleCallback(fn, { timeout: timeout || 3000 });
+  else setTimeout(fn, timeout || 3000);
+}
+
 // Dropdown Position Adjustment
 document.addEventListener("DOMContentLoaded", function () {
-    // Initialize AOS (Animate On Scroll) library
-    AOS.init({
-        once: false,     // whether animation should happen only once - while scrolling down
-        mirror: true,    // whether elements should animate out while scrolling past them
-        duration: 1000   // values from 0 to 3000, with step 50ms
-    });
+    // Initialize AOS (Animate On Scroll) library lazily and lighter
+    if (window.AOS && !window.__AOS_INIT && !__perf.reduced && !__perf.saveData) {
+        window.__AOS_INIT = true;
+        runIdle(() => {
+            try { AOS.init({ once: true, mirror: false, duration: 700 }); } catch(_){}
+        }, 1500);
+    }
 
     // Get dropdown elements
     const dropdown = document.querySelector(".dropdown");
@@ -170,39 +181,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ==========================================
-// Logo Animation using GSAP
+// GSAP animations – run only on capable devices and when idle
 // ==========================================
-gsap.from(".logo", { 
-    duration: 2,
-    opacity: 0,
-    y: -50,
-    ease: "power2.out"
-});
-
-// GSAP Animation for Main Content Block
-gsap.to(".registration-block", {
-    duration: 0.5,
-    opacity: 1,
-    ease: "power2.in",
-    onComplete: () => {
-        // Animate the registration section
-        gsap.to(".registration-section", {
-            duration: 0.5,
-            opacity: 1,
-            y: 0,
-            ease: "power2.out",
-            onComplete: () => {
-                // Animate the find vehicle section
-                gsap.to(".find-vehicle-section", {
-                    duration: 0.5,
-                    opacity: 1,
-                    y: 0,
-                    ease: "power2.out"
-                });
-            }
-        });
-    }
-});
+if (!__perf.reduced && !__perf.saveData) {
+    runIdle(() => {
+        if (typeof gsap === 'undefined') return;
+        try {
+            gsap.from(".logo", { duration: 1.2, opacity: 0, y: -24, ease: "power2.out" });
+            gsap.to(".registration-block", { duration: 0.4, opacity: 1, ease: "power2.in" });
+            gsap.to(".registration-section", { duration: 0.5, opacity: 1, y: 0, ease: "power2.out", delay: 0.1 });
+            gsap.to(".find-vehicle-section", { duration: 0.5, opacity: 1, y: 0, ease: "power2.out", delay: 0.2 });
+        } catch(_){}
+    }, 1200);
+}
 
 
 
@@ -450,32 +441,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1500);
     }
     
-    // Function to setup image rotation for a card
+    // Function to setup image rotation for a card (only while visible)
     function setupImageRotation(card) {
         const images = card.querySelectorAll('.image-container img');
         if (images.length <= 1) return;
-        
         let currentIndex = 0;
-        
-        // Find the initially active image
         for (let i = 0; i < images.length; i++) {
-            if (images[i].classList.contains('active')) {
-                currentIndex = i;
-                break;
-            }
+            if (images[i].classList.contains('active')) { currentIndex = i; break; }
         }
-        
-        // Rotate images every 5 seconds
-        setInterval(() => {
-            // Remove active class from current image
-            images[currentIndex].classList.remove('active');
-            
-            // Move to next image
-            currentIndex = (currentIndex + 1) % images.length;
-            
-            // Add active class to next image
-            images[currentIndex].classList.add('active');
-        }, 5000);
+        let timer = null;
+        const start = () => {
+            if (timer) return;
+            timer = setInterval(() => {
+                images[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % images.length;
+                images[currentIndex].classList.add('active');
+            }, 6000);
+        };
+        const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => { e.isIntersecting ? start() : stop(); });
+        }, { threshold: 0.15 });
+        io.observe(card);
     }
 });
 
@@ -746,17 +733,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const shareDrawer = document.querySelector('.share-drawer');
     const shareToggle = document.querySelector('.share-toggle');
     const shareIcons = document.querySelectorAll('.share-icon');
+    const shareContent = document.getElementById('share-content');
 
     // Toggle drawer with slide effect
     shareToggle.addEventListener('click', function(e) {
         e.stopPropagation();
-        shareDrawer.classList.toggle('active');
+        const nowActive = shareDrawer.classList.toggle('active');
+        // Update accessibility state
+        shareToggle.setAttribute('aria-expanded', String(nowActive));
+        if (shareContent) {
+            shareContent.setAttribute('aria-hidden', String(!nowActive));
+        }
     });
 
     // Close drawer when clicking outside
     document.addEventListener('click', function(e) {
         if (!shareDrawer.contains(e.target)) {
             shareDrawer.classList.remove('active');
+            // Update accessibility state when closing
+            shareToggle.setAttribute('aria-expanded', 'false');
+            if (shareContent) {
+                shareContent.setAttribute('aria-hidden', 'true');
+            }
         }
     });
 
@@ -791,23 +789,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // Function to hide/show slide bars on scroll
-let lastScrollTop = 0;
+let lastScrollTop = 0,
+    __ticking = false;
 window.addEventListener('scroll', function() {
     const reviewSidebar = document.querySelector('.review-sidebar');
     const shareDrawer = document.querySelector('.share-drawer');
     const st = window.pageYOffset || document.documentElement.scrollTop;
 
-    if (st > lastScrollTop) {
-        // Scroll down
-        reviewSidebar.classList.add('hidden'); // Add hidden class to hide
-        shareDrawer.classList.add('hidden'); // Add hidden class to hide
-    } else {
-        // Scroll up
-        reviewSidebar.classList.remove('hidden'); // Remove hidden class to show
-        shareDrawer.classList.remove('hidden'); // Remove hidden class to show
+    if (!__ticking) {
+        __ticking = true;
+        requestAnimationFrame(() => {
+            if (st > lastScrollTop) {
+                reviewSidebar.classList.add('hidden');
+                shareDrawer.classList.add('hidden');
+            } else {
+                reviewSidebar.classList.remove('hidden');
+                shareDrawer.classList.remove('hidden');
+            }
+            lastScrollTop = st <= 0 ? 0 : st;
+            __ticking = false;
+        });
     }
-    lastScrollTop = st <= 0 ? 0 : st; // For Mobile or negative scrolling
-});
+}, { passive: true });
 
 // Show More Functionality for About Us
 document.addEventListener('DOMContentLoaded', function() {

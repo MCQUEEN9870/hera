@@ -1,4 +1,4 @@
-/* Reset default styling */
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -9,38 +9,22 @@ body {
 }
 html { overscroll-behavior-x: none; overflow-x: hidden; }
 
-/* Styling the navbar */
-.navbar {
-  display: flex;
-  justify-content: end;  /* Changed from flex-start to space-between */
-  align-items: center;
-  background-color: transparent;
-  padding: 5px 20px;  
-  position: relative;
-  z-index: 100;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.375);
-  flex-wrap: wrap;
-  gap: 10px;
-  height: 135px;;
-}
-
-/* Glass/transparent navbar look for home page */
 .glass-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 80px;
-  padding: 10px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+     background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    z-index: 1000;
+    flex-wrap: wrap;
+  gap: 10px;
 }
 
 .glass-nav .navbar-logo { margin: 0; padding: 0; }
@@ -64,10 +48,8 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 
 /* When scrolled, switch to solid light background with dark text */
 .glass-nav.scrolled {
-  background: rgba(0, 0, 0, 0.25); /* darker so white links are visible */
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.30); /* slightly darker when scrolled */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 /* Keep top-level nav links white even after scroll */
@@ -831,26 +813,12 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     font-size: 3.9rem;
     font-weight: 700;
     margin-bottom: 20px;
-    
-    
-    display: inline;
-    background: linear-gradient(136deg, #fff, rgb(255 165 0 / 31%), #fff, #fff, #fff);
-    background-clip: text;
-    color: transparent;
-    background-size: 200% 100%;
-    animation: shimmer 7s linear infinite;
+    display: inline-block;
+    position: relative;
+    color: #ffffff;
+    overflow: hidden;
+    font-family: "Stack Sans Notch", sans-serif;
 }
-
-
-@keyframes shimmer {
-    0% {
-        background-position: 200% 0;
-    }
-    100% {
-        background-position: -200% 0;
-    }
-}
-
 
 .hero-content p {
     font-size: 1.5rem;
@@ -1907,6 +1875,15 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     margin-left: calc(-50vw + 50%);
 }
 
+
+@media (max-width: 768px) {
+    .how-it-works-section {
+        background-image: none !important;
+        background: #111827; /* neutral fallback */
+        background-attachment: scroll;
+    }
+}
+
 .how-it-works-section::before {
     content: '';
     position: absolute;
@@ -2194,76 +2171,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     margin: 0;
 }
 
-/* CTA Section */
-.cta-section {
-    text-align: center;
-    padding: 40px 20px;
-    background: linear-gradient(135deg, #FFD700, #B8860B, #DAA520, #FFD700);
-    background-size: 300% 300%;
-    border-radius: 20px;
-    color: white;
-    margin-top: 40px;
-    animation: gradientMove 8s ease infinite;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(218, 165, 32, 0.3);
-}
-
-@keyframes gradientMove {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-.cta-section::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-    animation: shimmerEffect 4s linear infinite;
-    pointer-events: none;
-}
-
-@keyframes shimmerEffect {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-.cta-section p {
-    font-size: 1.2rem;
-    margin-bottom: 15px;
-    line-height: 1.6;
-    position: relative;
-    z-index: 1;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-}
-
-.cta-section .highlight {
-    font-size: 1.4rem;
-    font-weight: 600;
-    margin: 20px 0;
-    color: #FFFACD;
-}
-
-.cta-section .tagline {
-    font-size: 1.6rem;
-    font-weight: 700;
-    margin-top: 20px;
-    color: #FFF8DC;
-}
+/* CTA Section removed */
 
 /* Responsive Styles */
 @media (max-width: 768px) {
@@ -2290,21 +2198,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
         font-size: 1rem;
     }
 
-    .cta-section {
-        padding: 30px 15px;
-    }
-
-    .cta-section p {
-        font-size: 1.1rem;
-    }
-
-    .cta-section .highlight {
-        font-size: 1.2rem;
-    }
-
-    .cta-section .tagline {
-        font-size: 1.4rem;
-    }
+    /* CTA responsive rules removed */
 }
 
 /* login Pages Styles */
@@ -2943,6 +2837,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     object-fit: cover;
     object-position: center 30%;
     max-height: 400px;
+    aspect-ratio: 16 / 9; /* Reserve space to prevent layout shift */
 }
 
 .why-hero-overlay {
@@ -3044,6 +2939,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     object-fit: cover;
     max-height: 350px;
+    aspect-ratio: 4 / 3; /* Stabilize layout before image loads */
 }
 
 .why-feature-image img:hover {
