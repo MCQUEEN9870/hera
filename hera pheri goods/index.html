@@ -94,16 +94,19 @@
   <!-- Google AdSense: lazy-loaded after first interaction or when idle -->
   <script>
     (function(){
-      var loaded = false;
+      // Ads: load only after an explicit user gesture to keep
+      // lab metrics (FCP/LCP) free from third‑party network work.
+      var adsLoaded = false;
       function loadAds(){
-        if (loaded) return; loaded = true;
+        if (adsLoaded) return; adsLoaded = true;
         var s = document.createElement('script');
         s.async = true;
         s.crossOrigin = 'anonymous';
         s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9790279842280207';
         document.head.appendChild(s);
       }
-      // Lazy-load Google Analytics after interaction or when idle
+
+      // Google Analytics: defer to first interaction or idle (long timeout)
       var gaLoaded = false;
       function loadGA(){
         if (gaLoaded) return; gaLoaded = true;
@@ -113,15 +116,18 @@
         s.onload = function(){ try { gtag('js', new Date()); gtag('config', 'G-V9X30VY879'); } catch(e){} };
         document.head.appendChild(s);
       }
-      if ('requestIdleCallback' in window){
-        requestIdleCallback(loadAds, { timeout: 6000 });
-        requestIdleCallback(loadGA,  { timeout: 6000 });
-      } else {
-        window.addEventListener('load', function(){ setTimeout(loadAds, 6000); setTimeout(loadGA, 6000); });
-      }
-      ['scroll','mousemove','touchstart','keydown'].forEach(function(ev){
+
+      // Only react to clear user gestures (exclude scroll/mousemove)
+      ['pointerdown','touchstart','keydown','click'].forEach(function(ev){
         window.addEventListener(ev, function once(){ loadAds(); loadGA(); }, { once:true, passive:true });
       });
+
+      // Idle fallback for GA only; Ads never auto-load without gesture
+      if ('requestIdleCallback' in window){
+        requestIdleCallback(loadGA, { timeout: 10000 });
+      } else {
+        window.addEventListener('load', function(){ setTimeout(loadGA, 10000); });
+      }
       // Keep AOS init on DOM ready
       window.addEventListener('DOMContentLoaded', function(){
         if (window.AOS && typeof AOS.init === 'function') {
@@ -643,7 +649,15 @@
                   <div class="flip-card-front">
                     <div class="image-container">
                       <img data-src="attached_assets/vehicle category/tata ace.webp" alt="Tata Ace (Chhota Hathi)" title="Popular choice for small business deliveries" class="lazy-swap">
-                      <img src="attached_assets/vehicle category/cng loader.webp" loading="lazy" decoding="async" alt="Auto Loader (CNG Loader)" title="better for medium sized goods within the city" class="active">
+                      <img
+                        src="attached_assets/vehicle category/cng loader.webp"
+                        srcset="/.netlify/images?url=/attached_assets/vehicle%20category/cng%20loader.webp&w=360&fm=webp 360w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/cng%20loader.webp&w=480&fm=webp 480w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/cng%20loader.webp&w=600&fm=webp 600w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/cng%20loader.webp&w=800&fm=webp 800w"
+                        sizes="(max-width: 480px) 92vw, (max-width: 1100px) 45vw, 600px"
+                        loading="lazy" decoding="async"
+                        alt="Auto Loader (CNG Loader)" title="better for medium sized goods within the city" class="active">
                       <img data-src="attached_assets/vehicle category/e-rickshaw tirri.webp" alt="E-Rickshaw Loader (Tuk-Tuk)" title="Eco friendly option for local cargo" class="lazy-swap">
                       <img data-src="attached_assets/vehicle category/vikram.webp" alt="Vikram Tempo" title="For local goods movement" class="lazy-swap">
                     </div>
@@ -662,7 +676,15 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/canter.webp" loading="lazy" decoding="async" alt="Mini Truck (Eicher Canter)" title="Perfect for city to city" class="active">
+                      <img
+                        src="attached_assets/vehicle category/canter.webp"
+                        srcset="/.netlify/images?url=/attached_assets/vehicle%20category/canter.webp&w=360&fm=webp 360w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/canter.webp&w=480&fm=webp 480w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/canter.webp&w=600&fm=webp 600w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/canter.webp&w=800&fm=webp 800w"
+                        sizes="(max-width: 480px) 92vw, (max-width: 1100px) 45vw, 600px"
+                        loading="lazy" decoding="async"
+                        alt="Mini Truck (Eicher Canter)" title="Perfect for city to city" class="active">
                       <img data-src="attached_assets/vehicle category/pickup.webp" alt="Bolero Pickup (MaXX)" title="Strong and suitable for various terrains" class="lazy-swap">
                       <img data-src="attached_assets/vehicle category/maxx.webp" alt="Bolero Pickup (MaXX)" title="Strong and suitable for various terrains" class="lazy-swap">
                     </div>
@@ -681,7 +703,15 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/14 wheeler.webp" loading="lazy" decoding="async" alt="12 wheeler and onwards" title="used for very large and heavy shipping like in industries" class="active">
+                      <img
+                        src="attached_assets/vehicle category/14 wheeler.webp"
+                        srcset="/.netlify/images?url=/attached_assets/vehicle%20category/14%20wheeler.webp&w=360&fm=webp 360w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/14%20wheeler.webp&w=480&fm=webp 480w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/14%20wheeler.webp&w=600&fm=webp 600w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/14%20wheeler.webp&w=800&fm=webp 800w"
+                        sizes="(max-width: 480px) 92vw, (max-width: 1100px) 45vw, 600px"
+                        loading="lazy" decoding="async"
+                        alt="12 wheeler and onwards" title="used for very large and heavy shipping like in industries" class="active">
                       <img data-src="attached_assets/vehicle category/container truck.webp" alt="container truck" title="safe choice for important and secured goods" class="lazy-swap">
                       <img data-src="attached_assets/vehicle category/closed body truck.webp" alt="Closed Body Truck" title="Protection from weather and theft" class="lazy-swap">
                       <img data-src="attached_assets/vehicle category/container truck 2.webp" alt="container truck" title="safe choice for important and secured goods" class="lazy-swap">
@@ -704,7 +734,15 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/crane 2.webp" loading="lazy" decoding="async" alt="Crane" title="Used for lifting or moving heavy objects" class="active">
+                      <img
+                        src="attached_assets/vehicle category/crane 2.webp"
+                        srcset="/.netlify/images?url=/attached_assets/vehicle%20category/crane%202.webp&w=360&fm=webp 360w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/crane%202.webp&w=480&fm=webp 480w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/crane%202.webp&w=600&fm=webp 600w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/crane%202.webp&w=800&fm=webp 800w"
+                        sizes="(max-width: 480px) 92vw, (max-width: 1100px) 45vw, 600px"
+                        loading="lazy" decoding="async"
+                        alt="Crane" title="Used for lifting or moving heavy objects" class="active">
                       <img data-src="attached_assets/vehicle category/JCB.webp" alt="J.C.B" title="For excavation and construction tasks" class="lazy-swap">
                       <img data-src="attached_assets/vehicle category/dumper truck.webp" alt="Tipper Truck (Dumper Truck)" title="Used for carrying loose materials like sand or gravels" class="lazy-swap">
                       <img data-src="attached_assets/vehicle category/garbage truck 1.webp" alt="Garbage Truck" title="Special Utility Vehicles" class="lazy-swap">
@@ -728,7 +766,15 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/ac truck.webp" loading="lazy" decoding="async" alt="Refrgerated Truck" title="Larger trucks for transporting frozen or chilled goods over long distances." class="active">
+                      <img
+                        src="attached_assets/vehicle category/ac truck.webp"
+                        srcset="/.netlify/images?url=/attached_assets/vehicle%20category/ac%20truck.webp&w=360&fm=webp 360w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/ac%20truck.webp&w=480&fm=webp 480w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/ac%20truck.webp&w=600&fm=webp 600w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/ac%20truck.webp&w=800&fm=webp 800w"
+                        sizes="(max-width: 480px) 92vw, (max-width: 1100px) 45vw, 600px"
+                        loading="lazy" decoding="async"
+                        alt="Refrgerated Truck" title="Larger trucks for transporting frozen or chilled goods over long distances." class="active">
                       <img data-src="attached_assets/vehicle category/AC truck 2.webp" alt="Refrigerated Truck" title="Larger trucks for transporting frozen or chilled goods over long distances." class="lazy-swap">
                       <img data-src="attached_assets/vehicle category/refrigerated van.webp" alt="Refrigerated Van" title="Keep dairy, icecream, and food cool for short trips" class="lazy-swap">
                     </div>
@@ -747,7 +793,15 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/delievery.webp" loading="lazy" decoding="async" alt="Parcel delivery" title="For local and city to city parcel deliveries." class="active">
+                      <img
+                        src="attached_assets/vehicle category/delievery.webp"
+                        srcset="/.netlify/images?url=/attached_assets/vehicle%20category/delievery.webp&w=360&fm=webp 360w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/delievery.webp&w=480&fm=webp 480w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/delievery.webp&w=600&fm=webp 600w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/delievery.webp&w=800&fm=webp 800w"
+                        sizes="(max-width: 480px) 92vw, (max-width: 1100px) 45vw, 600px"
+                        loading="lazy" decoding="async"
+                        alt="Parcel delivery" title="For local and city to city parcel deliveries." class="active">
                       <img data-src="attached_assets/vehicle category/packers and movers.webp" alt="Packers &  Movers" title="For house shifting, office realocation, or furniture transport." class="lazy-swap">
                     </div>
                     <h3>Delivery Services</h3>
@@ -765,7 +819,15 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-              <img src="attached_assets/vehicle category/drink truck.webp" loading="lazy" decoding="async" alt="Drink-based-vehicle" title="Food & Beverage Vehicles" class="active">
+              <img
+                src="attached_assets/vehicle category/drink truck.webp"
+                srcset="/.netlify/images?url=/attached_assets/vehicle%20category/drink%20truck.webp&w=360&fm=webp 360w,
+                        /.netlify/images?url=/attached_assets/vehicle%20category/drink%20truck.webp&w=480&fm=webp 480w,
+                        /.netlify/images?url=/attached_assets/vehicle%20category/drink%20truck.webp&w=600&fm=webp 600w,
+                        /.netlify/images?url=/attached_assets/vehicle%20category/drink%20truck.webp&w=800&fm=webp 800w"
+                sizes="(max-width: 480px) 92vw, (max-width: 1100px) 45vw, 600px"
+                loading="lazy" decoding="async"
+                alt="Drink-based-vehicle" title="Food & Beverage Vehicles" class="active">
             <img data-src="attached_assets/vehicle category/food truck 2.webp" alt="Food & Beverage Vehicles" title="Food-based-vehicle" class="lazy-swap">
             <img data-src="attached_assets/vehicle category/food truck 3.webp" alt="Food & Beverage Vehicles" title="Food-based-vehicle" class="lazy-swap">
                     </div>
@@ -784,7 +846,15 @@
                 <div class="flip-card-inner">
                   <div class="flip-card-front">
                     <div class="image-container">
-                      <img src="attached_assets/vehicle category/ambulance 3.webp" loading="lazy" decoding="async" alt="Ambulances" title="For patient and medical emergencies" class="active">
+                      <img
+                        src="attached_assets/vehicle category/ambulance 3.webp"
+                        srcset="/.netlify/images?url=/attached_assets/vehicle%20category/ambulance%203.webp&w=360&fm=webp 360w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/ambulance%203.webp&w=480&fm=webp 480w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/ambulance%203.webp&w=600&fm=webp 600w,
+                                /.netlify/images?url=/attached_assets/vehicle%20category/ambulance%203.webp&w=800&fm=webp 800w"
+                        sizes="(max-width: 480px) 92vw, (max-width: 1100px) 45vw, 600px"
+                        loading="lazy" decoding="async"
+                        alt="Ambulances" title="For patient and medical emergencies" class="active">
                       <img data-src="attached_assets/vehicle category/ambulance2.webp" alt="Ambulance" title="For patient and medical emergencies" class="lazy-swap">
                       <img data-src="attached_assets/vehicle category/tow truck.webp" alt="Tow Truck" title="For towing and recovery vehicles" class="lazy-swap">
                     </div>
