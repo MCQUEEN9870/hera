@@ -40,22 +40,15 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 
 .glass-nav ul { margin: 0 !important; gap: 28px; align-items: center; }
 .glass-nav .nav-links { align-items: center; }
-
-/* Top-level nav links stay white; dropdown links below get their own colors */
 .glass-nav .nav-links > li > a { color: #ffffff; }
 
-
-
-/* When scrolled, switch to solid light background with dark text */
 .glass-nav.scrolled {
-    background: rgba(0, 0, 0, 0.30); /* slightly darker when scrolled */
+    background: rgba(0, 0, 0, 0.30); /*darker when scrolled */
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* Keep top-level nav links white even after scroll */
 .glass-nav.scrolled .nav-links > li > a { color: #ffffff; }
 .glass-nav.scrolled .brand-wordmark { color: #ffffff; }
-
 .glass-nav.scrolled .nav-item:hover { color: #FFA500; }
 
 /* Dropdown content text should be dark on light panel */
@@ -95,11 +88,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 @media (max-width: 992px)  { .hero-content-overlay { padding: 100px 16px 60px; } }
 @media (max-width: 768px)  { .hero-content-overlay { padding: 80px 12px 50px; } }
 
-
-
-
-
-/* Logo styles */
+ /* Logo styles */
 .navbar-logo {
   display: flex;
   justify-content: flex-start;
@@ -111,9 +100,9 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
   margin-right: auto;
   position: relative;
   transition: all 0.3s ease;
-  flex: 0 0 auto;  /* Added flex property */
-  order: 1;  /* Added order property */
-  margin-left: -50px; /* shift left or right */
+  flex: 0 0 auto; 
+  order: 1;  
+  margin-left: -50px; 
 }
 
 .navbar-logo img {
@@ -131,12 +120,11 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
   
 }
 
-/* Styling the navbar links */
 .nav-links {
   display: flex;
   list-style: none;
   padding: 0;
-  order: 3;  /* Added order property */
+  order: 3;  
 }
 
 .nav-links li {
@@ -158,7 +146,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
   list-style: none;
   display: flex;
   gap: 20px;
-  margin-top: 0; /* reset for glass nav */
+  margin-top: 0;
 }
 
 .nav-item {
@@ -289,9 +277,9 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
   position: absolute;
   background-color: #fff;
   min-width: 300px;
-  max-width: 400px;  /* Added max-width */
-  max-height: 500px; /* Set a fixed height */
-  overflow-y: auto;  /* Enable vertical scrolling */
+  max-width: 400px;  
+  max-height: 500px; 
+  overflow-y: auto;  
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   z-index: 1;
   padding: 20px;
@@ -300,7 +288,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
   visibility: hidden;
   transform: translateY(10px);
   transition: all 0.3s ease;
-  right: 0;  /* Added to align with right edge */
+  right: 0;  
 }
 
 .dropdown.active .dropdown-content {
@@ -403,8 +391,6 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 }
 
 /* Responsive styles */
-
-/* For tablets and smaller devices */
 @media (max-width: 768px) {
   .navbar {
     flex-direction: row;
@@ -433,12 +419,10 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
   }
  
   .dropdown-content .category {
-    padding: 10px;  /* Reduced padding */
-    margin: 2px 0;  /* Reduced margin */
+    padding: 10px;  
+    margin: 2px 0;  
   }
 }
-
-
 
 /* Vehicle Registration Section */
 .registration-section {
@@ -479,12 +463,6 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
   gap: 30px;
   margin-bottom: 40px;
 }
-
-
-
-/* .feature:hover {
-  transform: translateY(-5px);
-} */
 
 .feature i {
   font-size: 1.5rem;
@@ -555,14 +533,14 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
   justify-content: center;
   align-items: center;
   position: relative;
-  height: 300px;  /* Fixed height for the container */
+  height: 300px;  
 }
 
 .registration-image img {
   max-width: 100%;
   height: auto;
   border-radius: 10px;
-  box-shadow: none;  /* Removed shadow */
+  box-shadow: none;  
 }
 
 .registration-img {
@@ -701,7 +679,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
   
 }
 
-/* Responsive styles for registration section (Hidden) */
+/* Responsive styles for registration section */
 @media (max-width: 768px) {
   .registration-container {
     flex-direction: column;
@@ -733,19 +711,15 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
   transition: transform 0.3s ease;
 }
 
-/* .feature:hover .feature-icon {
-        transform: scale(1.2);
-      } */
-
 /* Registration Video Styles */
  .registration-video {
     width: 100%;
     height: auto;
-    max-width: 400px;  /* Reduced maximum width */
-    max-height: 300px; /* Reduced maximum height */
+    max-width: 400px;  
+    max-height: 300px; 
     object-fit: contain;
     border-radius: 10px;
-    box-shadow: none;  /* Removed shadow */
+    box-shadow: none;  
 } 
 
 /* Hero Section Styles */
@@ -848,11 +822,6 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     backdrop-filter: blur(10px);
 }
 
-/* .hero-features .feature:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
-} */
-
 .hero-features .feature span {
     font-size: 1.1rem;
     color: #333;
@@ -912,7 +881,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     transform: translateY(-50%);
     width: 56px;
     height: auto;
-    pointer-events: none; /* ensure button remains fully clickable */
+    pointer-events: none; 
     user-select: none;
     z-index: 3;
     animation: subtleFloat 2.8s ease-in-out infinite;
@@ -924,7 +893,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     animation-duration: 3.4s;
 }
 
-/* Add extra right padding so text doesn't overlap the animation */
+
 .btn-with-click-anim .hero-btn { padding-right: 96px; }
 .btn-with-click-anim .find-vehicle-btn { padding-right: 72px; }
 
@@ -992,7 +961,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     }
 }
 
-/* Registration Block Styles (Hidden) */
+/* Registration Block Styles*/
 .registration-block {
     background: #f4f1ef;
     min-height: 100vh;
@@ -1006,7 +975,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 }
 
 .registration-section {
-    background: #cfcfcf;  /* Changed to #cfcfcf */
+    background: #cfcfcf;  
     padding: 30px;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -1019,7 +988,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 
 /* Find Vehicle Block Styles */
 .find-vehicle-block {
-    background: #efeeee;  /* Changed from blue gradient to solid color */
+    background: #efeeee;  
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -1030,7 +999,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 }
 
 .find-vehicle-section {
-    background: #cfcfcf;  /* Changed to #cfcfcf */
+    background: #cfcfcf;  
     padding: 40px 40px;
     border-radius: 20px;
     box-shadow: 0 10px 12px #555555ad;
@@ -1041,9 +1010,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 }
 
 .find-vehicle-container {
-    /* max-width: 1200px; */
-    /* margin: 0 -242px 0 40px; */
-    display: flex;
+display: flex;
     align-items: center;
     justify-content: space-between;
     /* gap: 40px; */
@@ -1286,7 +1253,6 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     flex: 1;
     text-align: left;
 }
-
 
 /* File Upload Styles */
 .file-upload {
@@ -1598,17 +1564,16 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 .file-upload-label span {
     flex: 1;
     text-align: right;
-    margin-right: 100px; /* Add space between text and icon */
+    margin-right: 100px; 
 }
 
 .file-upload-label i {
     position: absolute;
-    right: -80%; /* Position icon to the right */
+    right: -80%; 
     font-size: 20px;
     color: #666;
     line-height: 1;
 }
-
 
 /* Celebration Overlay Styles */
 .celebration-overlay {
@@ -1647,7 +1612,6 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     animation: popIn 0.5s ease-out 0.2s both;
 }
 
-/* Fireworks Animation */
 .fireworks {
     position: absolute;
     top: 0;
@@ -1861,7 +1825,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     margin: 0;
 }
 
-/* How It Works Section - Redesigned */
+/* How It Works Section */
 .how-it-works-section {
     padding: 100px 0;
     background-image: url('attached_assets/images/how-it-works.webp');
@@ -1869,17 +1833,15 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     background-position: center;
     background-attachment: fixed;
     position: relative;
-    /* Full screen background - no container constraint */
     width: 100vw;
     margin: 0;
     margin-left: calc(-50vw + 50%);
 }
 
-
 @media (max-width: 768px) {
     .how-it-works-section {
         background-image: none !important;
-        background: #111827; /* neutral fallback */
+        background: #111827; 
         background-attachment: scroll;
     }
 }
@@ -1893,7 +1855,6 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     bottom: 0;
     width: 100%;
     height: 100%;
-    /* Match hero overlay - simple dark transparent overlay */
     background: rgba(0, 0, 0, 0.35) !important;
     z-index: 1;
 }
@@ -1957,7 +1918,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     left: 0;
     right: 0;
     bottom: 0;
-    background-size: cover; /* legacy support if inline style remains somewhere */
+    background-size: cover; 
     background-position: center;
     transition: transform 0.6s ease;
 }
@@ -1966,7 +1927,6 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     transform: scale(1);
 }
 
-/* Ensure lazy-loaded <img> inside how-step-bg fills the card */
 .how-step-bg img {
     position: absolute;
     top: 0;
@@ -1985,7 +1945,6 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     left: 0;
     right: 0;
     bottom: 0;
-    /* Match hero overlay - simple dark transparent overlay */
     background: rgba(0, 0, 0, 0.35);
     display: flex;
     flex-direction: column;
@@ -1997,16 +1956,13 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 }
 
 .how-step-card:hover .how-step-overlay {
-    /* Slightly darker on hover */
     background: rgba(0, 0, 0, 0.45);
 }
 
-/* Remove step number - hide it */
 .how-step-number {
     display: none;
 }
 
-/* Remove step icon - hide it */
 .how-step-icon {
     display: none;
 }
@@ -2126,53 +2082,6 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     }
 }
 
-/* Old How It Works Section - Keep for compatibility */
-.how-it-works {
-    margin-bottom: 60px;
-}
-
-.how-it-works h3 {
-    font-size: 2rem;
-    color: #1a237e;
-    text-align: center;
-    margin-bottom: 40px;
-    font-weight: 600;
-}
-
-.steps-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
-    padding: 20px;
-}
-
-.step-item {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    text-align: center;
-    transition: transform 0.3s ease;
-}
-
-.step-item:hover {
-    transform: translateY(-5px);
-}
-
-.step-number {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-}
-
-.step-item p {
-    font-size: 1.1rem;
-    color: #455a64;
-    line-height: 1.6;
-    margin: 0;
-}
-
-/* CTA Section removed */
-
 /* Responsive Styles */
 @media (max-width: 768px) {
     .description-container h2 {
@@ -2198,7 +2107,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
         font-size: 1rem;
     }
 
-    /* CTA responsive rules removed */
+    
 }
 
 /* login Pages Styles */
@@ -2252,13 +2161,13 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 
 .form-group i {
     position: absolute;
-    left: 16px; /* Adjust this value to position the icon */
+    left: 16px; 
     top: 56%;
     transform: translateY(-50%);
     color: #666;
     z-index: 1;
     font-size: 16px;
-    pointer-events: none; /* Prevents the icon from interfering with input */
+    pointer-events: none; 
 }
 
 .form-group input {
@@ -2536,22 +2445,6 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.1);
 }
 
-/* Login Animation Styles */
-.login-animation {
-    width: 100%;
-    max-width: 200px;
-    height: auto;
-    margin: 15px auto;
-    border-radius: 8px;
-    box-shadow: 0 3px 10px #f8f9fa;
-}
-
-@media (max-width: 480px) {
-    .login-animation {
-        max-width: 150px;
-    }
-}
-
 /* Vehicle Categories Section with Flip Cards */
 .vehicle-categories-section {
     padding: 60px 20px;
@@ -2819,7 +2712,6 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     padding: 0 20px;
 }
 
-/* Section Header with Hero Image */
 .why-choose-header {
     position: relative;
     width: 100%;
@@ -2837,7 +2729,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     object-fit: cover;
     object-position: center 30%;
     max-height: 400px;
-    aspect-ratio: 16 / 9; /* Reserve space to prevent layout shift */
+    aspect-ratio: 16 / 9; 
 }
 
 .why-hero-overlay {
@@ -2881,14 +2773,12 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     color: #ffd54f;
 }
 
-/* Feature Cards Wrapper */
+
 .why-features-wrapper {
     display: flex;
     flex-direction: column;
     gap: 60px;
 }
-
-/* Individual Feature Card - No box, transparent background */
 .why-feature-card {
     display: flex;
     align-items: center;
@@ -2939,7 +2829,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     object-fit: cover;
     max-height: 350px;
-    aspect-ratio: 4 / 3; /* Stabilize layout before image loads */
+    aspect-ratio: 4 / 3; 
 }
 
 .why-feature-image img:hover {
@@ -3065,7 +2955,6 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     
     .why-hero-image {
         max-height: 250px;
-        /* Slightly smaller shift on mobile to keep text readable */
         transform: translateY(12px);
         object-position: center 50%;
     }
@@ -3377,10 +3266,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
         top: 327px;
         
     }
-    /* .review-toggle {
-        top: 10px;
-    } */
-
+    
     .stars i {
         font-size: 20px;
     }
@@ -3393,7 +3279,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
         font-size: 0.8rem;
     }
     
-    /* Fix for reCAPTCHA in mobile view */
+    
     .g-recaptcha {
         transform: scale(0.85);
         transform-origin: left center;
@@ -3413,10 +3299,10 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 /* Social Share Drawer Styles */
 .share-drawer {
     position: fixed;
-    left: -119px; /* Changed to smaller initial position */
+    left: -119px; 
     top: calc(54% + 136px);
     width: auto;
-    background: transparent; /* Changed to transparent */
+    background: transparent; 
     transition: transform 0.8s ease, opacity 0.4s ease;
     z-index: 1000;
     opacity: 1;
@@ -3559,9 +3445,9 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 
 /* Back Button Styling in login page*/
 .back-btn {
-    position: absolute; /* Change to relative for proper positioning */
-    top: 20px; /* Adjust as needed */
-    left: 20px; /* Center it or adjust as needed */
+    position: absolute; 
+    top: 20px; 
+    left: 20px; 
     color: #333;
     font-size: 24px;
     text-decoration: none;
@@ -3570,8 +3456,8 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 }
 
 .back-btn:hover {
-    color: #FFA500; /* Change color on hover */
-    transform: translateX(-3px); /* Slightly shift left on hover */
+    color: #FFA500; 
+    transform: translateX(-3px); 
 }
 
 /* Footer Styles */
@@ -3622,8 +3508,8 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 }
 
 .footer-column ul li {
-    margin-bottom: 30px; /* Existing margin */
-    margin-top: 5px; /* Add margin above each link */
+    margin-bottom: 30px; 
+    margin-top: 5px; 
 }
 
 .footer-column ul li a {
@@ -3788,7 +3674,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 .footer-column {
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px; /* Add margin to create space between footer columns */
+    margin-bottom: 20px; 
 }
 
 /* Responsive styles for show more */
@@ -3799,20 +3685,20 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 }
 
 .service-icon {
-    width: 70px; /* Adjust the width to fit the paragraph size */
-    height: auto; /* Maintain aspect ratio */
-    vertical-align: middle; /* Align with the text */
-    margin-left: 5px; /* Add some space between text and icon */
+    width: 70px; 
+    height: auto; 
+    vertical-align: middle; 
+    margin-left: 5px; 
 }
 
 /* Privacy Policy Heading Styles */
 .privacy-policy-heading {
-    font-size: 3.5rem; /* Increase the font size */
-    color: rgb(243, 236, 236); /* Text color */
-    background-color: #FFA500; /* Background color */
-    padding: 20px; /* Padding around the text */
+    font-size: 3.5rem; 
+    color: rgb(243, 236, 236); 
+    background-color: #FFA500; 
+    padding: 20px; 
     text-align: left; 
-    margin-bottom: 20px; /* Space below the heading */
+    margin-bottom: 20px; 
 }
 
 /* Privacy Policy Content Styles */
@@ -3821,9 +3707,9 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     margin: 0 auto;
     padding: 10px;
     font-size: 16px;
-    font-family: 'Verdana', 'Geneva', sans-serif; /* Change to your desired font */
-    letter-spacing: 0.5px; /* Adjust letter spacing as needed */
-    word-spacing: 2px; /* Adjust word spacing as needed */
+    font-family: 'Verdana', 'Geneva', sans-serif;
+    letter-spacing: 0.5px;  
+    word-spacing: 2px;  
     color: #074a76;
     text-align: justify;
     margin-left: 80.0pt;
@@ -3887,53 +3773,53 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 }
 /* Privacy Policy Logo Styles */
 .privacy-logo {
-    width: 250px; /* Adjust the width as needed */
-    height: auto; /* Maintain aspect ratio */
-    display: block; /* Ensure it takes up space */
-    margin-bottom: -2%; /* Space below the logo */
+    width: 250px;   
+    height: auto;   
+    display: block;     
+    margin-bottom: -2%;     
 }
 /* Mobile Responsive Styles for Privacy Policy Content */
 @media (max-width: 768px) {
     .privacy-content {
-        margin-left: 10px; /* Adjust left margin for smaller screens */
-        margin-right: 10px; /* Adjust right margin for smaller screens */
-        padding: 10px; /* Adjust padding if necessary */
+        margin-left: 10px;   
+        margin-right: 10px; 
+        padding: 10px; 
     }
 
     .privacy-policy-heading {
-        font-size: 2.5rem; /* Adjust heading size for smaller screens */
+        font-size: 2.5rem;  
     }
 
     .privacy-content h2 {
-        font-size: 1.8rem; /* Adjust h2 size for smaller screens */
+        font-size: 1.8rem; 
     }
 
     .privacy-content h3 {
-        font-size: 1.5rem; /* Adjust h3 size for smaller screens */
+        font-size: 1.5rem;  
     }
 
     .privacy-content p {
-        font-size: 1rem; /* Adjust paragraph size for smaller screens */
+        font-size: 1rem; 
     }
 }
 
 /* Refer & Earn Policy and refund policy Styles */
 .refer-earn-policy-heading {
-    font-size: 3.0rem; /* Increase the font size */
-    color: rgb(243, 236, 236); /* Text color */
-    background-color: #FFA500; /* Background color */
-    padding: 20px; /* Padding around the text */
+    font-size: 3.0rem; 
+    color: rgb(243, 236, 236); 
+    background-color: #FFA500; 
+    padding: 20px; 
     text-align: left; 
-    margin-bottom: 20px; /* Space below the heading */
+    margin-bottom: 20px; 
 }
 
 .refund-policy-heading {
-    font-size: 3.0rem; /* Increase the font size */
-    color: rgb(243, 236, 236); /* Text color */
-    background-color: #FFA500; /* Background color */
-    padding: 20px; /* Padding around the text */
+    font-size: 3.0rem; 
+    color: rgb(243, 236, 236); 
+    background-color: #FFA500; 
+    padding: 20px; 
     text-align: left; 
-    margin-bottom: 20px; /* Space below the heading */
+    margin-bottom: 20px; 
 }
 
 .refer-earn-policy-content {
@@ -3941,9 +3827,9 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     margin: 0 auto;
     padding: 10px;
     font-size: 16px;
-    font-family: 'Verdana', 'Geneva', sans-serif; /* Change to your desired font */
-    letter-spacing: 0.5px; /* Adjust letter spacing as needed */
-    word-spacing: 2px; /* Adjust word spacing as needed */
+    font-family: 'Verdana', 'Geneva', sans-serif; 
+    letter-spacing: 0.5px; 
+    word-spacing: 2px; 
     color: #074a76;
     text-align: justify;
     margin-left: 80.0pt;
@@ -3959,9 +3845,9 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     margin: 0 auto;
     padding: 10px;
     font-size: 1.1rem;
-    font-family: 'Verdana', 'Geneva', sans-serif; /* Change to your desired font */
-    letter-spacing: 0px; /* Adjust letter spacing as needed */
-    word-spacing: 0px; /* Adjust word spacing as needed */
+    font-family: 'Verdana', 'Geneva', sans-serif; 
+    letter-spacing: 0px; 
+    word-spacing: 0px; 
     color: #074a76;
     text-align: justify;
     margin-left: 80.0pt;
@@ -3971,46 +3857,31 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 /* Mobile Responsive Styles for refer & earn policy and refund policy Content */
 @media (max-width: 768px) {
     .refer-earn-policy-content {
-        margin-left: 10px; /* Adjust left margin for smaller screens */
-        margin-right: 10px; /* Adjust right margin for smaller screens */
-        padding: 10px; /* Adjust padding if necessary */
-        letter-spacing: 0px; /* Adjust letter spacing as needed */
-        word-spacing: 0px; /* Adjust word spacing as needed */  
+        margin-left: 10px;   
+        margin-right: 10px; 
+        padding: 10px; 
+        letter-spacing: 0px; 
+        word-spacing: 0px;   
     }
 
-    /* .refer-earn-policy-heading {
-        font-size: 2.5rem; 
-    }
-
-    .refer-earn-policy-content h2 {
-        font-size: 1.8rem; 
-    }
-
-    .refer-earn-policy-content h3 {
-        font-size: 1.5rem; 
-    }
-
-    .refer-earn-policy-content p {
-        font-size: 1rem; 
-    } */
 }
 /* Terms & Conditions  Styles */
 .terms-conditions-heading{
-    font-size: 3.0rem; /* Increase the font size */
-    color: rgb(243, 236, 236); /* Text color */
-    background-color: #FFA500; /* Background color */
-    padding: 20px; /* Padding around the text */
+    font-size: 3.0rem;  
+    color: rgb(243, 236, 236); 
+    background-color: #FFA500; 
+    padding: 20px; 
     text-align: left; 
-    margin-bottom: 20px; /* Space below the heading */
+    margin-bottom: 20px;    
 }
 
 .terms-conditions-content {max-width: 10000px;
     margin: 0 auto;
     padding: 10px;
     font-size: 17px;
-    font-family: 'Verdana', 'Geneva', sans-serif; /* Change to your desired font */
-    letter-spacing: 0.5px; /* Adjust letter spacing as needed */
-    word-spacing: 2px; /* Adjust word spacing as needed */
+    font-family: 'Verdana', 'Geneva', sans-serif; 
+    letter-spacing: 0.5px; 
+    word-spacing: 2px; 
     color: #074a76;
     text-align: justify;
     margin-left: 80.0pt;
@@ -4027,9 +3898,9 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 }
 @media (max-width: 768px) {
     .terms-conditions-content {
-        margin-left: 10px; /* Adjust left margin for smaller screens */
-        margin-right: 10px; /* Adjust right margin for smaller screens */
-        padding: 10px; /* Adjust padding if necessary */
+        margin-left: 10px;   
+        margin-right: 10px; 
+        padding: 10px; 
     }
 }
 
@@ -4451,9 +4322,8 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     }
 }
 
-/* ==========================================
-   Feedback Carousel Styles
-   ========================================== */
+/*Feedback Carousel Styles*/
+
 .feedback-carousel-section {
   padding: 50px 0 30px;
   background-color: #f8f9fa;
@@ -4488,7 +4358,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 
 .feedback-carousel {
   display: flex;
-  transition: transform 0.1s linear; /* Smoother transition */
+  transition: transform 0.1s linear;    
   will-change: transform;
   padding: 10px 0;
   position: relative;
@@ -4583,7 +4453,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 }
 
 .feedback-card .user-location::before {
-  content: '\f3c5'; /* Font Awesome location marker */
+  content: '\f3c5';     
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
   font-size: 12px;
@@ -4607,7 +4477,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 }
 
 .feedback-card .high-rating-star {
-  color: #ffd700; /* Gold color */
+  color: #ffd700; 
 }
 
 /* Rating indicator */
@@ -4637,20 +4507,20 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
   overflow: hidden;
   transition: all 0.3s ease-out;
   font-style: normal;
-  padding-left: 0px;  /* Removed left padding */
-  border-left: none;  /* Removed left border */
+  padding-left: 0px;    
+  border-left: none;    
 }
 
 .feedback-card.low-rating .review-text {
-  border-left: none;  /* Removed border for low ratings */
+  border-left: none;    
 }
 
 .feedback-card.medium-rating .review-text {
-  border-left: none;  /* Removed border for medium ratings */
+  border-left: none;    
 }
 
 .feedback-card.high-rating .review-text {
-  border-left: none;  /* Removed border for high ratings */
+  border-left: none;    
 }
 
 .feedback-card .review-text::after {
@@ -4667,11 +4537,11 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 
 /* Expanded card styles */
 .feedback-card .review-text.expanded::after {
-  opacity: 0; /* Hide gradient when expanded */
+  opacity: 0;    
 }
 
 .feedback-card:hover {
-  z-index: 100; /* Make sure hovered cards stay on top */
+  z-index: 100;    
 }
 
 
@@ -4784,23 +4654,22 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 
 .vehicle-owner-carousel {
   display: flex;
-  transition: transform 0.1s linear; /* Match the smoothness */
+  transition: transform 0.1s linear;    
   will-change: transform;
   padding: 10px 0;
   position: relative;
-  left: 0; /* Start at the left edge */
+  left: 0;    
 }
 
-/* Style specific to vehicle owner cards */
+
 .vehicle-owner-card {
   background: linear-gradient(to bottom right, #e6f2ff, #ffffff);
   border: 1px solid #b3d9ff;
-  /* Remove all border-left properties to avoid the blue lines */
   border-left: none;
 }
 
 .vehicle-owner-card .user-avatar {
-  background-color: #3366cc; /* Default color */
+  background-color: #3366cc;    
 }
 
 .vehicle-owner-card.high-rating {
@@ -4839,9 +4708,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
   }
 }
 
-/* ==========================================
-   Mobile Navbar: Hamburger + Sidebar Drawer
-   ========================================== */
+/*Mobile Navbar: Hamburger + Sidebar Drawer*/
 .mobile-menu-btn {
   display: none;
   background: transparent;
@@ -5545,11 +5412,6 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     border: none;
     background-color: white;
 }
-
-/* Style for the always visible security note */
-
-
-
 
 .permanent-note i {
     color: #dc3545;
