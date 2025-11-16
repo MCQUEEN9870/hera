@@ -581,7 +581,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // For signed-in users, use their existing info from localStorage
             const userPhone = localStorage.getItem('userPhone') || localStorage.getItem('contactNumber');
             
-            console.log("User is logged in, phone from storage:", userPhone);
+            
             
             // Make AJAX call to save feedback in the users table
             saveFeedbackForSignedInUser(userPhone, currentRating, reviewText);
@@ -617,10 +617,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to save feedback for signed-in users (to users table)
     function saveFeedbackForSignedInUser(userPhone, rating, reviewText) {
-        console.log('Attempting to save feedback with phone:', userPhone, 'Rating:', rating);
+        
         
         if (!userPhone) {
-            console.error('Cannot save feedback: No phone number available');
+            
             alert('Error: Could not retrieve your contact information. Please log in again.');
             return;
         }
@@ -640,28 +640,27 @@ document.addEventListener('DOMContentLoaded', function() {
             })
         })
         .then(response => {
-            console.log('Response status:', response.status, response.statusText);
+            
             if (!response.ok) {
                 return response.text().then(text => {
-                    console.error('Error response:', text);
+                    
                     throw new Error('Network response was not ok: ' + response.status);
                 });
             }
             return response.json();
         })
         .then(data => {
-            console.log('Feedback saved successfully:', data);
+            
         })
         .catch(error => {
-            console.error('Error saving feedback:', error);
+            
             // Try direct AJAX call with XMLHttpRequest as fallback
             const xhr = new XMLHttpRequest();
             xhr.open('POST', (window.API_BASE_URL ? `${window.API_BASE_URL}/api/save-user-feedback` : 'http://localhost:8080/api/save-user-feedback'), true);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
-                    console.log('XHR Status:', xhr.status);
-                    console.log('XHR Response:', xhr.responseText);
+                    
                 }
             };
             xhr.send(JSON.stringify({
@@ -672,12 +671,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // For development testing:
-        console.log('Request sent to server - Phone:', userPhone, 'Rating:', rating, 'Review:', reviewText);
+        
     }
 
     // Function to save feedback for non-signed-in users (to feedback table)
     function saveFeedbackForNonSignedInUser(name, address, rating, reviewText) {
-        console.log('Attempting to save non-user feedback with name:', name, 'Rating:', rating);
+        
         
         // Call backend with absolute API base (works on localhost and production)
         const base = window.API_BASE_URL || 'http://localhost:8080';
@@ -695,28 +694,27 @@ document.addEventListener('DOMContentLoaded', function() {
             })
         })
         .then(response => {
-            console.log('Response status:', response.status, response.statusText);
+            
             if (!response.ok) {
                 return response.text().then(text => {
-                    console.error('Error response:', text);
+                    
                     throw new Error('Network response was not ok: ' + response.status);
                 });
             }
             return response.json();
         })
         .then(data => {
-            console.log('Feedback saved successfully:', data);
+            
         })
         .catch(error => {
-            console.error('Error saving feedback:', error);
+            
             // Try direct AJAX call with XMLHttpRequest as fallback
             const xhr = new XMLHttpRequest();
             xhr.open('POST', (window.API_BASE_URL ? `${window.API_BASE_URL}/api/save-feedback` : 'http://localhost:8080/api/save-feedback'), true);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
-                    console.log('XHR Status:', xhr.status);
-                    console.log('XHR Response:', xhr.responseText);
+                    
                 }
             };
             xhr.send(JSON.stringify({
@@ -728,7 +726,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // For development testing:
-        console.log('Request sent to server - Name:', name, 'Address:', address, 'Rating:', rating, 'Review:', reviewText);
+        
     }
 });
 

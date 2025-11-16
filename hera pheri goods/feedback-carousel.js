@@ -1,26 +1,17 @@
-/**
- * Feedback Carousel
- * This script handles the auto-scrolling feedback carousel that displays reviews
- * from non-signed-in users (feedback table only).
- */
+// Feedback Carousel (trimmed for production)
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the feedback carousel
     initFeedbackCarousel();
 });
 
-/**
- * Initialize the feedback carousel by fetching reviews and setting up auto-scroll
- */
+// Initialize the feedback carousel by fetching reviews and setting up auto-scroll
 function initFeedbackCarousel() {
     const carouselElement = document.getElementById('feedbackCarousel');
     if (!carouselElement) return;
     
-    // Fetch feedback data and populate the carousel
     fetchFeedbackData()
         .then(feedbacks => {
             if (feedbacks && feedbacks.length > 0) {
-                // Filter feedbacks to only include those with rating AND review text
                 const validFeedbacks = feedbacks.filter(feedback => 
                     feedback.rating > 0 && 
                     feedback.reviewText && 
@@ -38,39 +29,30 @@ function initFeedbackCarousel() {
             }
         })
         .catch(error => {
-            console.error('Error loading feedback:', error);
+                    
             showErrorMessage(carouselElement);
         });
 }
 
-/**
- * Fetch feedback data from the feedback table only (non-signed-in users) via API
- * @returns {Promise<Array>} Array of feedback objects
- */
+    // Fetch feedback data from the feedback table only (non-signed-in users) via API
 function fetchFeedbackData() {
     return new Promise((resolve, reject) => {
-        // Try both relative and absolute URL paths to ensure connectivity
         const base = window.API_BASE_URL || 'http://localhost:8080';
         const urlsToTry = [
             `${base}/api/get-feedback`,
             '/api/get-feedback'
         ];
         
-        // Track attempts
         let attemptCount = 0;
         
-        // Function to try next URL
         function tryNextUrl() {
             if (attemptCount >= urlsToTry.length) {
-                console.warn('All API attempts failed, using mock data');
                 resolve(generateMockFeedback());
                 return;
             }
             
             const url = urlsToTry[attemptCount];
             attemptCount++;
-            
-            console.log(`Attempt ${attemptCount}: Fetching feedback from ${url}`);
             
             fetch(url)
                 .then(response => {
@@ -80,7 +62,6 @@ function fetchFeedbackData() {
                     return response.json();
                 })
                 .then(data => {
-                    console.log(`Successfully fetched ${data.length} feedback entries`);
                     // Ensure we received valid data
                     if (Array.isArray(data) && data.length > 0) {
                         // Filter out any invalid entries
@@ -93,16 +74,13 @@ function fetchFeedbackData() {
                         if (validData.length > 0) {
                             resolve(validData);
                         } else {
-                            console.warn('Received data but no valid feedback entries, trying next URL');
                             tryNextUrl();
                         }
                     } else {
-                        console.warn('Received empty data array, trying next URL');
                         tryNextUrl();
                     }
                 })
                 .catch(error => {
-                    console.warn(`Attempt ${attemptCount} failed:`, error);
                     tryNextUrl();
                 });
         }
@@ -112,10 +90,7 @@ function fetchFeedbackData() {
     });
 }
 
-/**
- * Generate mock feedback data for testing/fallback
- * @returns {Array} Array of mock feedback objects
- */
+// Generate mock feedback data for testing/fallback
 function generateMockFeedback() {
     return [
         {
@@ -161,11 +136,7 @@ function generateMockFeedback() {
     ];
 }
 
-/**
- * Shuffle an array using the Fisher-Yates algorithm
- * @param {Array} array The array to shuffle
- * @returns {Array} The shuffled array
- */
+// Shuffle utility (Fisher-Yates)
 function shuffleArray(array) {
     let currentIndex = array.length;
     let temporaryValue, randomIndex;
@@ -185,11 +156,7 @@ function shuffleArray(array) {
     return array;
 }
 
-/**
- * Populate the carousel with feedback cards
- * @param {HTMLElement} carouselElement The carousel container element
- * @param {Array} feedbacks Array of feedback objects
- */
+// Populate the carousel with feedback cards
 function populateCarousel(carouselElement, feedbacks) {
     // Clear loading indicator
     carouselElement.innerHTML = '';
@@ -201,17 +168,12 @@ function populateCarousel(carouselElement, feedbacks) {
     });
 }
 
-/**
- * Create a feedback card element
- * @param {Object} feedback The feedback object
- * @returns {HTMLElement} The created card element
- */
+// Create a feedback card element
 function createFeedbackCard(feedback) {
     const card = document.createElement('div');
     card.className = 'feedback-card';
     card.dataset.id = feedback.id;
     
-    // Add rating class to style cards differently based on rating
     if (feedback.rating <= 2) {
         card.classList.add('low-rating');
     } else if (feedback.rating === 3) {
@@ -220,16 +182,13 @@ function createFeedbackCard(feedback) {
         card.classList.add('high-rating');
     }
     
-    // Create user info section
     const userInfo = document.createElement('div');
     userInfo.className = 'user-info';
     
-    // Create avatar with first letter of name
     const avatar = document.createElement('div');
     avatar.className = 'user-avatar';
     avatar.textContent = feedback.name ? feedback.name.charAt(0).toUpperCase() : 'U';
     
-    // Set avatar color based on rating
     if (feedback.rating <= 2) {
         avatar.classList.add('low-rating-avatar');
     } else if (feedback.rating === 3) {
@@ -238,7 +197,6 @@ function createFeedbackCard(feedback) {
         avatar.classList.add('high-rating-avatar');
     }
     
-    // Create user details
     const userDetails = document.createElement('div');
     userDetails.className = 'user-details';
     
@@ -256,16 +214,13 @@ function createFeedbackCard(feedback) {
     userInfo.appendChild(avatar);
     userInfo.appendChild(userDetails);
     
-    // Create rating stars with appropriate styling
     const rating = document.createElement('div');
     rating.className = 'rating';
     
-    // Add star icons based on rating
     for (let i = 0; i < 5; i++) {
         const star = document.createElement('i');
         star.className = i < feedback.rating ? 'fas fa-star' : 'far fa-star';
         
-        // Add specific styling to stars based on rating
         if (feedback.rating <= 2) {
             star.classList.add('low-rating-star');
         } else if (feedback.rating === 3) {
@@ -277,24 +232,19 @@ function createFeedbackCard(feedback) {
         rating.appendChild(star);
     }
     
-    // Create review text wrapper for expansion effect
     const reviewWrapper = document.createElement('div');
     reviewWrapper.className = 'review-wrapper';
     
-    // Create review text
     const reviewText = document.createElement('div');
     reviewText.className = 'review-text';
     reviewText.textContent = feedback.reviewText || '';
     
-    // Add review to wrapper
     reviewWrapper.appendChild(reviewText);
     
-    // Add all elements to the card
     card.appendChild(userInfo);
     card.appendChild(rating);
     card.appendChild(reviewWrapper);
     
-    // Add event listeners for expand/collapse on hover
     card.addEventListener('mouseenter', function() {
         expandCard(card);
     });
@@ -306,55 +256,42 @@ function createFeedbackCard(feedback) {
     return card;
 }
 
-/**
- * Expand a card to show full review text
- * @param {HTMLElement} card The card element to expand
- */
+// Expand a card to show full review text
 function expandCard(card) {
     const reviewWrapper = card.querySelector('.review-wrapper');
     const reviewText = card.querySelector('.review-text');
     
     if (reviewWrapper && reviewText) {
-        // Remove height restriction and gradient
         reviewText.style.maxHeight = 'none';
         reviewText.style.overflow = 'visible';
         reviewText.classList.add('expanded');
         
-        // Make card wider and apply highlight effect
         card.style.zIndex = '10';
         card.style.transform = 'scale(1.05)';
         card.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.15)';
     }
 }
 
-/**
- * Collapse a card back to normal size
- * @param {HTMLElement} card The card element to collapse
- */
+// Collapse a card back to normal size
 function collapseCard(card) {
     const reviewText = card.querySelector('.review-text');
     
     if (reviewText) {
-        // Reset to default styles
         reviewText.style.maxHeight = '';
         reviewText.style.overflow = '';
         reviewText.classList.remove('expanded');
         
-        // Reset card size
         card.style.zIndex = '';
         card.style.transform = '';
         card.style.boxShadow = '';
     }
 }
 
-/**
- * Set up truly continuous loop scrolling in one direction (right to left)
- * @param {HTMLElement} carouselElement The carousel container element
- */
+// Set up truly continuous loop scrolling in one direction (right to left)
 function setupTrueLoopScroll(carouselElement) {
     // Variables for scroll control
     let scrollPosition = 0;
-    const scrollSpeed = 0.6; // Slightly faster for better movement
+    const scrollSpeed = 0.6;
     let isPaused = false;
     let animationId = null;
     let lastTimestamp = 0;
@@ -365,7 +302,7 @@ function setupTrueLoopScroll(carouselElement) {
     
     // Get all original cards
     const originalCards = Array.from(carouselElement.querySelectorAll('.feedback-card'));
-    if (originalCards.length === 0) return; // Safety check
+    if (originalCards.length === 0) return;
     
     // Calculate card dimensions
     const cardWidth = originalCards[0].offsetWidth;
@@ -373,23 +310,18 @@ function setupTrueLoopScroll(carouselElement) {
                        parseInt(window.getComputedStyle(originalCards[0]).marginRight);
     const totalCardWidth = cardWidth + cardMargin;
     
-    // Clear any existing clones
     const existingClones = carouselElement.querySelectorAll('.clone');
     existingClones.forEach(clone => clone.remove());
     
-    // Calculate how many cards are needed to fill the container at least 3 times
-    // This ensures smooth scrolling regardless of screen size
     const minCardsNeeded = Math.ceil((containerWidth * 3) / totalCardWidth);
     const setsNeeded = Math.ceil(minCardsNeeded / originalCards.length);
     
-    // Create clones and add them before the original cards
-    // Adding clones BEFORE is key for the infinite loop effect
+    // Create clones before originals for the infinite loop effect
     for (let i = 0; i < setsNeeded; i++) {
         originalCards.forEach(card => {
             const clone = card.cloneNode(true);
             clone.classList.add('clone');
             
-            // Add event listeners to clones
             clone.addEventListener('mouseenter', () => expandCard(clone));
             clone.addEventListener('mouseleave', () => collapseCard(clone));
             
@@ -398,13 +330,11 @@ function setupTrueLoopScroll(carouselElement) {
         });
     }
     
-    // Then add clones after the original cards too
     for (let i = 0; i < setsNeeded; i++) {
         originalCards.forEach(card => {
             const clone = card.cloneNode(true);
             clone.classList.add('clone');
             
-            // Add event listeners to clones
             clone.addEventListener('mouseenter', () => expandCard(clone));
             clone.addEventListener('mouseleave', () => collapseCard(clone));
             
@@ -413,19 +343,16 @@ function setupTrueLoopScroll(carouselElement) {
         });
     }
     
-    // Recalculate total width now that we've added clones
     const totalCards = carouselElement.querySelectorAll('.feedback-card').length;
     const totalWidth = totalCardWidth * totalCards;
     carouselElement.style.width = `${totalWidth}px`;
     
-    // Calculate the width of one complete set of cards
     const setWidth = totalCardWidth * originalCards.length;
     
-    // Position the carousel so one set of clones is initially off-screen to the left
     scrollPosition = setWidth;
     carouselElement.style.transform = `translateX(-${scrollPosition}px)`;
     
-    // Create a true infinite loop effect with timestamp-based animation
+    // Timestamp-based animation
     function animateCarousel(timestamp) {
         if (isPaused) {
             animationId = requestAnimationFrame(animateCarousel);
@@ -438,22 +365,19 @@ function setupTrueLoopScroll(carouselElement) {
         lastTimestamp = timestamp;
         
         // Adjust scroll speed based on deltaTime for consistency
-        const frameAdjustedSpeed = (scrollSpeed * deltaTime) / 16.67; // Normalize to 60fps
+        const frameAdjustedSpeed = (scrollSpeed * deltaTime) / 16.67;
         
         // Move from right to left
         scrollPosition += frameAdjustedSpeed;
         
-        // Apply the transform with hardware acceleration
         carouselElement.style.transform = `translateX(-${scrollPosition}px)`;
         
-        // Check if we've scrolled beyond the reset point
         if (scrollPosition >= (setWidth * 2)) {
             // Reset to one setWidth exactly, maintaining visual continuity
             scrollPosition = setWidth;
             carouselElement.style.transform = `translateX(-${scrollPosition}px)`;
         }
         
-        // Also check if we've somehow scrolled backwards (shouldn't happen but safety check)
         if (scrollPosition <= 0) {
             scrollPosition = setWidth;
             carouselElement.style.transform = `translateX(-${scrollPosition}px)`;
@@ -463,14 +387,10 @@ function setupTrueLoopScroll(carouselElement) {
         animationId = requestAnimationFrame(animateCarousel);
     }
     
-    // Start animation with requestAnimationFrame
     animationId = requestAnimationFrame(animateCarousel);
     
-    // Set up a restart mechanism to prevent potential stalling
     const heartbeatInterval = setInterval(() => {
-        // Check if animation is still running
         if (!isPaused && !animationId) {
-            console.log('Restarting stalled carousel animation');
             lastTimestamp = 0; // Reset timestamp
             animationId = requestAnimationFrame(animateCarousel);
         }
@@ -490,7 +410,6 @@ function setupTrueLoopScroll(carouselElement) {
         }
     });
     
-    // Handle visibility changes (tab switching, etc.)
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             // Pause when tab is not visible
@@ -514,10 +433,7 @@ function setupTrueLoopScroll(carouselElement) {
     });
 }
 
-/**
- * Display a message when no feedback is available
- * @param {HTMLElement} carouselElement The carousel container element
- */
+// Display a message when no feedback is available
 function showNoFeedbackMessage(carouselElement) {
     carouselElement.innerHTML = '';
     
@@ -531,10 +447,7 @@ function showNoFeedbackMessage(carouselElement) {
     carouselElement.appendChild(messageCard);
 }
 
-/**
- * Display an error message when feedback cannot be loaded
- * @param {HTMLElement} carouselElement The carousel container element
- */
+// Display an error message when feedback cannot be loaded
 function showErrorMessage(carouselElement) {
     carouselElement.innerHTML = '';
     
