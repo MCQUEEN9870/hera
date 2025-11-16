@@ -45,7 +45,7 @@ public class SecurityConfig {
                     "/api/get-user-locations",
                     "/api/contact-submissions"
                 ).permitAll()
-                .anyRequest().permitAll() // TODO: tighten later for admin endpoints
+                .anyRequest().permitAll() 
             );
         return http.build();
     }
