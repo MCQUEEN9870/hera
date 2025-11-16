@@ -1,14 +1,14 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-V9X30VY879"></script>
+        <!-- Google tag (gtag.js) – deferred to user interaction to reduce unused JS -->
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-V9X30VY879');
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    (function(){
+        var loaded=false; function loadGA(){ if(loaded) return; loaded=true; var s=document.createElement('script'); s.async=true; s.src='https://www.googletagmanager.com/gtag/js?id=G-V9X30VY879'; s.onload=function(){ try{ gtag('js', new Date()); gtag('config','G-V9X30VY879'); }catch(e){} }; document.head.appendChild(s); }
+        ['pointerdown','touchstart','keydown','click'].forEach(function(ev){ window.addEventListener(ev,function(){ loadGA(); },{once:true,passive:true}); });
+    })();
 </script>
 <script>
 // Reveal obfuscated emails and ensure security rel attributes

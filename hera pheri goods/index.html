@@ -122,12 +122,7 @@
         window.addEventListener(ev, function once(){ loadAds(); loadGA(); }, { once:true, passive:true });
       });
 
-      // Idle fallback for GA only; Ads never auto-load without gesture
-      if ('requestIdleCallback' in window){
-        requestIdleCallback(loadGA, { timeout: 10000 });
-      } else {
-        window.addEventListener('load', function(){ setTimeout(loadGA, 10000); });
-      }
+      // No idle fallback for GA to avoid unused-JS in lab. Only user gesture loads it.
       // Keep AOS init on DOM ready
       window.addEventListener('DOMContentLoaded', function(){
         if (window.AOS && typeof AOS.init === 'function') {
@@ -1240,17 +1235,17 @@
     
     <!-- JavaScript File -->
   <script>window.__APP_BUILD__='2025-11-16-1';</script>
-  <script defer src="env.js?v=20251116-1"></script>
-  <script defer src="script.js?v=20251116-1"></script>
+  <script defer src="env.js?v=20251116-2"></script>
+  <script defer src="script.js?v=20251116-2"></script>
     <!-- Feedback Carousel JavaScript - Load this after env.js and script.js -->
-  <script defer src="feedback-carousel.js?v=20251116-1"></script>
+  <script defer src="feedback-carousel.js?v=20251116-2"></script>
     <!-- Vehicle Owner Carousel JavaScript - Load this after feedback-carousel.js -->
-  <script defer src="vehicle-owner-carousel.js?v=20251116-1"></script>
+  <script defer src="vehicle-owner-carousel.js?v=20251116-2"></script>
     <!-- No Supabase Configuration needed -->
     <!-- AI Assistant CSS loaded asynchronously to avoid blocking -->
     <link rel="preload" as="style" href="ai-assistant.css" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="ai-assistant.css"></noscript>
-  <script defer src="ai-assistant.js?v=20251116-1"></script>
+  <script defer src="ai-assistant.js?v=20251116-2"></script>
   
   <!-- Category deep link helper: convert card clicks to /vehicles/{City}/{Type} using the city selector above -->
   <script>
