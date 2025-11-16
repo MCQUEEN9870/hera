@@ -926,3 +926,93 @@ document.addEventListener("DOMContentLoaded", function() {
 // ==========================================
 // All animations are handled by AOS data attributes in HTML
 
+// ==========================================
+// Lazy media loader (images/picture/videos) using data-src/data-srcset
+// Prevents offscreen assets from loading before FCP
+// ==========================================
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        const candidates = [];
+
+        // Collect pictures that have deferred sources
+        document.querySelectorAll('picture').forEach(pic => {
+            const hasDeferred = pic.querySelector('source[data-srcset]') || pic.querySelector('img[data-src], img[data-srcset]');
+            if (hasDeferred) candidates.push(pic);
+        });
+
+        // Collect standalone deferred images not inside picture
+        document.querySelectorAll('img[data-src], img[data-srcset]').forEach(img => {
+            if (!img.closest('picture')) candidates.push(img);
+        });
+
+        // Collect deferred videos
+        document.querySelectorAll('video.lazy-video[data-src]').forEach(v => candidates.push(v));
+
+        if (!('IntersectionObserver' in window)) {
+            // Fallback: upgrade only visible ones immediately
+            candidates.forEach(upgradeIfVisible);
+            return;
+        }
+
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                upgrade(entry.target);
+                io.unobserve(entry.target);
+            });
+        }, { rootMargin: '200px 0px', threshold: 0.01 });
+
+        candidates.forEach(el => io.observe(el));
+
+        // Helper: check if element is effectively visible in viewport (skip hidden modals)
+        function isVisible(node) {
+            const target = node.tagName === 'PICTURE' ? (node.querySelector('img') || node) : node;
+            if (!target) return false;
+            const style = window.getComputedStyle(target);
+            if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+            const rect = target.getBoundingClientRect();
+            if ((rect.width === 0 && rect.height === 0)) return false;
+            // offsetParent is null when display:none (except for fixed). Treat non-fixed null as hidden
+            if (!target.offsetParent && style.position !== 'fixed') return false;
+            return rect.top < (window.innerHeight + 200) && rect.bottom > -200;
+        }
+
+        function upgradeIfVisible(el) { if (isVisible(el)) upgrade(el); }
+
+        // Perform the actual upgrade from data-* to real attrs
+        function upgrade(el) {
+            if (!el) return;
+            if (el.tagName === 'PICTURE') {
+                el.querySelectorAll('source[data-srcset]').forEach(s => {
+                    s.srcset = s.dataset.srcset;
+                    s.removeAttribute('data-srcset');
+                });
+                const img = el.querySelector('img');
+                if (img) {
+                    if (img.dataset.src) { img.src = img.dataset.src; img.removeAttribute('data-src'); }
+                    if (img.dataset.srcset) { img.srcset = img.dataset.srcset; img.removeAttribute('data-srcset'); }
+                }
+            } else if (el.tagName === 'IMG') {
+                if (el.dataset.src) { el.src = el.dataset.src; el.removeAttribute('data-src'); }
+                if (el.dataset.srcset) { el.srcset = el.dataset.srcset; el.removeAttribute('data-srcset'); }
+            } else if (el.tagName === 'VIDEO') {
+                if (el.dataset.src) { el.src = el.dataset.src; el.removeAttribute('data-src'); }
+                try { el.load(); if (el.autoplay) el.play().catch(()=>{}); } catch(_){ }
+            }
+        }
+
+        // User interaction fallback: only upgrade elements that are visible at that moment
+        const kickOnce = () => {
+            candidates.forEach(el => {
+                if (isVisible(el)) {
+                    upgrade(el);
+                    io.unobserve(el);
+                }
+            });
+        };
+        window.addEventListener('pointerdown', kickOnce, { once: true });
+        window.addEventListener('keydown', kickOnce, { once: true });
+        window.addEventListener('scroll', kickOnce, { once: true, passive: true });
+    } catch(_) { /* no-op */ }
+});
+
