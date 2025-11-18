@@ -392,6 +392,82 @@ document.addEventListener('DOMContentLoaded', function() {
             showToast('Error searching vehicles. Please try again.', 'error');
         }
     });
+
+    // ===== Initial Load: Fetch all vehicles for first paint (SEO + user trust) =====
+    // This bypasses form validation so bots & users instantly see real data.
+    function initialLoadAllVehicles() {
+        try {
+            console.log('[InitialLoad] Fetching all vehicles with no filters');
+            // Show a subtle loading indicator
+            loadingOverlay.style.display = 'flex';
+            // Directly call the Spring Boot API without query params
+            const base = API_BASE_URL.endsWith('/') ? API_BASE_URL : API_BASE_URL + '/';
+            const apiUrl = base + 'vehicles/search';
+            fetch(apiUrl, { headers: { 'Accept': 'application/json' } })
+                .then(r => {
+                    if (!r.ok) throw new Error('Initial load request failed: ' + r.status);
+                    return r.json();
+                })
+                .then(data => {
+                    console.log('[InitialLoad] Raw response:', data);
+                    const vehicles = (data && data.vehicles) ? data.vehicles : [];
+                    // Sort using existing sorter for consistency
+                    const sorted = sortResults(vehicles);
+                    displayResults(sorted);
+                    // Add lightweight JSON-LD for first 10 vehicles to help crawlers
+                    injectStructuredData(sorted.slice(0, 10));
+                })
+                .catch(err => {
+                    console.error('[InitialLoad] Error:', err);
+                    loadingOverlay.style.display = 'none';
+                });
+        } catch (e) {
+            console.error('[InitialLoad] Unexpected error:', e);
+            loadingOverlay.style.display = 'none';
+        }
+    }
+
+    // Inject JSON-LD structured data describing vehicles (helps Google understand real inventory)
+    function injectStructuredData(list) {
+        try {
+            if (!list || !list.length) return;
+            // Remove any previous injection to avoid duplicates
+            const old = document.getElementById('vehicles-jsonld');
+            if (old) old.remove();
+            const items = list.map(v => ({
+                '@type': 'Product',
+                'name': (v.name || (v.type || 'Vehicle') + ' #' + (v.id || '')),
+                'productID': String(v.id || ''),
+                'category': v.type || v.vehicleType || 'Transport Vehicle',
+                'description': (v.description && v.description.trim()) ? v.description : 'Transport service vehicle available for local goods movement',
+                'brand': 'Herapheri Goods',
+                'areaServed': [v.locationCity, v.locationState].filter(Boolean).join(', '),
+                'offers': {
+                    '@type': 'Offer',
+                    'price': '0',
+                    'priceCurrency': 'INR',
+                    'availability': 'https://schema.org/InStock'
+                }
+            }));
+            const jsonld = {
+                '@context': 'https://schema.org',
+                '@type': 'ItemList',
+                'name': 'Registered Transport Vehicles',
+                'itemListElement': items.map((it, idx) => ({ '@type': 'ListItem', position: idx + 1, item: it }))
+            };
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.id = 'vehicles-jsonld';
+            script.textContent = JSON.stringify(jsonld);
+            document.head.appendChild(script);
+            console.log('[InitialLoad] Injected JSON-LD for', items.length, 'vehicles');
+        } catch(e) {
+            console.warn('Structured data injection failed:', e);
+        }
+    }
+
+    // Trigger initial load after a short delay to allow environment setup
+    setTimeout(initialLoadAllVehicles, 300);
     
     // Function to fetch vehicles from the database
     function fetchVehiclesFromDatabase(vehicleType, state, city, pincode) {
@@ -1054,6 +1130,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const vehicleName = vehicle.name || vehicle.vehicleName || vehicle.fullName || `${vehicle.type || vehicle.vehicleType || 'Vehicle'} #${vehicle.id || ''}`;
         const vehicleCity = vehicle.locationCity || vehicle.city || 'Unknown City';
         const vehicleState = vehicle.locationState || vehicle.state || 'Unknown State';
+        const vehiclePincodeCard = vehicle.locationPincode || vehicle.pincode || '-';
         const ownerName = vehicle.ownerName || vehicle.driverName || vehicle.owner || vehicle.fullName || 'Owner';
         // Premium flag used later inside modal content rendering (scoped to modal only)
         let isPremiumForModal = false;
@@ -1156,6 +1233,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="info-item">
                         <i class="fas fa-map-marker-alt"></i>
                         <span>${vehicleCity}, ${vehicleState}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-thumbtack"></i>
+                        <span>${vehiclePincodeCard}</span>
                     </div>
                     <div class="info-item">
                         <i class="fas fa-user"></i>

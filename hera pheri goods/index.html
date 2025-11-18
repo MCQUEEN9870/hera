@@ -56,13 +56,8 @@
     <link rel="preload" href="style.css?v=20251116-3" as="style">
     <link rel="stylesheet" href="style.css?v=20251116-3">
     
-  <!-- Defer Font Awesome CSS -->
-  <script>
-    (function(){
-      var faLoaded=false; function loadFA(){ if(faLoaded) return; faLoaded=true; var l=document.createElement('link'); l.rel='stylesheet'; l.href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'; document.head.appendChild(l); }
-      ['pointerdown','touchstart','keydown','click'].forEach(function(ev){ window.addEventListener(ev,function(){ loadFA(); },{once:true,passive:true}); });
-    })();
-  </script>
+  <!-- Load Font Awesome asynchronously without blocking render -->
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
   
   <!-- Enforce font-display: swap for Font Awesome webfonts -->
@@ -880,7 +875,7 @@
         </div>
     </div>
 
-    <!-- How It Works Section - Redesigned (Full Width) -->
+    <!-- How It Works Section-->
     <section class="how-it-works-section">
       <div class="how-it-works-container">
         <div class="how-it-works-header" data-aos="fade-down" data-aos-duration="1000" data-aos-offset="200">
@@ -898,8 +893,7 @@
               <h3>Register Your Vehicle</h3>
               <p>Own a transport vehicle?
               List it on HerapheriGoods.in in just a few minutes — no charges, no hidden commissions.
-              Whether it’s a truck, tempo, auto, JCB, Crane services, Packers & Movers or refrigerated van, registration is completely free and open to all verified owners.  
-              Start building your online presence today — absolutely free!</p>
+              Whether it’s a truck, tempo, auto, JCB, Crane services, Packers & Movers or refrigerated van, registration is completely free and open to all verified owners.</p>
             </div>
           </div>
 
