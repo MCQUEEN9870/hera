@@ -862,12 +862,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Convert Supabase public URL to pretty proxied URL (production only)
+    function toPrettyImageUrl(url) {
+        if (!url || typeof url !== 'string') return url;
+        const marker = '/storage/v1/object/public/vehicle-images/';
+        const isProd = /herapherigoods\.in$/i.test(window.location.hostname);
+        if (isProd && url.includes('supabase.co') && url.includes(marker)) {
+            try {
+                const after = url.split(marker)[1];
+                return `${window.location.origin}/images/vehicles/${after}`; // /images/vehicles/:id/:file
+            } catch(_) {
+                return url;
+            }
+        }
+        return url;
+    }
+
     // Function that attempts to handle image URLs intelligently with retry and fallback mechanisms
     function getImageUrlsForVehicle(vehicle, callback) {
         // Start with existing methods if available
         if (vehicle.images && vehicle.images.length > 0) {
             console.log('Using existing images array:', vehicle.images);
-            callback(vehicle.images);
+            const mapped = vehicle.images.map(toPrettyImageUrl);
+            callback(mapped);
             return;
         }
         
@@ -880,8 +897,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 url.trim() !== '');
                 
             if (validImages.length > 0) {
-                vehicle.images = validImages;
-                callback(validImages);
+                const mapped = validImages.map(toPrettyImageUrl);
+                vehicle.images = mapped;
+                callback(mapped);
                 return;
             }
         }
@@ -898,8 +916,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     url.trim() !== '');
                     
                 if (validImages.length > 0) {
-                    vehicle.images = validImages;
-                    callback(validImages);
+                    const mapped = validImages.map(toPrettyImageUrl);
+                    vehicle.images = mapped;
+                    callback(mapped);
                     return;
                 }
             } catch (err) {
@@ -947,8 +966,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         url.trim() !== '');
                         
                     if (validImages.length > 0) {
-                        vehicle.images = validImages;
-                        callback(validImages);
+                        const mapped = validImages.map(toPrettyImageUrl);
+                        vehicle.images = mapped;
+                        callback(mapped);
                         return;
                     }
                 }
