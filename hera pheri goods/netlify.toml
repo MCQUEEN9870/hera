@@ -149,6 +149,13 @@
   to = "/refer-and-refund-policy"
   status = 301
 
+# Pretty image proxy to hide Supabase bucket paths
+[[redirects]]
+  from = "/images/vehicles/:id/*"
+  to = "https://kmwcinmjonqetgircdtr.supabase.co/storage/v1/object/public/vehicle-images/:id/:splat"
+  status = 200
+  force = true
+
 # SPA fallback redirect (must be last)
 [[redirects]]
   from = "/*"
@@ -202,5 +209,11 @@
   for = "/favicon.ico"
   [headers.values]
     Cache-Control = "public, max-age=604800"
+
+# Cache pretty-proxied vehicle images aggressively
+[[headers]]
+  for = "/images/vehicles/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
 

@@ -472,7 +472,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 // Filter unusable placeholders
                 candidates = candidates.filter(u => typeof u === 'string' && u.trim() && !u.endsWith('.hidden_folder') && !u.endsWith('.folder'));
-                if (candidates.length) return toAbsolute(candidates[0]);
+                if (candidates.length) {
+                    const raw = candidates[0];
+                    // Pretty rewrite for Supabase public bucket paths
+                    const marker = '/storage/v1/object/public/vehicle-images/';
+                    if (raw.includes('supabase.co') && raw.includes(marker)) {
+                        try {
+                            const after = raw.split(marker)[1]; // e.g., "79/filename.jpg"
+                            const pretty = `${window.location.origin}/images/vehicles/${after}`;
+                            return pretty;
+                        } catch (_) {
+                            return toAbsolute(raw);
+                        }
+                    }
+                    return toAbsolute(raw);
+                }
                 // Fallback to a deterministic default image so the required field is present
                 return toAbsolute('attached_assets/images/default-vehicle.png');
             };
