@@ -3081,7 +3081,7 @@ display: flex;
 
 .review-toggle {
     position: absolute;
-    right: -42px;
+    right: -38px;
     top: 44%;
     transform: translateY(-50%);
     background: #FFA500;

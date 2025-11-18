@@ -451,13 +451,41 @@ document.addEventListener('DOMContentLoaded', function() {
             // Remove any previous injection to avoid duplicates
             const old = document.getElementById('vehicles-jsonld');
             if (old) old.remove();
+            // Helper: choose a primary image URL for a vehicle and make it absolute
+            const toAbsolute = (url) => {
+                try {
+                    // If already absolute, new URL will keep it; otherwise base it on current origin
+                    return new URL(url, window.location.origin).href;
+                } catch (_) {
+                    return url;
+                }
+            };
+            const getPrimaryImage = (v) => {
+                let candidates = [];
+                if (Array.isArray(v.images) && v.images.length) candidates = candidates.concat(v.images);
+                if (Array.isArray(v.vehicleImageUrls) && v.vehicleImageUrls.length) candidates = candidates.concat(v.vehicleImageUrls);
+                if (v.vehicle_image_urls_json) {
+                    try {
+                        const arr = JSON.parse(v.vehicle_image_urls_json);
+                        if (Array.isArray(arr)) candidates = candidates.concat(arr);
+                    } catch(_) {}
+                }
+                // Filter unusable placeholders
+                candidates = candidates.filter(u => typeof u === 'string' && u.trim() && !u.endsWith('.hidden_folder') && !u.endsWith('.folder'));
+                if (candidates.length) return toAbsolute(candidates[0]);
+                // Fallback to a deterministic default image so the required field is present
+                return toAbsolute('attached_assets/images/default-vehicle.png');
+            };
             const items = list.map(v => ({
                 '@type': 'Product',
                 'name': (v.name || (v.type || 'Vehicle') + ' #' + (v.id || '')),
                 'productID': String(v.id || ''),
                 'category': v.type || v.vehicleType || 'Transport Vehicle',
                 'description': (v.description && v.description.trim()) ? v.description : 'Transport service vehicle available for local goods movement',
-                'brand': 'Herapheri Goods',
+                // Google Merchant listings treats image as a REQUIRED property
+                'image': getPrimaryImage(v),
+                // Use Brand object form for clarity
+                'brand': { '@type': 'Brand', 'name': 'Herapheri Goods' },
                 'areaServed': [v.locationCity, v.locationState].filter(Boolean).join(', '),
                 'offers': {
                     '@type': 'Offer',
