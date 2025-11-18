@@ -1046,6 +1046,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`Image load error, falling back to default`);
             this.src = 'attached_assets/images/default-vehicle.png';
         };
+        // Light deterrents against casual saving/dragging
+        // Allow normal browser interactions (right-click, copy address) as requested
         
         imgContainer.appendChild(img);
         
@@ -1864,6 +1866,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     imageLightbox.classList.add('active');
                     document.body.style.overflow = 'hidden';
                 });
+                // Keep default browser interactions enabled intentionally
             }
             
             // Populate gallery
@@ -1872,6 +1875,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const galleryItem = document.createElement('div');
                 galleryItem.className = 'gallery-item';
                 galleryItem.innerHTML = `<img src="${image}" alt="Vehicle image ${index + 1}" onerror="this.src='attached_assets/images/default-vehicle.png'">`;
+                // Keep default browser interactions enabled intentionally
                 
                 // Add click event to switch main image
                 galleryItem.addEventListener('click', function() {

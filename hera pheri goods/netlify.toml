@@ -149,10 +149,10 @@
   to = "/refer-and-refund-policy"
   status = 301
 
-# Pretty image proxy to hide Supabase bucket paths
+# Pretty image proxy to backend derivative (watermarked)
 [[redirects]]
   from = "/images/vehicles/:id/*"
-  to = "https://kmwcinmjonqetgircdtr.supabase.co/storage/v1/object/public/vehicle-images/:id/:splat"
+  to = "https://api.herapherigoods.in/api/images/vehicles/:id/:splat"
   status = 200
   force = true
 
