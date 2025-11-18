@@ -24,8 +24,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeLightbox = document.getElementById('closeLightbox');
     const favoriteBtn = document.getElementById('favoriteBtn');
     
-    // API endpoint (replace with your actual backend URL)
-    const API_BASE_URL = (window.API_BASE_URL ? `${window.API_BASE_URL}/api/` : "http://localhost:8080/api/");
+    // API endpoint (normalized to ensure exactly one /api/ suffix)
+    function buildApiBase() {
+        const raw = window.API_BASE_URL || 'http://localhost:8080';
+        try {
+            const u = new URL(raw);
+            // Normalize trailing slash and ensure single /api/ context
+            let path = (u.pathname || '').replace(/\/+$/, '');
+            if (!/\/api$/i.test(path)) {
+                path = path + '/api';
+            }
+            u.pathname = path.endsWith('/') ? path : path + '/';
+            return u.origin + u.pathname;
+        } catch (e) {
+            // Fallback string ops if URL parsing fails
+            const base = String(raw).replace(/\/+$/, '');
+            return base.endsWith('/api') ? base + '/' : base + '/api/';
+        }
+    }
+    const API_BASE_URL = buildApiBase();
     
     // Log the API base URL for debugging
     console.log('Using API base URL:', API_BASE_URL);
