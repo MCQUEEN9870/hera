@@ -56,34 +56,7 @@
     <link rel="preload" href="style.css?v=20251116-3" as="style">
     <link rel="stylesheet" href="style.css?v=20251116-3">
     
-  <!-- Load Font Awesome asynchronously without blocking render -->
-  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
-  
-  <!-- Enforce font-display: swap for Font Awesome webfonts -->
-  <style>
-    @font-face {
-      font-family: "Font Awesome 6 Free";
-      font-style: normal;
-      font-weight: 900;
-      font-display: swap;
-      src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-solid-900.woff2") format("woff2");
-    }
-    @font-face {
-      font-family: "Font Awesome 6 Free";
-      font-style: normal;
-      font-weight: 400;
-      font-display: swap;
-      src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-regular-400.woff2") format("woff2");
-    }
-    @font-face {
-      font-family: "Font Awesome 6 Brands";
-      font-style: normal;
-      font-weight: 400;
-      font-display: swap;
-      src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-brands-400.woff2") format("woff2");
-    }
-  </style>
+  <!-- Font Awesome will be lazy-loaded on interaction/viewport; inline SVGs used for above-the-fold icons -->
  
     <!-- Google Fonts-->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cookie&family=Agu+Display&family=Big+Shoulders+Stencil:opsz,wght@10..72,100..900&family=Stack+Sans+Notch:wght@200..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
@@ -583,7 +556,12 @@
             <p>Search for available transport vehicles according to your need in your area and get information of transport vehicle owner directly - Free, No commission.</p>
             <!-- Find Vehicle Button with Click-It animation (small, right side) -->
             <div class="btn-with-click-anim">
-              <button class="find-vehicle-btn" onclick="window.location.href = 'vehicles.html'"><i class="fas fa-search"></i> Find Vehicle</button>
+              <button class="find-vehicle-btn" onclick="window.location.href = 'vehicles.html'">
+                <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" focusable="false" style="vertical-align:-0.125em; margin-right:6px; fill:currentColor;">
+                  <path d="M10 2a8 8 0 1 1 5.3 14.1l5.3 5.3-1.4 1.4-5.3-5.3A8 8 0 0 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/>
+                </svg>
+                Find Vehicle
+              </button>
               <video data-src="attached_assets/animation/click-it.webm" alt="Click hint animation" class="click-it-anim small lazy-video" loading="lazy" decoding="async" preload="none"></video>
             </div>
           </div>
@@ -1064,7 +1042,9 @@
     <!-- Review Slide Bar -->
     <div class="review-sidebar">
       <button class="review-toggle" title="Want your experience to be part of our public reviews? Just tell us your name and address!">
-        <i class="fas fa-star"></i>
+        <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" focusable="false" style="vertical-align:-0.2em; margin-right:6px; fill:currentColor;">
+          <path d="M12 17.27L18.18 21l-1.64-7.03 5.46-4.73-7.19-.62L12 2 9.19 8.62l-7.19.62 5.46 4.73L5.82 21z"/>
+        </svg>
         <span>Rate Us</span>
       </button>
       
@@ -1184,7 +1164,9 @@
     <!-- Social Share Drawer -->
     <div class="share-drawer">
       <button class="share-toggle" type="button" aria-label="Open share options" aria-expanded="false" aria-controls="share-content" title="Share options">
-        <i class="fas fa-share-alt"></i>
+        <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" focusable="false" style="fill:currentColor;">
+          <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7a3.04 3.04 0 0 0 0-1.39l7.02-4.11A3 3 0 1 0 14 5a3 3 0 0 0 .04.5L7 9.61A3 3 0 1 0 7 14.4l7.05 4.12c-.03.16-.05.33-.05.5a3 3 0 1 0 3-2.94z"/>
+        </svg>
       </button>
       
       <div class="share-content" id="share-content" aria-hidden="true">
@@ -1255,6 +1237,38 @@
     <link rel="preload" as="style" href="ai-assistant.css" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="ai-assistant.css"></noscript>
   <script defer src="ai-assistant.js?v=20251118-1"></script>
+  
+  <!-- Lazy-load Font Awesome CSS only when needed (dropdown/share/footer in view) -->
+  <script>
+    (function(){
+      var faLoaded = false;
+      function loadFA(){
+        if (faLoaded) return; faLoaded = true;
+        var l = document.createElement('link');
+        l.rel = 'stylesheet';
+        l.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';
+        l.crossOrigin = 'anonymous';
+        document.head.appendChild(l);
+      }
+      // Load on dropdown open/hover
+      var dd = document.querySelector('.dropdown');
+      if (dd){ dd.addEventListener('mouseenter', loadFA, { passive:true, once:true }); dd.addEventListener('click', loadFA, { once:true }); }
+      // Load when share drawer toggled or review panel used
+      var shareBtn = document.querySelector('.share-toggle'); if (shareBtn) shareBtn.addEventListener('click', loadFA, { once:true });
+      var rateBtn = document.querySelector('.review-toggle'); if (rateBtn) rateBtn.addEventListener('click', loadFA, { once:true });
+      // Load when footer is near viewport
+      window.addEventListener('DOMContentLoaded', function(){
+        try{
+          var footer = document.querySelector('footer.footer');
+          if (!footer || !('IntersectionObserver' in window)) return;
+          var io = new IntersectionObserver(function(entries){
+            entries.forEach(function(e){ if (e.isIntersecting) { loadFA(); io.disconnect(); } });
+          }, { rootMargin: '300px' });
+          io.observe(footer);
+        } catch(_){}
+      });
+    })();
+  </script>
   
   <!-- Category deep link helper: convert card clicks to /vehicles/{City}/{Type} using the city selector above -->
   <script>
