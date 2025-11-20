@@ -272,15 +272,15 @@
       }
       .tutorial-actions .skip-btn:hover { background-color: #f6f6f6; border-color: #ccc; color: #222; }
       @media (max-width: 480px){
-        .tutorial-content { margin: 18% auto; padding: 18px; max-width: 250px; }
+        .tutorial-content { margin: 18% auto; padding: 18px; max-width: 305px; }
         .tutorial-actions { gap: 10px; }
       }
 
       @media (max-width: 768px) {
       .find-vehicle-section {
-        width: 100%;
-        max-width: 75%;
-        margin: 0;
+        width: 96%;
+        max-width: 100%;
+        margin: 10px 0 0 8px;
       }
       .find-vehicle-video {
         margin-left: 0;
@@ -1338,6 +1338,20 @@
           }
         });
       });
+
+      /* Mobile flip-card behavior: disable hover flips */
+      try {
+        const isTouchEnv = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+        if (isTouchEnv) {
+          document.querySelectorAll('.flip-card').forEach(card => {
+            card.addEventListener('click', function(ev){
+              // If user clicked the "View Vehicles" / action button, do not toggle flip
+              if (ev.target.closest('a.card-btn')) return;
+              this.classList.toggle('flipped');
+            });
+          });
+        }
+      } catch(_){ /* no-op */ }
     });
   </script>
 

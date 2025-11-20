@@ -66,7 +66,7 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
 
 @media (max-width: 768px) {
   .glass-nav { height: 68px; padding: 6px 14px; }
-  .glass-nav .navbar-logo img { max-width: 160px; }
+  .glass-nav .navbar-logo img { max-width: 160px; height: 45px; }
   .glass-nav .nav-links { flex-direction: row; width: auto; margin: 0; }
   .glass-nav ul { gap: 12px; }
   .glass-nav .nav-item { font-size: 14px; padding: 6px 8px; }
@@ -1002,10 +1002,10 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     padding: 40px 40px;
     border-radius: 20px;
     box-shadow: 0 10px 12px #555555ad;
-    width: 92%;
+    width: 99%;
     max-width: 100%;
-    margin-top: 28px;
-    margin-left: 28px;
+    margin-top: 18px;
+    margin-left: 7px;
 }
 
 .find-vehicle-container {
@@ -2513,6 +2513,19 @@ display: flex;
     transform: rotateY(180deg);
 }
 
+/* Enable programmatic flipping via a class (for mobile tap) */
+.flip-card.flipped .flip-card-inner {
+        transform: rotateY(180deg);
+}
+
+/* On devices that do not support (or have awkward) hover, disable hover flip
+     so scrolling does not accidentally trigger flips. Users will tap to flip instead. */
+@media (hover: none), (pointer: coarse) {
+    .flip-card:hover .flip-card-inner {
+        transform: none; /* prevent unintended flip on scroll/drag */
+    }
+}
+
 .flip-card-front, .flip-card-back {
     position: absolute;
     width: 100%;
@@ -3329,13 +3342,13 @@ display: flex;
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: end;
     gap: 5px;
     color: white;
     transition: all 0.4 ease;
-    width: 50px;
+    width: 65px;
     height: 50px;
-    font-size: 19px;
+    font-size: 22px;
 }
 
 .share-toggle:hover {
@@ -3427,7 +3440,7 @@ display: flex;
 @media (max-width: 768px) {
     .share-drawer {
         left: -108px;
-        top: 558px;
+        top: 485px;
     }
     .share-toggle {
         top: 107px;
