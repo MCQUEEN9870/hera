@@ -2518,11 +2518,9 @@ display: flex;
         transform: rotateY(180deg);
 }
 
-/* On devices that do not support (or have awkward) hover, disable hover flip
-     so scrolling does not accidentally trigger flips. Users will tap to flip instead. */
 @media (hover: none), (pointer: coarse) {
     .flip-card:hover .flip-card-inner {
-        transform: none; /* prevent unintended flip on scroll/drag */
+        transform: none; 
     }
 }
 
@@ -2670,7 +2668,7 @@ display: flex;
     
     .flip-cards-row {
         flex-direction: column;
-        gap: 30px;
+        gap: 75px;
     }
     
     .flip-card {
