@@ -25,6 +25,14 @@ html { overscroll-behavior-x: none; overflow-x: hidden; }
     z-index: 1000;
     flex-wrap: wrap;
   gap: 10px;
+        transition: transform .55s cubic-bezier(.25,.8,.25,1), background-color .35s ease, opacity .4s ease;
+        will-change: transform;
+}
+
+/* Hidden state for auto-hide behavior */
+.glass-nav.nav-hidden {
+    transform: translateY(-110%);
+    opacity: 0.92; /* keep slight presence for quicker perception when returning */
 }
 
 .glass-nav .navbar-logo { margin: 0; padding: 0; }

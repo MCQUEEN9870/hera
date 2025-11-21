@@ -46,6 +46,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Log the API base URL for debugging
     console.log('Using API base URL:', API_BASE_URL);
+
+    // Ensure default sort is always newest on initial load (override any accidental persisted value)
+    if (sortSelect) {
+        sortSelect.value = 'newest';
+    }
     
     // Remove direct Supabase usage in frontend
     const REGISTRATIONS_TABLE = "registration";
@@ -862,17 +867,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Convert Supabase public URL to pretty proxied URL (production only)
+    // Restore pretty URL mapping: convert Supabase public URL to /images/vehicles/:id/:file for sharing.
     function toPrettyImageUrl(url) {
         if (!url || typeof url !== 'string') return url;
         const marker = '/storage/v1/object/public/vehicle-images/';
-        const isProd = /herapherigoods\.in$/i.test(window.location.hostname);
-        if (isProd && url.includes('supabase.co') && url.includes(marker)) {
+        if (url.includes('supabase.co') && url.includes(marker)) {
             try {
-                const after = url.split(marker)[1];
-                return `${window.location.origin}/images/vehicles/${after}`; // /images/vehicles/:id/:file
-            } catch(_) {
-                return url;
+                const after = url.split(marker)[1]; // e.g. "79/filename.webp"
+                return `${window.location.origin}/images/vehicles/${after}`;
+            } catch (_) {
+                return url; // fallback
             }
         }
         return url;
@@ -998,8 +1002,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     `${base}/api/file/registration/${registrationId}/front.jpg`,
                     `${base}/api/file/registrations/${registrationId}/front.jpg`,
                     `${base}/api/file/vehicles/${registrationId}/front.jpg`,
-                    `${base}/supabase-images/registration/${registrationId}/front.jpg`,
-                    `${base}/api/images/registration/${registrationId}/front.jpg`
+                    `${base}/supabase-images/registration/${registrationId}/front.jpg`
                 ];
                 
                 console.log('Trying fallback URLs:', possibleUrls);
@@ -1054,8 +1057,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Use our new helper function to get and set images
         getImageUrlsForVehicle(vehicle, (validImages) => {
             if (validImages && validImages.length > 0) {
-                mainImage = validImages[0];
-                console.log('Updating card image to:', mainImage);
+                mainImage = toPrettyImageUrl(validImages[0]);
+                console.log('Updating card image to pretty URL:', mainImage);
                 img.src = mainImage;
             }
         });

@@ -1,12 +1,29 @@
 package com.example.demo.service;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Iterator;
+
+import java.awt.image.BufferedImage;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.geom.AffineTransform;
+
+import javax.imageio.ImageIO;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -975,33 +992,46 @@ public class SupabaseService {
         // Keep track of uploaded image URLs
         List<String> uploadedImageUrls = new ArrayList<>();
         
-        // Upload each image to the specified folder
+        // Upload each image to the specified folder WITH resize + watermark + WebP conversion
+        int index = 0;
         for (MultipartFile image : images) {
             if (image.isEmpty()) {
+                index++;
                 continue;
             }
-            
-            // Create a unique filename for the image within the folder
-            String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
+
+            boolean isFront = (index == 0); // treat first image as front (thumbnail size)
+            index++;
+
+            // Process image (resize + watermark + convert to WebP/JPEG fallback)
+            byte[] processedBytes = processAndConvertImage(image, isFront);
+            String extension = processedBytes == null ? "jpg" : "webp"; // assume webp if successful
+            if (processedBytes == null) {
+                // Fallback to original bytes if processing failed
+                processedBytes = image.getBytes();
+            }
+
+            String originalName = image.getOriginalFilename() != null ? image.getOriginalFilename() : "image";
+            String baseName = originalName.replaceAll("[^A-Za-z0-9_-]", "_");
+            String filename = UUID.randomUUID() + (isFront ? "_front" : "") + "_" + baseName + "." + extension;
             String fullPath = folderPath + "/" + filename;
-            
-            RequestBody fileBody = RequestBody.create(MediaType.parse(image.getContentType()), image.getBytes());
-            
+
+            MediaType mediaType = extension.equals("webp") ? MediaType.parse("image/webp") : MediaType.parse(image.getContentType());
+            RequestBody fileBody = RequestBody.create(mediaType, processedBytes);
+
             Request request = new Request.Builder()
                     .url(supabaseUrl + "/storage/v1/object/" + bucketName + "/" + fullPath)
                     .addHeader("apikey", supabaseKey)
                     .addHeader("Authorization", "Bearer " + supabaseKey)
                     .put(fileBody)
                     .build();
-    
+
             try (Response response = client.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
                     throw new IOException("Image upload failed: " + response.message());
                 }
-                
-                // Generate direct public URL for the image
                 String imageUrl = supabaseUrl + "/storage/v1/object/public/" + bucketName + "/" + fullPath;
-                System.out.println("Uploaded image URL: " + imageUrl);
+                System.out.println("Uploaded processed image URL: " + imageUrl);
                 uploadedImageUrls.add(imageUrl);
             }
         }
@@ -1026,6 +1056,89 @@ public class SupabaseService {
         result.put("imageUrls", uploadedImageUrls);
         
         return result;
+    }
+
+    /**
+     * Resize + watermark + convert image to WebP (front image: 360px width, others: 1200px max width).
+     * Falls back to original bytes if any step fails.
+     */
+    private byte[] processAndConvertImage(MultipartFile image, boolean isFront) {
+        try (InputStream in = image.getInputStream(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            BufferedImage src = ImageIO.read(in);
+            if (src == null) return null;
+            int targetWidth = isFront ? 360 : 1200;
+            int w = src.getWidth();
+            int h = src.getHeight();
+            int newW = w;
+            int newH = h;
+            if (w > targetWidth) {
+                newW = targetWidth;
+                newH = (int) Math.round((targetWidth / (double) w) * h);
+            }
+            BufferedImage canvas = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g = canvas.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.drawImage(src, 0, 0, newW, newH, null);
+            // Watermark (diagonal tiled HPG)
+            String mark = "HPG";
+            float alpha = 0.12f;
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+            g.setColor(Color.WHITE);
+            int fontSize = Math.max(24, (int) (newW * 0.12));
+            g.setFont(new Font("Arial", Font.BOLD, fontSize));
+            AffineTransform orig = g.getTransform();
+            g.rotate(Math.toRadians(-30), newW / 2.0, newH / 2.0);
+            int step = (int) (fontSize * 3.0);
+            for (int y = -newH; y < newH * 2; y += step) {
+                for (int x = -newW; x < newW * 2; x += step) {
+                    g.drawString(mark, x, y);
+                }
+            }
+            g.setTransform(orig);
+            g.dispose();
+            // Try WebP writer
+            Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("webp");
+            if (writers.hasNext()) {
+                ImageWriter writer = writers.next();
+                try (MemoryCacheImageOutputStream ios = new MemoryCacheImageOutputStream(out)) {
+                    writer.setOutput(ios);
+                    ImageWriteParam param = writer.getDefaultWriteParam();
+                    if (param.canWriteCompressed()) {
+                        param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                        param.setCompressionType(param.getCompressionType());
+                        param.setCompressionQuality(0.82f);
+                    }
+                    writer.write(null, new IIOImage(canvas, null, null), param);
+                } finally {
+                    writer.dispose();
+                }
+                return out.toByteArray();
+            }
+            // Fallback to JPEG if WebP not available
+            Iterator<ImageWriter> jpgWriters = ImageIO.getImageWritersByFormatName("jpg");
+            if (jpgWriters.hasNext()) {
+                ImageWriter writer = jpgWriters.next();
+                try (MemoryCacheImageOutputStream ios = new MemoryCacheImageOutputStream(out)) {
+                    writer.setOutput(ios);
+                    ImageWriteParam param = writer.getDefaultWriteParam();
+                    if (param.canWriteCompressed()) {
+                        param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                        param.setCompressionQuality(0.82f);
+                    }
+                    writer.write(null, new IIOImage(canvas, null, null), param);
+                } finally {
+                    writer.dispose();
+                }
+                return out.toByteArray();
+            }
+            // Last resort: PNG
+            ImageIO.write(canvas, "png", out);
+            return out.toByteArray();
+        } catch (Exception e) {
+            System.err.println("Image processing failed, using original bytes: " + e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -1171,20 +1284,34 @@ public class SupabaseService {
         // APPROACH 1: Try to get folder paths from database
         try {
             List<RegistrationImageFolder> folders = registrationImageFolderRepository.findByRegistrationId(registrationId);
-            
+
             if (!folders.isEmpty()) {
                 foundFolders = true;
                 System.out.println("DELETE IMAGES: Found " + folders.size() + " folders in database for registration ID: " + registrationId);
-                
+
                 for (RegistrationImageFolder folder : folders) {
-                    String folderPath = folder.getFolderPath();
+                    String folderPath = folder.getFolderPath(); // e.g. "123" (we actually stored images as 123/filename)
                     System.out.println("DELETE IMAGES: Deleting folder from database record: " + folderPath);
-                    
-                    // Delete the folder from Supabase
-                    deleteFilesWithPrefix(folderPath);
+
+                    // Delete using both prefix variants to cover Supabase list API expectations
+                    boolean deletedBase = deleteFilesWithPrefix(folderPath);       // may miss files if API expects trailing slash
+                    boolean deletedSlash = deleteFilesWithPrefix(folderPath + "/"); // explicit folder prefix form used during upload
+                    if (deletedBase || deletedSlash) {
+                        System.out.println("DELETE IMAGES: Folder contents removed for: " + folderPath);
+                    } else {
+                        System.out.println("DELETE IMAGES: No files matched for folder path variants: '" + folderPath + "' and '" + folderPath + "/'");
+                    }
                 }
             } else {
-                System.out.println("DELETE IMAGES: No folders found in database for registration ID: " + registrationId);
+                System.out.println("DELETE IMAGES: No folders found in database for registration ID: " + registrationId + ". Trying direct ID-based prefixes.");
+                // Attempt direct deletion using registrationId base folder assumptions
+                String idPath = registrationId.toString();
+                boolean idDeletedBase = deleteFilesWithPrefix(idPath);
+                boolean idDeletedSlash = deleteFilesWithPrefix(idPath + "/");
+                if (idDeletedBase || idDeletedSlash) {
+                    foundFolders = true;
+                    System.out.println("DELETE IMAGES: Removed files using direct registration ID prefixes.");
+                }
             }
         } catch (Exception e) {
             System.err.println("DELETE IMAGES: Error finding folders in database: " + e.getMessage());

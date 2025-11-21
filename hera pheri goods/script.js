@@ -48,7 +48,50 @@ document.addEventListener('DOMContentLoaded', function() {
         else glassNav.classList.remove('scrolled');
     };
     toggleScrolled();
-    window.addEventListener('scroll', toggleScrolled, { passive: true });
+
+    // Auto-hide on scroll down, show on scroll up (buttery smooth)
+    let lastY = window.scrollY;
+    let ticking = false;
+    let hideThreshold = 120; // start hiding after user scrolls past this
+    let directionBuffer = 8; // minimal movement to consider direction change
+    const shouldIgnore = () => {
+        // Do not hide when dropdown or mobile menu is open
+        const mobileSidebar = document.querySelector('.mobile-sidebar');
+        const dropdownActive = document.querySelector('.dropdown.active');
+        return (dropdownActive && dropdownActive.classList.contains('active')) ||
+               (mobileSidebar && mobileSidebar.classList.contains('open'));
+    };
+    const applyNavState = (scrollY) => {
+        const diff = scrollY - lastY;
+        // At very top always show
+        if (scrollY < 40) {
+            glassNav.classList.remove('nav-hidden');
+            return;
+        }
+        if (shouldIgnore()) {
+            glassNav.classList.remove('nav-hidden');
+            return;
+        }
+        // Scrolling down enough & past threshold -> hide
+        if (diff > directionBuffer && scrollY > hideThreshold) {
+            glassNav.classList.add('nav-hidden');
+        } else if (diff < -directionBuffer) {
+            // Scrolling up -> show
+            glassNav.classList.remove('nav-hidden');
+        }
+    };
+    window.addEventListener('scroll', () => {
+        const currentY = window.scrollY;
+        toggleScrolled();
+        if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(() => {
+                applyNavState(currentY);
+                lastY = currentY;
+                ticking = false;
+            });
+        }
+    }, { passive: true });
     window.addEventListener('resize', () => {
         if (!dropdownContent) return;
         if (window.innerWidth <= 768) {
