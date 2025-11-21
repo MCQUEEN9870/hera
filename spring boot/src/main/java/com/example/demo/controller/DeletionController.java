@@ -300,8 +300,20 @@ public class DeletionController {
                 try {
                     Long registrationId = registration.getId();
                     System.out.println("Processing registration ID: " + registrationId);
-                    
-                    // 2.1 Delete registration_image_folders entries
+                    // IMPORTANT: Delete images BEFORE removing folder records so path info is still available
+                    // 2.1 Delete vehicle images from storage
+                    try {
+                        System.out.println("Deleting vehicle images for registration: " + registrationId);
+                        supabaseService.deleteAllVehicleImages(registrationId);
+                        System.out.println("Successfully deleted vehicle images for registration: " + registrationId);
+                    } catch (Exception e) {
+                        String errorMsg = "Error deleting vehicle images for registration " + registrationId + ": " + e.getMessage();
+                        System.err.println(errorMsg);
+                        deletionErrors.add(errorMsg);
+                        // Continue with deletion
+                    }
+
+                    // 2.2 Delete registration_image_folders entries (after storage cleanup)
                     try {
                         int rowsDeleted = jdbcTemplate.update(
                             "DELETE FROM registration_image_folders WHERE registration_id = ?", 
@@ -310,18 +322,6 @@ public class DeletionController {
                         System.out.println("Deleted " + rowsDeleted + " rows from registration_image_folders for registration: " + registrationId);
                     } catch (Exception e) {
                         String errorMsg = "Error deleting from registration_image_folders for registration " + registrationId + ": " + e.getMessage();
-                        System.err.println(errorMsg);
-                        deletionErrors.add(errorMsg);
-                        // Continue with deletion
-                    }
-                    
-                    // 2.2 Delete vehicle images from storage
-                    try {
-                        System.out.println("Deleting vehicle images for registration: " + registrationId);
-                        supabaseService.deleteAllVehicleImages(registrationId);
-                        System.out.println("Successfully deleted vehicle images for registration: " + registrationId);
-                    } catch (Exception e) {
-                        String errorMsg = "Error deleting vehicle images for registration " + registrationId + ": " + e.getMessage();
                         System.err.println(errorMsg);
                         deletionErrors.add(errorMsg);
                         // Continue with deletion

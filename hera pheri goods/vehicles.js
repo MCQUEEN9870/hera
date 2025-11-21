@@ -829,6 +829,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
             
+            // Persist latest normalized set for client-side re-sorting
+            searchResults = normalizedResults;
+
             // Clear previous results
             vehiclesGrid.innerHTML = '';
             
@@ -2349,24 +2352,14 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.style.overflow = 'auto';
     }
     
-    // Sort select change event
-    sortSelect.addEventListener('change', function() {
-        // Get current results and resort
-        const vehicleCards = Array.from(vehiclesGrid.querySelectorAll('.vehicle-card'));
-        if (vehicleCards.length === 0) return;
-        
-        // Get the last search parameters
-        const vehicleType = vehicleTypeSelect.value;
-        const state = stateSelect.value;
-        const city = cityInput.value;
-        const pincode = pincodeInput.value;
-        
-        // Show loading overlay
-        loadingOverlay.style.display = 'flex';
-        
-        // Re-fetch with the same search criteria but new sorting
-        fetchVehiclesFromDatabase(vehicleType, state, city, pincode);
-    });
+    // Remove previous refetch-on-sort logic; rely on in-memory resort only
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            console.log('Sorting results by:', sortSelect.value);
+            const sortedResults = sortResults(searchResults);
+            displayResults(sortedResults);
+        });
+    }
     
     // Update Find Vehicle button in index
     document.querySelector('.find-vehicle-btn')?.addEventListener('click', function() {
@@ -2406,11 +2399,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialize any needed event listeners
-    if (sortSelect) {
-        sortSelect.addEventListener('change', function() {
-            console.log('Sorting results by:', sortSelect.value);
-            const sortedResults = sortResults(searchResults);
-            displayResults(sortedResults);
-        });
-    }
+    // (Second duplicate listener removed above)
 });
