@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultsCount = document.getElementById('resultsCount');
     const noResults = document.getElementById('noResults');
     const loadingOverlay = document.getElementById('loadingOverlay');
-    const sortSelect = document.getElementById('sortBy');
+    // Sort dropdown removed from UI; backend handles ordering (premium-first oldest-first)
+    const sortSelect = null;
     const vehicleModal = document.getElementById('vehicleModal');
     const modalClose = document.getElementById('modalClose');
     const modalHeader = document.getElementById('modalHeader');
@@ -47,10 +48,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Log the API base URL for debugging
     console.log('Using API base URL:', API_BASE_URL);
 
-    // Ensure default sort is always newest on initial load (override any accidental persisted value)
-    if (sortSelect) {
-        sortSelect.value = 'newest';
-    }
+    // Pagination state (temporary PAGE_SIZE=2 for visual testing; will revert to 20)
+    let currentPage = 1;
+    const PAGE_SIZE = 20; // Restored standard page size
+    let totalPages = 1;
+    let totalItems = 0;
     
     // Remove direct Supabase usage in frontend
     const REGISTRATIONS_TABLE = "registration";
@@ -424,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingOverlay.style.display = 'flex';
             // Directly call the Spring Boot API without query params
             const base = API_BASE_URL.endsWith('/') ? API_BASE_URL : API_BASE_URL + '/';
-            const apiUrl = base + 'vehicles/search';
+            const apiUrl = base + 'vehicles/search?page=' + currentPage + '&size=' + PAGE_SIZE;
             fetch(apiUrl, { headers: { 'Accept': 'application/json' } })
                 .then(r => {
                     if (!r.ok) throw new Error('Initial load request failed: ' + r.status);
@@ -433,11 +435,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     console.log('[InitialLoad] Raw response:', data);
                     const vehicles = (data && data.vehicles) ? data.vehicles : [];
-                    // Sort using existing sorter for consistency
-                    const sorted = sortResults(vehicles);
-                    displayResults(sorted);
+                    totalPages = data.totalPages || 1;
+                    totalItems = data.totalItems || vehicles.length;
+                    displayResults(vehicles);
+                    updatePaginationControls();
                     // Add lightweight JSON-LD for first 10 vehicles to help crawlers
-                    injectStructuredData(sorted.slice(0, 10));
+                    injectStructuredData(vehicles.slice(0, 10));
                 })
                 .catch(err => {
                     console.error('[InitialLoad] Error:', err);
@@ -544,6 +547,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (state && state !== 'any') queryParams.append('state', state);
         if (city && city.trim() !== '') queryParams.append('city', city);
         if (pincode && pincode.trim() !== '') queryParams.append('pincode', pincode);
+        queryParams.append('page', currentPage);
+        queryParams.append('size', PAGE_SIZE);
+        lastSearchCriteria = { vehicleType, state, city, pincode };
         
         // Use Spring Boot API
         console.log('Using Spring Boot API for vehicle search...');
@@ -617,11 +623,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.warn('No highlights found in the first vehicle of API response');
                 }
                 
-                // Apply sorting to the vehicles returned from API
-                const sortedVehicles = sortResults(data.vehicles);
-                
-                // Display the results
-                displayResults(sortedVehicles);
+                totalPages = data.totalPages || 1;
+                totalItems = data.totalItems || data.vehicles.length;
+                displayResults(data.vehicles);
+                updatePaginationControls();
             } else {
                 console.log('No vehicles found through Spring Boot API');
                 displayResults([]);
@@ -645,121 +650,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Function to sort results
-    function sortResults(results) {
-        if (!results || results.length === 0) return results;
-        
-        const sortBy = sortSelect ? sortSelect.value : 'newest';
-        console.log(`Sorting ${results.length} results by: ${sortBy}`);
-        
-        const sortedResults = [...results]; // Create a copy to avoid modifying the original
-        
-        // We no longer need to fetch membership from users table
-        // as it's now directly stored in the registration table
-        console.log('Checking premium vehicles in results...');
-        
-        // Log how many premium vehicles we have
-        const premiumVehicles = sortedResults.filter(vehicle => vehicle.membership === 'Premium');
-        console.log(`Found ${premiumVehicles.length} premium vehicles out of ${sortedResults.length} total`);
-        
-        // If we have any vehicles without membership info, set them to Standard
-        sortedResults.forEach(vehicle => {
-            if (!vehicle.membership) {
-                vehicle.membership = 'Standard';
-            }
-        });
-        
-        // Always prioritize premium users by moving them to the top
-        sortedResults.sort((a, b) => {
-            // Check if either vehicle belongs to a premium user
-            const aIsPremium = a.membership === 'Premium';
-            const bIsPremium = b.membership === 'Premium';
-            
-            // If one is premium and the other isn't, the premium one comes first
-            if (aIsPremium && !bIsPremium) return -1;
-            if (!aIsPremium && bIsPremium) return 1;
-            
-            // If both are premium or both are not premium, sort according to selected criteria
-            return 0;
-        });
-        
-        // Then apply the selected sort criteria as a secondary sort
-        switch (sortBy) {
-            case 'newest':
-                // Sort by date descending (newest first)
-                sortedResults.sort((a, b) => {
-                    // If premium status differs, keep that order
-                    const aIsPremium = a.membership === 'Premium';
-                    const bIsPremium = b.membership === 'Premium';
-                    if (aIsPremium !== bIsPremium) return aIsPremium ? -1 : 1;
-                    
-                    // Otherwise sort by date
-                    const dateA = a.registrationDate ? new Date(a.registrationDate) : new Date(0);
-                    const dateB = b.registrationDate ? new Date(b.registrationDate) : new Date(0);
-                    return dateB - dateA;
-                });
-                break;
-            case 'oldest':
-                // Sort by date ascending (oldest first)
-                sortedResults.sort((a, b) => {
-                    // If premium status differs, keep that order
-                    const aIsPremium = a.membership === 'Premium';
-                    const bIsPremium = b.membership === 'Premium';
-                    if (aIsPremium !== bIsPremium) return aIsPremium ? -1 : 1;
-                    
-                    // Otherwise sort by date
-                    const dateA = a.registrationDate ? new Date(a.registrationDate) : new Date(0);
-                    const dateB = b.registrationDate ? new Date(b.registrationDate) : new Date(0);
-                    return dateA - dateB;
-                });
-                break;
-            case 'name_asc':
-            case 'nameAsc':
-                // Sort by name ascending (A-Z)
-                sortedResults.sort((a, b) => {
-                    // If premium status differs, keep that order
-                    const aIsPremium = a.membership === 'Premium';
-                    const bIsPremium = b.membership === 'Premium';
-                    if (aIsPremium !== bIsPremium) return aIsPremium ? -1 : 1;
-                    
-                    // Otherwise sort by name
-                    const nameA = a.name || a.vehicleName || a.fullName || '';
-                    const nameB = b.name || b.vehicleName || b.fullName || '';
-                    return nameA.localeCompare(nameB);
-                });
-                break;
-            case 'name_desc':
-            case 'nameDesc':
-                // Sort by name descending (Z-A)
-                sortedResults.sort((a, b) => {
-                    // If premium status differs, keep that order
-                    const aIsPremium = a.membership === 'Premium';
-                    const bIsPremium = b.membership === 'Premium';
-                    if (aIsPremium !== bIsPremium) return aIsPremium ? -1 : 1;
-                    
-                    // Otherwise sort by name
-                    const nameA = a.name || a.vehicleName || a.fullName || '';
-                    const nameB = b.name || b.vehicleName || b.fullName || '';
-                    return nameB.localeCompare(nameA);
-                });
-                break;
-            default:
-                // Default to newest first
-                sortedResults.sort((a, b) => {
-                    // If premium status differs, keep that order
-                    const aIsPremium = a.membership === 'Premium';
-                    const bIsPremium = b.membership === 'Premium';
-                    if (aIsPremium !== bIsPremium) return aIsPremium ? -1 : 1;
-                    
-                    // Otherwise sort by date
-                    const dateA = a.registrationDate ? new Date(a.registrationDate) : new Date(0);
-                    const dateB = b.registrationDate ? new Date(b.registrationDate) : new Date(0);
-                    return dateB - dateA;
-                });
-        }
-        
-        return sortedResults;
-    }
+    // Client-side sorting removed; server returns correct ordering.
     
     // Function to display search results
     function displayResults(results) {
@@ -836,7 +727,7 @@ document.addEventListener('DOMContentLoaded', function() {
             vehiclesGrid.innerHTML = '';
             
             // Update results count
-            resultsCount.textContent = `Showing ${normalizedResults.length} vehicles`;
+            resultsCount.textContent = `Showing ${normalizedResults.length} of ${totalItems} vehicles (Page ${currentPage} / ${totalPages})`;
             
             // Show/hide no results message
             if (normalizedResults.length === 0) {
@@ -855,6 +746,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('Error creating vehicle card:', err, vehicle);
                 }
             });
+            // Initialize viewport-aware lazy loading for thumbnails
+            requestAnimationFrame(initThumbnailObserver);
             
             // Add a debugging log
             console.log('Displayed vehicles:', normalizedResults);
@@ -1041,29 +934,35 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log('Creating vehicle card for vehicle:', vehicle);
         
-        // Create the card content first with default image
+        // Lazy thumbnail loading with skeleton
         const imgContainer = document.createElement('div');
-        imgContainer.className = 'vehicle-image';
-        
+        imgContainer.className = 'vehicle-image loading';
+        const skeleton = document.createElement('div');
+        skeleton.className = 'image-skeleton';
+        skeleton.style.width = '100%';
+        skeleton.style.height = '100%';
+        imgContainer.appendChild(skeleton);
         const img = document.createElement('img');
-        img.src = mainImage; // Start with default, will update async if available
         img.alt = vehicle.fullName ? `${vehicle.fullName}'s ${vehicle.vehicleType}` : 'Vehicle Image';
-        img.onerror = function() {
-            console.log(`Image load error, falling back to default`);
-            this.src = 'attached_assets/images/default-vehicle.png';
-        };
-        // Light deterrents against casual saving/dragging
-        // Allow normal browser interactions (right-click, copy address) as requested
-        
+        img.setAttribute('data-thumb','true');
+        let candidates = Array.isArray(vehicle.images) ? vehicle.images.slice() : [];
+        if (!candidates.length && Array.isArray(vehicle.vehicleImageUrls)) candidates = vehicle.vehicleImageUrls.slice();
+        if (!candidates.length && vehicle.vehicle_image_urls_json) {
+            try { const arr = JSON.parse(vehicle.vehicle_image_urls_json); if (Array.isArray(arr)) candidates = arr; } catch(_){}
+        }
+        candidates = candidates.filter(u => typeof u === 'string' && u.trim() && !u.endsWith('.hidden_folder') && !u.endsWith('.folder'));
+        const primary = candidates[0] ? toPrettyImageUrl(candidates[0]) : 'attached_assets/images/default-vehicle.png';
+        img.dataset.src = primary;
+        img.loading = 'lazy';
+        img.style.opacity = '0';
         imgContainer.appendChild(img);
-        
-        // Use our new helper function to get and set images
-        getImageUrlsForVehicle(vehicle, (validImages) => {
-            if (validImages && validImages.length > 0) {
-                mainImage = toPrettyImageUrl(validImages[0]);
-                console.log('Updating card image to pretty URL:', mainImage);
-                img.src = mainImage;
-            }
+        const retryOverlay = document.createElement('div');
+        retryOverlay.className = 'thumb-retry hidden';
+        retryOverlay.innerHTML = '<span>Image failed</span><button type="button">Retry</button>';
+        imgContainer.appendChild(retryOverlay);
+        retryOverlay.querySelector('button').addEventListener('click', () => {
+            retryOverlay.classList.add('hidden');
+            loadThumbnailImage(img, img.dataset.src, imgContainer, retryOverlay, 1);
         });
         
         // Process WhatsApp number - check all possible field names
@@ -1313,29 +1212,35 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Set the HTML for the details container
-        detailsContainer.innerHTML = `
-                <h3 class="vehicle-title ${isPremium ? 'premium-title' : ''}">${vehicleName}</h3>
-                <div class="vehicle-info">
-                    <div class="info-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>${vehicleCity}, ${vehicleState}</span>
-                    </div>
-                    <div class="info-item">
-                        <i class="fas fa-thumbtack"></i>
-                        <span>${vehiclePincodeCard}</span>
-                    </div>
-                    <div class="info-item">
-                        <i class="fas fa-user"></i>
-                        <span>${ownerName}</span>
-                    </div>
-                    ${getTrustIndicatorText()}
-                    ${highlightsHTML}
+        // Text skeleton + real content (real hidden until image load completes)
+        const skeletonBlock = document.createElement('div');
+        skeletonBlock.className = 'details-skeleton';
+        skeletonBlock.innerHTML = '<div class="text-skel line1"></div><div class="text-skel line2"></div><div class="text-skel line3"></div>';
+        const realDetails = document.createElement('div');
+        realDetails.className = 'details-real pending';
+        realDetails.innerHTML = `
+            <h3 class="vehicle-title ${isPremium ? 'premium-title' : ''}">${vehicleName}</h3>
+            <div class="vehicle-info">
+                <div class="info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${vehicleCity}, ${vehicleState}</span>
                 </div>
-                <div class="vehicle-bottom">
-                    <button class="view-details-btn ${isPremium ? 'premium-btn' : ''}">View Details</button>
+                <div class="info-item">
+                    <i class="fas fa-thumbtack"></i>
+                    <span>${vehiclePincodeCard}</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-user"></i>
+                    <span>${ownerName}</span>
+                </div>
+                ${getTrustIndicatorText()}
+                ${highlightsHTML}
             </div>
-        `;
+            <div class="vehicle-bottom">
+                <button class="view-details-btn ${isPremium ? 'premium-btn' : ''}">View Details</button>
+            </div>`;
+        detailsContainer.appendChild(skeletonBlock);
+        detailsContainer.appendChild(realDetails);
         
         // Assemble the card
         card.appendChild(imgContainer);
@@ -1347,6 +1252,79 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         return card;
+    }
+
+    // Thumbnail loader with retry attempts (2) then show retry overlay
+    function loadThumbnailImage(imgEl, url, container, retryOverlay, attempt=0) {
+        if (!url) return;
+        const MAX_ATTEMPTS = 2;
+        const probe = new Image();
+        probe.onload = () => {
+            imgEl.src = url;
+            container.classList.remove('loading');
+            container.classList.add('loaded');
+            const sk = container.querySelector('.image-skeleton');
+            if (sk) sk.remove();
+            requestAnimationFrame(() => { imgEl.style.transition='opacity .35s'; imgEl.style.opacity='1'; });
+            const card = container.closest('.vehicle-card');
+            if (card) {
+                const ds = card.querySelector('.details-skeleton');
+                const real = card.querySelector('.details-real');
+                if (ds) ds.remove();
+                if (real) real.classList.remove('pending');
+            }
+        };
+        probe.onerror = () => {
+            console.warn('Thumbnail load error', url, 'attempt', attempt);
+            if (attempt < MAX_ATTEMPTS) {
+                setTimeout(() => loadThumbnailImage(imgEl, url, container, retryOverlay, attempt+1), 700);
+            } else {
+                const sk = container.querySelector('.image-skeleton');
+                if (sk) sk.remove();
+                // Show retry overlay but still reveal real details and set fallback image
+                retryOverlay.classList.remove('hidden');
+                if (!imgEl.src) {
+                    imgEl.src = 'attached_assets/images/default-vehicle.png';
+                    requestAnimationFrame(()=>{ imgEl.style.transition='opacity .35s'; imgEl.style.opacity='1'; });
+                }
+                const card = container.closest('.vehicle-card');
+                if (card) {
+                    const ds = card.querySelector('.details-skeleton');
+                    const real = card.querySelector('.details-real');
+                    if (ds) ds.remove();
+                    if (real) real.classList.remove('pending');
+                }
+            }
+        };
+        probe.src = url;
+    }
+
+    function loadThumbnailsForCurrentPage() {
+        document.querySelectorAll('.vehicle-card .vehicle-image img[data-thumb]').forEach(img => {
+            if (!img.src && img.dataset.src) {
+                const container = img.closest('.vehicle-image');
+                const retry = container.querySelector('.thumb-retry');
+                loadThumbnailImage(img, img.dataset.src, container, retry);
+            }
+        });
+    }
+    // IntersectionObserver based lazy load
+    function initThumbnailObserver() {
+        if (!('IntersectionObserver' in window)) { loadThumbnailsForCurrentPage(); return; }
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target.querySelector('img[data-thumb]');
+                    if (img && !img.src && img.dataset.src) {
+                        const container = img.closest('.vehicle-image');
+                        const retry = container.querySelector('.thumb-retry');
+                        loadThumbnailImage(img, img.dataset.src, container, retry);
+                    }
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { root:null, rootMargin:'120px', threshold:0.05 });
+        document.querySelectorAll('.vehicle-card .vehicle-image').forEach(el => observer.observe(el));
     }
     
     // Function to open vehicle details modal
@@ -1880,16 +1858,29 @@ document.addEventListener('DOMContentLoaded', function() {
             images.forEach((image, index) => {
                 const galleryItem = document.createElement('div');
                 galleryItem.className = 'gallery-item';
-                galleryItem.innerHTML = `<img src="${image}" alt="Vehicle image ${index + 1}" onerror="this.src='attached_assets/images/default-vehicle.png'">`;
-                // Keep default browser interactions enabled intentionally
-                
-                // Add click event to switch main image
+                galleryItem.style.position='relative';
+                const sk = document.createElement('div');
+                sk.className='gallery-skeleton';
+                sk.style.width='100%'; sk.style.height='100%';
+                galleryItem.appendChild(sk);
+                const im = document.createElement('img');
+                im.alt = `Vehicle image ${index + 1}`;
+                im.loading = 'lazy';
+                galleryItem.appendChild(im);
+                const retryWrap = document.createElement('div');
+                retryWrap.className='retry-wrapper hidden';
+                retryWrap.innerHTML='<div>Image failed</div><div class="retry-icon" title="Retry"><i class="fas fa-redo"></i></div>';
+                galleryItem.appendChild(retryWrap);
+                retryWrap.querySelector('.retry-icon').addEventListener('click', () => {
+                    retryWrap.classList.add('hidden');
+                    loadModalImage(im, image, sk, retryWrap, 1);
+                });
+                modalGallery.appendChild(galleryItem);
+                loadModalImage(im, image, sk, retryWrap, 0);
                 galleryItem.addEventListener('click', function() {
                     const header = document.querySelector('.modal-header-image');
-                    if (header) header.src = image;
+                    if (header && im.src) header.src = im.src;
                 });
-                
-                modalGallery.appendChild(galleryItem);
             });
             
             // Format service highlights
@@ -2304,6 +2295,27 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Unexpected error while preparing images:', err);
         }
     }
+
+    // Modal image loader with retry attempts
+    function loadModalImage(imgEl, url, skeletonEl, retryWrap, attempt=0) {
+        const MAX_ATTEMPTS = 2;
+        const tester = new Image();
+        tester.onload = () => {
+            imgEl.src = url;
+            if (skeletonEl) skeletonEl.remove();
+            imgEl.style.opacity='0';
+            requestAnimationFrame(()=>{ imgEl.style.transition='opacity .4s'; imgEl.style.opacity='1'; });
+        };
+        tester.onerror = () => {
+            if (attempt < MAX_ATTEMPTS) {
+                setTimeout(()=> loadModalImage(imgEl, url, skeletonEl, retryWrap, attempt+1), 900);
+            } else {
+                if (skeletonEl) skeletonEl.remove();
+                retryWrap.classList.remove('hidden');
+            }
+        };
+        tester.src = url;
+    }
     
     // Function to format date
     function formatDate(dateString) {
@@ -2353,12 +2365,70 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Remove previous refetch-on-sort logic; rely on in-memory resort only
-    if (sortSelect) {
-        sortSelect.addEventListener('change', function() {
-            console.log('Sorting results by:', sortSelect.value);
-            const sortedResults = sortResults(searchResults);
-            displayResults(sortedResults);
+    // Pagination controls rendering
+    function updatePaginationControls() {
+        const container = document.getElementById('paginationControls');
+        if (!container) return;
+        container.innerHTML = '';
+        if (totalPages <= 1) return;
+
+        container.setAttribute('role', 'navigation');
+        container.classList.add('pagination-controls');
+
+        const makeBtn = (label, ariaLabel, disabled, onClick, isActive=false, type='button') => {
+            const btn = document.createElement('button');
+            btn.type = type;
+            btn.textContent = label;
+            btn.className = 'pagination-btn';
+            if (isActive) btn.classList.add('active');
+            if (disabled) btn.disabled = true;
+            if (ariaLabel) btn.setAttribute('aria-label', ariaLabel);
+            btn.addEventListener('click', (e) => { e.preventDefault(); if (!btn.disabled) onClick(); });
+            return btn;
+        };
+
+        // First & Prev
+        container.appendChild(makeBtn('«', 'First page', currentPage === 1, () => { currentPage = 1; refetchLast(); }));
+        container.appendChild(makeBtn('‹', 'Previous page', currentPage === 1, () => { currentPage--; refetchLast(); }));
+
+        // Page number logic with ellipsis
+        const pages = [];
+        if (totalPages <= 9) {
+            for (let p = 1; p <= totalPages; p++) pages.push(p);
+        } else {
+            pages.push(1);
+            const windowStart = Math.max(2, currentPage - 2);
+            const windowEnd = Math.min(totalPages - 1, currentPage + 2);
+            if (windowStart > 2) pages.push('ellipsis-left');
+            for (let p = windowStart; p <= windowEnd; p++) pages.push(p);
+            if (windowEnd < totalPages - 1) pages.push('ellipsis-right');
+            pages.push(totalPages);
+        }
+
+        pages.forEach(p => {
+            if (typeof p === 'number') {
+                container.appendChild(makeBtn(String(p), `Page ${p}`, false, () => { if (p !== currentPage) { currentPage = p; refetchLast(); } }, p === currentPage));
+            } else {
+                const span = document.createElement('span');
+                span.className = 'pagination-ellipsis';
+                span.textContent = '…';
+                span.setAttribute('aria-hidden', 'true');
+                container.appendChild(span);
+            }
         });
+
+        // Next & Last
+        container.appendChild(makeBtn('›', 'Next page', currentPage === totalPages, () => { currentPage++; refetchLast(); }));
+        container.appendChild(makeBtn('»', 'Last page', currentPage === totalPages, () => { currentPage = totalPages; refetchLast(); }));
+    }
+    function refetchLast() {
+        if (!lastSearchCriteria) {
+            // fallback to initial load
+            initialLoadAllVehicles();
+            return;
+        }
+        const { vehicleType, state, city, pincode } = lastSearchCriteria;
+        fetchVehiclesFromDatabase(vehicleType, state, city, pincode);
     }
     
     // Update Find Vehicle button in index

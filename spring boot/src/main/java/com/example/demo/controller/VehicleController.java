@@ -6,6 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.Comparator;
+import java.util.Objects;
+import java.time.LocalDate;
+import java.time.Duration;
+
+import org.springframework.http.CacheControl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -58,11 +64,13 @@ public class VehicleController {
     }
     
     @GetMapping("/vehicles/search")
-    public ResponseEntity<?> searchVehicles(
+        public ResponseEntity<?> searchVehicles(
             @RequestParam(value = "type", required = false) String vehicleType,
             @RequestParam(value = "state", required = false) String state,
             @RequestParam(value = "city", required = false) String city,
-            @RequestParam(value = "pincode", required = false) String pincode) {
+            @RequestParam(value = "pincode", required = false) String pincode,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
             
         System.out.println("Searching vehicles with: type=" + vehicleType + ", state=" + state + 
                            ", city=" + city + ", pincode=" + pincode);
@@ -76,6 +84,28 @@ public class VehicleController {
             // Ignoring state and city filters as requested
             .filter(reg -> pincode == null || pincode.isEmpty() || reg.getPincode().startsWith(pincode))
             .collect(Collectors.toList());
+
+        // Premium-first then oldest-first sorting
+        Comparator<Registration> premiumThenDateAsc = Comparator
+                .comparing((Registration r) -> {
+                    String membership = r.getMembership();
+                    return membership != null && membership.equalsIgnoreCase("premium") ? 0 : 1; // premium first
+                })
+            .thenComparing(Registration::getRegistrationDate, Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(Registration::getId); // tie-breaker for stability
+
+        filteredRegistrations = filteredRegistrations.stream()
+            .sorted(premiumThenDateAsc)
+                .collect(Collectors.toList());
+
+        // Pagination calculations (1-based page in request)
+        int cappedSize = Math.min(Math.max(size, 1), 50); // enforce upper bound
+        int totalItems = filteredRegistrations.size();
+        int totalPages = (int) Math.ceil(totalItems / (double) cappedSize);
+        int currentPage = Math.min(Math.max(page, 1), Math.max(totalPages, 1));
+        int fromIndex = (currentPage - 1) * cappedSize;
+        int toIndex = Math.min(fromIndex + cappedSize, totalItems);
+        List<Registration> pageSlice = fromIndex < totalItems ? filteredRegistrations.subList(fromIndex, toIndex) : List.of();
             
         System.out.println("Found " + filteredRegistrations.size() + " matching vehicles");
         
@@ -85,7 +115,7 @@ public class VehicleController {
         
         List<Map<String, Object>> vehicleList = new ArrayList<>();
         
-        for (Registration reg : filteredRegistrations) {
+        for (Registration reg : pageSlice) {
             Map<String, Object> vehicle = new HashMap<>();
             vehicle.put("id", reg.getId());
             vehicle.put("userId", reg.getUserId());
@@ -128,8 +158,23 @@ public class VehicleController {
         }
         
         response.put("vehicles", vehicleList);
-        
-        return ResponseEntity.ok(response);
+        response.put("page", currentPage);
+        response.put("pageSize", cappedSize);
+        response.put("totalPages", totalPages);
+        response.put("totalItems", totalItems);
+
+        // Build a weak ETag using count + newest registration date for cache validation
+        LocalDate newestDate = filteredRegistrations.stream()
+            .map(Registration::getRegistrationDate)
+            .filter(Objects::nonNull)
+            .max(LocalDate::compareTo)
+            .orElse(LocalDate.MIN);
+        String eTag = "W/\"search-" + filteredRegistrations.size() + "-" + newestDate + "\"";
+
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.maxAge(Duration.ofSeconds(60)).cachePublic())
+            .eTag(eTag)
+            .body(response);
     }
     
     @PostMapping("/vehicles/{vehicleId}/highlights")
@@ -384,8 +429,14 @@ public class VehicleController {
         vehicleData.put("highlights", highlights);
         
         response.put("vehicle", vehicleData);
-        
-        return ResponseEntity.ok(response);
+
+        LocalDate regDate = registration.getRegistrationDate() != null ? registration.getRegistrationDate() : LocalDate.MIN;
+        String eTag = "W/\"veh-" + registration.getId() + "-" + regDate + "\"";
+
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.maxAge(Duration.ofSeconds(120)).cachePublic())
+            .eTag(eTag)
+            .body(response);
     }
     
     // Helper method to format vehicle photos
@@ -460,8 +511,18 @@ public class VehicleController {
         
         response.put("vehicles", vehicleList);
         response.put("count", vehicleList.size());
-        
-        return ResponseEntity.ok(response);
+
+        LocalDate newestDate = registrations.stream()
+            .map(Registration::getRegistrationDate)
+            .filter(Objects::nonNull)
+            .max(LocalDate::compareTo)
+            .orElse(LocalDate.MIN);
+        String eTag = "W/\"user-" + userId + "-" + registrations.size() + "-" + newestDate + "\"";
+
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.maxAge(Duration.ofSeconds(30)).cachePublic())
+            .eTag(eTag)
+            .body(response);
     }
     
     /**

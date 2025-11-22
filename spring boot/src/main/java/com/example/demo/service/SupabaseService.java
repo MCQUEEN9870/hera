@@ -1370,65 +1370,107 @@ public class SupabaseService {
      */
     private boolean deleteFilesWithPrefix(String prefix) throws IOException {
         System.out.println("DELETE FILES: Deleting files with prefix: " + prefix);
+        // Normalise prefix: ensure trailing slash so Supabase list treats it as folder
+        String normalizedPrefix = prefix.endsWith("/") ? prefix : prefix + "/";
+        int filesDeleted = 0;
+        boolean anyFound = false;
         
         try {
-            // List all files with the given prefix
+            // Supabase Storage list API expects POST with JSON body, not GET with query params.
+            String listUrl = supabaseUrl + "/storage/v1/object/list/" + bucketName;
+            String jsonBody = "{\"prefix\":\"" + normalizedPrefix + "\",\"limit\":1000,\"offset\":0,\"sortBy\":{\"column\":\"name\",\"order\":\"asc\"}}";
+            RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonBody);
             Request listRequest = new Request.Builder()
-                    .url(supabaseUrl + "/storage/v1/object/list/" + bucketName + "?prefix=" + prefix)
+                    .url(listUrl)
                     .addHeader("apikey", supabaseKey)
                     .addHeader("Authorization", "Bearer " + supabaseKey)
-                    .get()
+                    .post(body)
                     .build();
-            
-            int filesDeleted = 0;
             
             try (Response response = client.newCall(listRequest).execute()) {
                 if (!response.isSuccessful()) {
-                    System.err.println("DELETE FILES: Failed to list files with prefix " + prefix + ": " + response.code() + " " + response.message());
-                    return false;
-                }
-                
-                // Parse the response to get file paths
-                String responseBody = response.body().string();
-                JsonNode fileList = objectMapper.readTree(responseBody);
-                
-                if (fileList.size() == 0) {
-                    System.out.println("DELETE FILES: No files found with prefix: " + prefix);
-                    return false;
-                }
-                
-                System.out.println("DELETE FILES: Found " + fileList.size() + " files with prefix: " + prefix);
-                
-                // Delete each file
-                for (JsonNode file : fileList) {
-                    String filePath = file.get("name").asText();
-                    System.out.println("DELETE FILES: Deleting file: " + filePath);
-                    
-                    Request deleteRequest = new Request.Builder()
-                            .url(supabaseUrl + "/storage/v1/object/" + bucketName + "/" + filePath)
-                            .addHeader("apikey", supabaseKey)
-                            .addHeader("Authorization", "Bearer " + supabaseKey)
-                            .delete()
-                            .build();
-                    
-                    try (Response deleteResponse = client.newCall(deleteRequest).execute()) {
-                        if (!deleteResponse.isSuccessful()) {
-                            System.err.println("DELETE FILES: Failed to delete file " + filePath + ": " + deleteResponse.code() + " " + deleteResponse.message());
-                        } else {
-                            System.out.println("DELETE FILES: Successfully deleted file: " + filePath);
-                            filesDeleted++;
+                    System.err.println("DELETE FILES: Primary list POST failed (" + response.code() + ") for prefix " + normalizedPrefix + ". Attempting legacy GET fallback.");
+                } else {
+                    String responseBody = response.body() != null ? response.body().string() : "[]";
+                    JsonNode fileList = objectMapper.readTree(responseBody);
+                    if (fileList.size() == 0) {
+                        System.out.println("DELETE FILES: No files returned via POST for prefix: " + normalizedPrefix);
+                    } else {
+                        anyFound = true;
+                        System.out.println("DELETE FILES: Found " + fileList.size() + " files via POST for prefix: " + normalizedPrefix);
+                        for (JsonNode file : fileList) {
+                            String filePath = file.get("name").asText();
+                            // Sanity: only delete inside the folder
+                            if (!filePath.startsWith(prefix) && !filePath.startsWith(normalizedPrefix)) {
+                                continue;
+                            }
+                            System.out.println("DELETE FILES: Deleting file: " + filePath);
+                            Request deleteRequest = new Request.Builder()
+                                    .url(supabaseUrl + "/storage/v1/object/" + bucketName + "/" + filePath)
+                                    .addHeader("apikey", supabaseKey)
+                                    .addHeader("Authorization", "Bearer " + supabaseKey)
+                                    .delete()
+                                    .build();
+                            try (Response deleteResponse = client.newCall(deleteRequest).execute()) {
+                                if (!deleteResponse.isSuccessful() && deleteResponse.code() != 404) {
+                                    System.err.println("DELETE FILES: Failed delete (" + deleteResponse.code() + ") for " + filePath);
+                                } else {
+                                    filesDeleted++;
+                                }
+                            }
                         }
                     }
                 }
             }
             
-            System.out.println("DELETE FILES: Deleted " + filesDeleted + " files with prefix: " + prefix);
-            return filesDeleted > 0;
-            
+            // Fallback legacy GET (in case older storage behaviour or POST blocked)
+            if (!anyFound) {
+                Request legacyList = new Request.Builder()
+                        .url(supabaseUrl + "/storage/v1/object/list/" + bucketName + "?prefix=" + normalizedPrefix)
+                        .addHeader("apikey", supabaseKey)
+                        .addHeader("Authorization", "Bearer " + supabaseKey)
+                        .get()
+                        .build();
+                try (Response legacyResp = client.newCall(legacyList).execute()) {
+                    if (legacyResp.isSuccessful()) {
+                        String respBody = legacyResp.body() != null ? legacyResp.body().string() : "[]";
+                        JsonNode fileList = objectMapper.readTree(respBody);
+                        if (fileList.size() > 0) {
+                            anyFound = true;
+                            System.out.println("DELETE FILES: Fallback GET found " + fileList.size() + " files for prefix: " + normalizedPrefix);
+                            for (JsonNode file : fileList) {
+                                String filePath = file.get("name").asText();
+                                if (!filePath.startsWith(prefix) && !filePath.startsWith(normalizedPrefix)) {
+                                    continue;
+                                }
+                                Request deleteRequest = new Request.Builder()
+                                        .url(supabaseUrl + "/storage/v1/object/" + bucketName + "/" + filePath)
+                                        .addHeader("apikey", supabaseKey)
+                                        .addHeader("Authorization", "Bearer " + supabaseKey)
+                                        .delete()
+                                        .build();
+                                try (Response deleteResponse = client.newCall(deleteRequest).execute()) {
+                                    if (!deleteResponse.isSuccessful() && deleteResponse.code() != 404) {
+                                        System.err.println("DELETE FILES: Failed delete (" + deleteResponse.code() + ") for " + filePath);
+                                    } else {
+                                        filesDeleted++;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        System.err.println("DELETE FILES: Legacy GET list failed (" + legacyResp.code() + ") for prefix " + normalizedPrefix);
+                    }
+                }
+            }
         } catch (Exception e) {
-            System.err.println("DELETE FILES: Error deleting files with prefix " + prefix + ": " + e.getMessage());
-            return false;
+            System.err.println("DELETE FILES: Exception during deletion for prefix " + normalizedPrefix + ": " + e.getMessage());
         }
+
+        if (filesDeleted > 0) {
+            System.out.println("DELETE FILES: Deleted " + filesDeleted + " files for prefix: " + normalizedPrefix);
+        }
+        return filesDeleted > 0;
     }
     
     /**
