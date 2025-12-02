@@ -465,6 +465,40 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Ensure eye buttons are initialized and wired once
+    (function initEyeButtons(){
+        try{
+            function sync(btn, input){
+                const isVisible = input.type === 'text';
+                const icon = btn.querySelector('i');
+                if (icon) icon.className = isVisible ? 'fas fa-eye' : 'fas fa-eye-slash';
+                btn.setAttribute('aria-pressed', String(isVisible));
+                btn.setAttribute('aria-label', isVisible ? 'show password' : 'hide password');
+            }
+            document.querySelectorAll('.pw-eye[data-target]').forEach(function(btn){
+                if (btn.dataset.init === '1') return;
+                const id = btn.getAttribute('data-target');
+                const input = id ? document.getElementById(id) : null;
+                if (!input) return;
+                // Add padding class so text doesn't sit under the eye
+                if (!input.classList.contains('has-eye')) input.classList.add('has-eye');
+                // Initial sync
+                sync(btn, input);
+                // Click handler per button (more reliable than global delegation)
+                btn.addEventListener('click', function(ev){
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    input.type = (input.type === 'password') ? 'text' : 'password';
+                    sync(btn, input);
+                });
+                // If something else changes the type, resync icon
+                input.addEventListener('change', function(){ sync(btn, input); });
+                input.addEventListener('input', function(){ /* no-op, but keeps live */ });
+                btn.dataset.init = '1';
+            });
+        }catch(_){/* no-op */}
+    })();
+
     // OTP Login modal logic
     const forgotLink = document.getElementById('forgotPasswordLink');
     const otpModal = document.getElementById('otpLoginModal');
@@ -472,7 +506,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const modalPhone = document.getElementById('otpLoginPhone');
         const modalOtp = document.getElementById('otpLoginOtp');
         const primaryBtn = document.getElementById('otpLoginPrimaryBtn');
-        const closeBtn = document.getElementById('otpLoginClose');
         const otpTimerEl = document.getElementById('otpLoginTimer');
         const otpGroupEl = document.getElementById('otpLoginOtpGroup');
         const newPassBlock = document.getElementById('otpLoginNewPassBlock');
@@ -485,9 +518,11 @@ document.addEventListener('DOMContentLoaded', function () {
         let timerId = null;
         let timeLeft = 0;
         let isOtpSent = false;
+        let otpFlowLocked = false; // prevents closing until password reset finishes
 
         function openModal() { 
             otpModal.style.display = 'flex'; 
+            otpFlowLocked = true;
             // Pre-fill phone number from login form
             if (mobileInputEl && mobileInputEl.value) {
                 modalPhone.value = mobileInputEl.value;
@@ -497,6 +532,7 @@ document.addEventListener('DOMContentLoaded', function () {
         function closeModal() { 
             otpModal.style.display = 'none'; 
             resetModalState(); 
+            otpFlowLocked = false;
         }
         
         function resetModalState(){ 
@@ -551,24 +587,37 @@ document.addEventListener('DOMContentLoaded', function () {
             return ` ${m}:${ss<10?'0':''}${ss}`; 
         }
 
-        closeBtn.addEventListener('click', closeModal);
-        otpModal.addEventListener('click', (e)=>{ if(e.target===otpModal) closeModal(); });
+        // Remove ability to close by clicking outside while locked
+        otpModal.addEventListener('click', (e)=>{ if(!otpFlowLocked) { if(e.target===otpModal) closeModal(); } });
         
-        forgotLink.addEventListener('click', function(e){
+        forgotLink.addEventListener('click', async function(e){
             e.preventDefault();
-            if (!validateMobile(mobileInputEl.value)) { 
+            const number = mobileInputEl.value.trim();
+            if (!validateMobile(number)) { 
                 showToast('Enter valid 10-digit mobile', 'error'); 
                 return; 
             }
-            modalPhone.value = mobileInputEl.value; 
+            // Correct existence check: use user profile endpoint instead of /auth/login (which expects password/otpLogin flags)
+            try {
+                const rootBase = API_BASE_URL.replace(/\/auth$/,'');
+                const res = await fetch(`${rootBase}/api/users/${number}`, { method:'GET', headers:{'Accept':'application/json'} });
+                if (!res.ok) {
+                    showToast('Number not found. Please sign up first.', 'error');
+                    return;
+                }
+            } catch(err){
+                showToast('Unable to verify number. Try again.', 'error');
+                return;
+            }
+            modalPhone.value = number; 
             wrongOtpCount = 0; 
             openModal();
         });
 
         async function requestOtp() {
-            // Disable button immediately to prevent multiple clicks
+            // Disable button immediately to prevent multiple clicks and show loader
             primaryBtn.disabled = true;
-            primaryBtn.textContent = 'Sending...';
+            primaryBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
             
             let captchaToken = '';
             let captchaRequired = true;
@@ -613,6 +662,38 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Show success message immediately
                 showToast('OTP sent successfully! Please check your phone.', 'success');
+                // Show bilingual popup: Please pick up voice call
+                try{
+                    const existing = document.getElementById('otpVoicePopup');
+                    if (!existing) {
+                        const overlay = document.createElement('div');
+                        overlay.id = 'otpVoicePopup';
+                        overlay.style.position = 'fixed';
+                        overlay.style.inset = '0';
+                        overlay.style.background = 'rgba(0,0,0,0.45)';
+                        overlay.style.display = 'flex';
+                        overlay.style.alignItems = 'center';
+                        overlay.style.justifyContent = 'center';
+                        overlay.style.zIndex = '1100';
+                        const box = document.createElement('div');
+                        box.style.background = '#fff';
+                        box.style.borderRadius = '12px';
+                        box.style.maxWidth = '520px';
+                        box.style.width = '92%';
+                        box.style.padding = '18px 16px';
+                        box.style.boxShadow = '0 12px 32px rgba(0,0,0,.25)';
+                        box.innerHTML = '<h3 style="margin:0 0 10px; font-size:18px;">Please pick up the voice call</h3>'+
+                            '<p style="margin:0 0 8px; color:#444;">You will receive an automated call to hear your OTP.</p>'+
+                            '<h3 style="margin:14px 0 8px; font-size:18px;">कृपया वॉयस कॉल उठाएँ</h3>'+
+                            '<p style="margin:0; color:#444;">आपको आपका OTP सुनाने के लिए एक ऑटोमेटेड कॉल आएगी।</p>'+
+                            '<div style="text-align:right; margin-top:14px;"><button id="otpVoicePopupClose" style="background:#4CAF50;color:#fff;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;">OK</button></div>';
+                        overlay.appendChild(box);
+                        document.body.appendChild(overlay);
+                        const close = () => { try{ document.body.removeChild(overlay); }catch(_){} };
+                        overlay.addEventListener('click', (e)=>{ if(e.target===overlay) close(); });
+                        overlay.querySelector('#otpVoicePopupClose').addEventListener('click', close);
+                    }
+                }catch(_){/* no-op */}
                 
                 // Show OTP field immediately with smooth animation
                 if (otpGroupEl) { 
@@ -693,10 +774,29 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
                 
-                // OTP verified successfully -> show new password form
+                // OTP verified successfully -> show clean new password UI only
                 stopTimer();
+                // Hide phone and OTP inputs area
+                const phoneRow = modalPhone ? modalPhone.closest('.form-group') : null;
+                const otpRow = otpGroupEl ? otpGroupEl.closest('.form-group') : null;
+                if (phoneRow) phoneRow.style.display = 'none';
+                if (otpRow) otpRow.style.display = 'none';
+                // Hide reCAPTCHA block entirely
+                try{
+                    const recaptchaBlock = document.getElementById('otpLoginRecaptcha')?.closest('div');
+                    if (recaptchaBlock) recaptchaBlock.style.display = 'none';
+                    if (window.grecaptcha && window.OTPLOGIN_RECAPTCHA_ID) {
+                        grecaptcha.reset(window.OTPLOGIN_RECAPTCHA_ID);
+                    }
+                }catch(_){}
+                // Hide primary button and timer
                 primaryBtn.style.display = 'none';
+                const timerEl = document.getElementById('otpLoginTimer');
+                if (timerEl) timerEl.style.display = 'none';
+                // Show new password block
                 newPassBlock.style.display = 'block';
+                // Focus new password field for immediate input
+                if (newPass) newPass.focus();
                 showToast('OTP verified successfully! Please set your new password.', 'success');
                 
             } catch (error) {
@@ -754,6 +854,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Redirect to login by closing modal
                 setTimeout(()=> { 
+                    otpFlowLocked = false; // allow closing now
                     closeModal(); 
                 }, 1000);
                 

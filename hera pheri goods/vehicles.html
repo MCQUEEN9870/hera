@@ -1973,14 +1973,14 @@
                                 showToast('Error detecting location', 'error');
                             } finally {
                                 detectLocationBtn.disabled = false;
-                                detectLocationBtn.innerHTML = '<i class="fas fa-location-arrow"></i> Use Location';
+                                detectLocationBtn.innerHTML = ' Use Location';
                             }
                         },
                         function(error) {
                             console.error('Geolocation error:', error);
                             showToast('Please allow location access', 'error');
                             detectLocationBtn.disabled = false;
-                            detectLocationBtn.innerHTML = '<i class="fas fa-location-arrow"></i> Use Location';
+                            detectLocationBtn.innerHTML = ' Use Location';
                         }
                     );
                 } else {

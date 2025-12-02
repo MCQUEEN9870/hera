@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const photoCounter = document.querySelector('.photo-counter');
     const photoError = document.querySelector('.photo-error');
     const pincode = document.getElementById('pincode');
-    const verifyPincodeBtn = document.querySelector('.verify-pincode-btn');
+    const verifyPincodeBtn = document.getElementById('verifyPincodeBtn');
+    const useLocationBtn = document.getElementById('useLocationBtn');
     const vehicleSelectBtn = document.getElementById('vehicleSelectBtn');
     const vehicleDropdown = document.querySelector('.vehicle-dropdown');
     const celebrationOverlay = document.getElementById('celebrationOverlay');
@@ -266,84 +267,125 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle pincode verification
-    verifyPincodeBtn.addEventListener('click', function() {
-        const pincodeValue = pincode.value;
-        if (pincodeValue.length === 6) {
-            // Show loading state on button
-            const originalBtnText = verifyPincodeBtn.innerHTML;
-            verifyPincodeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
-            verifyPincodeBtn.disabled = true;
-            
-            // Use India Post API to verify pincode and get location details
-            fetch(`https://api.postalpincode.in/pincode/${pincodeValue}`)
-                .then(response => response.json())
-                .then(data => {
-                    verifyPincodeBtn.innerHTML = originalBtnText;
-                    verifyPincodeBtn.disabled = false;
-                    
-                    if (data && data[0].Status === 'Success') {
-                        const postOffice = data[0].PostOffice[0];
-                        
-                        // Auto-fill fields
-                        // Set state by value instead of index for more reliable behavior
-                        const stateValue = postOffice.State || postOffice.Circle;
-                        for (let i = 0; i < stateInput.options.length; i++) {
-                            if (stateInput.options[i].value === stateValue) {
-                                stateInput.selectedIndex = i;
-                                break;
+    // Extracted verification logic so it can be reused by Use Location flow
+    async function performPincodeVerification(pin) {
+        const pincodeValue = (pin || pincode.value || '').trim();
+        if (!/^\d{6}$/.test(pincodeValue)) {
+            showToast('Please enter a valid 6-digit pincode', 'error');
+            return false;
+        }
+        const originalBtnText = verifyPincodeBtn ? verifyPincodeBtn.innerHTML : '';
+        if (verifyPincodeBtn) { verifyPincodeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...'; verifyPincodeBtn.disabled = true; }
+        try {
+            const resp = await fetch(`https://api.postalpincode.in/pincode/${pincodeValue}`);
+            const data = await resp.json();
+            if (data && data[0].Status === 'Success') {
+                const postOffice = data[0].PostOffice[0];
+                const stateValue = postOffice.State || postOffice.Circle;
+                for (let i = 0; i < stateInput.options.length; i++) {
+                    if (stateInput.options[i].value === stateValue) { stateInput.selectedIndex = i; break; }
+                }
+                cityInput.value = postOffice.District || postOffice.Division || postOffice.Region || postOffice.Block;
+                // Visual confirmation
+                cityInput.style.borderColor = '#4CAF50';
+                cityInput.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
+                stateInput.style.borderColor = '#4CAF50';
+                stateInput.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
+                pincode.style.borderColor = '#4CAF50';
+                pincode.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
+                locationNote.innerHTML = 'Location verified';
+                locationNote.style.color = '#4CAF50';
+                isPincodeVerified = true;
+                showToast('Pincode verified successfully!', 'success');
+                return true;
+            } else {
+                cityInput.value = '';
+                stateInput.selectedIndex = 0;
+                isPincodeVerified = false;
+                pincode.style.borderColor = '#ff5252';
+                pincode.style.boxShadow = '0 0 5px rgba(255, 82, 82, 0.5)';
+                locationNote.innerHTML = 'Invalid pincode. Please enter a valid pincode';
+                locationNote.style.color = '#ff5252';
+                showToast('Invalid pincode. Please enter a valid pincode.', 'error');
+                return false;
+            }
+        } catch (e) {
+            console.error('Error verifying pincode:', e);
+            isPincodeVerified = false;
+            locationNote.innerHTML = 'Error verifying pincode. Please try again';
+            locationNote.style.color = '#ff5252';
+            showToast('Error verifying pincode. Please try again.', 'error');
+            return false;
+        } finally {
+            if (verifyPincodeBtn) { verifyPincodeBtn.innerHTML = originalBtnText; verifyPincodeBtn.disabled = false; }
+        }
+    }
+
+    // Hook up original Verify button to the shared function
+    if (verifyPincodeBtn) verifyPincodeBtn.addEventListener('click', () => { performPincodeVerification(); });
+
+    // Use Location flow: detect GPS -> reverse geocode -> autofill -> auto-verify
+    let lastVerifiedPin = null;
+    if (useLocationBtn) {
+        useLocationBtn.addEventListener('click', function() {
+            if (!('geolocation' in navigator)) { showToast('Geolocation not supported by your browser', 'error'); return; }
+            useLocationBtn.disabled = true; const original = useLocationBtn.innerHTML; useLocationBtn.innerHTML = 'Detecting...';
+            navigator.geolocation.getCurrentPosition(async pos => {
+                try {
+                    const lat = pos.coords.latitude, lon = pos.coords.longitude;
+                    const apiBase = (window.API_BASE_URL || '').replace(/\/$/, '');
+                    const r = await fetch(`${apiBase}/api/geo/reverse?lat=${lat}&lon=${lon}`);
+                    if (!r.ok) throw new Error('Reverse geocoding failed');
+                    const data = await r.json();
+                    if (data && data.pincode) {
+                        // Fill state/city if available
+                        if (data.state) {
+                            for (let i = 0; i < stateInput.options.length; i++) {
+                                if (stateInput.options[i].value === data.state) { stateInput.selectedIndex = i; break; }
                             }
                         }
-                        
-                        // Set city
-                        cityInput.value = postOffice.District || postOffice.Division || postOffice.Region || postOffice.Block;
-                        
-                        // Add visual confirmation
-                        cityInput.style.borderColor = '#4CAF50';
-                        cityInput.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
-                        stateInput.style.borderColor = '#4CAF50';
-                        stateInput.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
-                        pincode.style.borderColor = '#4CAF50';
-                        pincode.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
-                        
-                        // Update location note
-                        locationNote.innerHTML = 'Location verified';
-                        locationNote.style.color = '#4CAF50';
-                        
-                        // Set verification status
-                        isPincodeVerified = true;
-                        
-                        // Show success message
-                        showToast('Pincode verified successfully!', 'success');
+                        if (data.district) { cityInput.value = data.district; }
+                        // Fill pincode and auto-verify
+                        pincode.value = String(data.pincode).slice(0,6);
+                        const ok = await performPincodeVerification(pincode.value);
+                        if (ok) {
+                            lastVerifiedPin = pincode.value;
+                            // Hide Verify button until user edits pincode
+                            if (verifyPincodeBtn) verifyPincodeBtn.style.display = 'none';
+                            locationNote.innerHTML = 'Location detected and verified';
+                            locationNote.style.color = '#4CAF50';
+                        }
+                        showToast('Location detected successfully!', 'success');
                     } else {
-                        // Reset and show error
-                        cityInput.value = '';
-                        stateInput.selectedIndex = 0;
-                        isPincodeVerified = false;
-                        pincode.style.borderColor = '#ff5252';
-                        pincode.style.boxShadow = '0 0 5px rgba(255, 82, 82, 0.5)';
-                        
-                        // Update location note
-                        locationNote.innerHTML = 'Invalid pincode. Please enter a valid pincode';
-                        locationNote.style.color = '#ff5252';
-                        
-                        showToast('Invalid pincode. Please enter a valid pincode.', 'error');
+                        showToast('Could not detect pincode from your location', 'error');
                     }
-                })
-                .catch(error => {
-                    console.error('Error verifying pincode:', error);
-                    verifyPincodeBtn.innerHTML = originalBtnText;
-                    verifyPincodeBtn.disabled = false;
-                    isPincodeVerified = false;
-                    
-                    // Update location note
-                    locationNote.innerHTML = 'Error verifying pincode. Please try again';
-                    locationNote.style.color = '#ff5252';
-                    
-                    showToast('Error verifying pincode. Please try again.', 'error');
-                });
-        } else {
-            showToast('Please enter a valid 6-digit pincode', 'error');
+                } catch (err) {
+                    console.error('Use Location error:', err);
+                    showToast('Error detecting location', 'error');
+                } finally {
+                    useLocationBtn.disabled = false; useLocationBtn.innerHTML = original;
+                }
+            }, err => {
+                console.error('Geolocation error:', err);
+                showToast('Please allow location access', 'error');
+                useLocationBtn.disabled = false; useLocationBtn.innerHTML = 'Use Location';
+            });
+        });
+    }
+
+    // If user edits/clears pincode after auto verification, show Verify button back
+    pincode.addEventListener('input', function(){
+        const val = (this.value || '').trim();
+        if (!/^\d{6}$/.test(val) || (lastVerifiedPin && val !== lastVerifiedPin)) {
+            isPincodeVerified = false;
+            if (verifyPincodeBtn) verifyPincodeBtn.style.display = '';
+            // Reset visuals to pending state
+            this.style.borderColor = val.length === 6 ? '#ff9800' : '#ff5252';
+            this.style.boxShadow = val.length === 6 ? '0 0 5px rgba(255, 152, 0, 0.5)' : '0 0 5px rgba(255, 82, 82, 0.5)';
+            locationNote.innerHTML = val.length === 6 ? 'Please click "Verify" button to verify pincode' : 'Please enter a valid 6-digit pincode';
+            locationNote.style.color = val.length === 6 ? '#ff9800' : '#ff5252';
+            // Clear city/state if user is actively changing
+            if (val.length < 6) { cityInput.value = ''; stateInput.selectedIndex = 0; }
         }
     });
     
