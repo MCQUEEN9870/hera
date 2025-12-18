@@ -616,6 +616,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle review submission
     submitButton.addEventListener('click', function() {
+        // Require reCAPTCHA before submission
+        try {
+            const recaptchaContainer = document.querySelector('.g-recaptcha');
+            const hasGrecaptcha = typeof window.grecaptcha !== 'undefined' && window.grecaptcha;
+            const response = hasGrecaptcha ? window.grecaptcha.getResponse() : '';
+            if (!hasGrecaptcha || !response) {
+                if (recaptchaContainer) {
+                    recaptchaContainer.classList.remove('recaptcha-shake');
+                    void recaptchaContainer.offsetWidth; // restart animation
+                    recaptchaContainer.classList.add('recaptcha-shake');
+                    recaptchaContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                alert('Please complete the reCAPTCHA first.');
+                return;
+            }
+        } catch (_) {
+            const recaptchaContainer = document.querySelector('.g-recaptcha');
+            if (recaptchaContainer) {
+                recaptchaContainer.classList.remove('recaptcha-shake');
+                void recaptchaContainer.offsetWidth;
+                recaptchaContainer.classList.add('recaptcha-shake');
+                recaptchaContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            alert('Please complete the reCAPTCHA first.');
+            return;
+        }
         // Check if user is logged in
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
         const reviewText = reviewTextarea.value;

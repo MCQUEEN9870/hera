@@ -3641,6 +3641,7 @@ display: flex;
 
     .footer-column {
         text-align: center;
+        align-items: center;
     }
 
     .footer-column h3::after {

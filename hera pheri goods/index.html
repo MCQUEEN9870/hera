@@ -180,6 +180,19 @@
         from {opacity: 0; transform: translateY(-30px);}
         to {opacity: 1; transform: translateY(0);}
       }
+
+      /* Subtle shake animation to draw attention to reCAPTCHA */
+      @keyframes hpg-shake {
+        0% { transform: translateX(0); }
+        20% { transform: translateX(-4px); }
+        40% { transform: translateX(4px); }
+        60% { transform: translateX(-3px); }
+        80% { transform: translateX(3px); }
+        100% { transform: translateX(0); }
+      }
+      .recaptcha-shake {
+        animation: hpg-shake 400ms ease;
+      }
       
       .close-modal {
         position: absolute;
@@ -342,7 +355,7 @@
       
       .footer .social-follow {
         display: flex;
-        gap: 12px;
+        gap: 28px;
         flex-wrap: wrap;
         margin-top: 8px;
       }
@@ -599,10 +612,9 @@
             <!-- Find Vehicle Button with Click-It animation (small, right side) -->
             <div class="btn-with-click-anim">
               <button class="find-vehicle-btn" onclick="window.location.href = 'vehicles.html'">
-               
-                Find Vehicle
+               Find Vehicle
               </button>
-              <video data-src="attached_assets/animation/click-it.webm" alt="Click hint animation" class="click-it-anim small lazy-video" loading="lazy" decoding="async" preload="none"></video>
+              <video autoplay loop muted playsinline class="click-it-anim lazy-video" loading="lazy" decoding="async" preload="none" data-src="attached_assets/animation/click-it.webm"></video>
             </div>
           </div>
           <!-- Find Vehicle Image -->
@@ -903,7 +915,7 @@
 
         <div class="how-it-works-grid">
           <!-- Step 1: Choose Vehicle Category -->
-          <div class="how-step-card" data-aos="zoom-in" data-aos-duration="800" data-aos-offset="110" data-aos-anchor-placement="top-center">
+          <div class="how-step-card" data-aos="zoom-in" data-aos-duration="800" data-aos-offset="90" data-aos-anchor-placement="top-center">
             <div class="how-step-bg">
               <img src="attached_assets/images/vehicle-categories.webp" alt="Choose Vehicle Category" loading="lazy" decoding="async" fetchpriority="low">
             </div>
@@ -916,7 +928,7 @@
           </div>
 
           <!-- Step 2: Direct Contact -->
-          <div class="how-step-card" data-aos="zoom-in" data-aos-duration="800" data-aos-offset="110" data-aos-anchor-placement="top-center">
+          <div class="how-step-card" data-aos="zoom-in" data-aos-duration="800" data-aos-offset="90" data-aos-anchor-placement="top-center">
             <div class="how-step-bg">
               <img src="attached_assets/images/direct-contact.webp" alt="Direct Contact with Owners" loading="lazy" decoding="async" fetchpriority="low">
             </div>
@@ -927,7 +939,7 @@
           </div>
 
           <!-- Step 3: Best Deal Finalize -->
-          <div class="how-step-card" data-aos="zoom-in" data-aos-duration="800" data-aos-offset="110" data-aos-anchor-placement="top-center">
+          <div class="how-step-card" data-aos="zoom-in" data-aos-duration="800" data-aos-offset="90" data-aos-anchor-placement="top-center">
             <div class="how-step-bg">
               <img src="attached_assets/images/best-deal.webp" alt="Best Deal Finalize" loading="lazy" decoding="async" fetchpriority="low">
             </div>
@@ -938,7 +950,7 @@
           </div>
 
           <!-- Step 4: Transport Instantly -->
-          <div class="how-step-card" data-aos="zoom-in" data-aos-duration="800" data-aos-offset="110" data-aos-anchor-placement="top-center">
+          <div class="how-step-card" data-aos="zoom-in" data-aos-duration="800" data-aos-offset="90" data-aos-anchor-placement="top-center">
             <div class="how-step-bg">
               <img src="attached_assets/images/transport-instantly.webp" alt="Transport Instantly" loading="lazy" decoding="async" fetchpriority="low">
             </div>
@@ -968,109 +980,109 @@
           
           <!-- Feature 1: Direct Connection (Image Left) -->
           <div class="why-feature-card left-image">
-            <div class="why-feature-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="350">
+            <div class="why-feature-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="300">
               <img src="attached_assets/images/direct-connection.webp" alt="Direct Connection" title="Direct Connection with Transport Owners" loading="lazy">
             </div>
-            <div class="why-feature-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="300" data-aos-offset="350">
-              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500" data-aos-offset="350">
+            <div class="why-feature-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="300" data-aos-offset="300">
+              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500" data-aos-offset="300">
                 <i class="fas fa-handshake"></i>
               </div>
-              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="600" data-aos-offset="350">Direct Connection</h3>
+              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="600" data-aos-offset="300">Direct Connection</h3>
               <p>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="700" data-aos-offset="350">Direct Connection with Transport Owners – No brokers or middlemen!</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="850" data-aos-offset="350">Customers can directly contact <strong>Verified</strong> trucks, mini trucks, autos, e-rickshaws, JCBs, crane, and other transport vehicle owners in your area.</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="1000" data-aos-offset="350"><strong>List your vehicle</strong> at the right locations so customers can find you exactly when they need you — helping you get more trust and more bookings.</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="1150" data-aos-offset="350">Simple. Transparent. No extra charges.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="300">Direct Connection with Transport Owners – No brokers or middlemen!</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="550" data-aos-offset="300">Customers can directly contact <strong>Verified</strong> trucks, mini trucks, autos, e-rickshaws, JCBs, crane, and other transport vehicle owners in your area.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="600" data-aos-offset="300"><strong>List your vehicle</strong> at the right locations so customers can find you exactly when they need you — helping you get more trust and more bookings.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="650" data-aos-offset="300">Simple. Transparent. No extra charges.</span>
               </p>
             </div>
           </div>
 
           <!-- Feature 2: All Types (Image Right) -->
           <div class="why-feature-card right-image">
-            <div class="why-feature-content" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="350">
-              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300" data-aos-offset="350">
+            <div class="why-feature-content" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="300">
+              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300" data-aos-offset="300">
                 <i class="fas fa-truck-loading"></i>
               </div>
-              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="400" data-aos-offset="350">Various Categories</h3>
+              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="400" data-aos-offset="300">Various Categories</h3>
               <p>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="350"><strong>Various Types of Transport Vehicles Available</strong> – From small local deliveries to long-distance shifting, <strong>Herapheri</strong> Goods connects you with every type of transport vehicles - From mini trucks and tempos to heavy-duty trailers, JCBs, cranes, even Packers&Movers, food or emergency vehicles, and more!</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="650" data-aos-offset="350">Whatever your goods, wherever your location, find the right vehicle instantly – all in one platform.</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="800" data-aos-offset="350">One website, all transport solutions!</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="300"><strong>Various Types of Transport Vehicles Available</strong> – From small local deliveries to long-distance shifting, <strong>Herapheri</strong> Goods connects you with every type of transport vehicles - From mini trucks and tempos to heavy-duty trailers, JCBs, cranes, even Packers&Movers, food or emergency vehicles, and more!</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="550" data-aos-offset="300">Whatever your goods, wherever your location, find the right vehicle instantly – all in one platform.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="600" data-aos-offset="300">One website, all transport solutions!</span>
               </p>
             </div>
-            <div class="why-feature-image" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200" data-aos-offset="350">
+            <div class="why-feature-image" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200" data-aos-offset="300">
               <img src="attached_assets/images/all-types.webp" alt="All Types of Vehicles" title="All Types of Transport Vehicles" loading="lazy">
             </div>
           </div>
 
           <!-- Feature 3: Fast & Hassle-Free (Image Left) -->
           <div class="why-feature-card left-image">
-            <div class="why-feature-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="350">
+            <div class="why-feature-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="300">
               <img src="attached_assets/images/fast-&-hassle-free.webp" alt="Fast and Hassle-Free" title="Fast & Hassle-Free Process" loading="lazy">
             </div>
-            <div class="why-feature-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="300" data-aos-offset="350">
-              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500" data-aos-offset="350">
+            <div class="why-feature-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="300" data-aos-offset="300">
+              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500" data-aos-offset="300">
                 <i class="fas fa-bolt"></i>
               </div>
-              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="600" data-aos-offset="350">Quick Deals</h3>
+              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="600" data-aos-offset="300">Quick Deals</h3>
               <p>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="700" data-aos-offset="350"><strong>Fast & Hassle-Free Process</strong> – Search, connect, and close the deal quickly!</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="850" data-aos-offset="350"><strong>No lengthy registrations</strong>, no middlemen — Just find the right vehicle, contact the owner directly, and finalize your booking in minutes.</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="1000" data-aos-offset="350">Save time. Save money. Get moving faster!</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay=500" data-aos-offset="300"><strong>Fast & Hassle-Free Process</strong> – Search, connect, and close the deal quickly!</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="550" data-aos-offset="300"><strong>No lengthy registrations</strong>, no middlemen — Just find the right vehicle, contact the owner directly, and finalize your booking in minutes.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="600" data-aos-offset="300">Save time. Save money. Get moving faster!</span>
               </p>
             </div>
           </div>
 
           <!-- Feature 4: No Hidden Fees (Image Right) -->
           <div class="why-feature-card right-image">
-            <div class="why-feature-content" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="350">
-              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300" data-aos-offset="350">
+            <div class="why-feature-content" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="300">
+              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300" data-aos-offset="300">
                 <i class="fas fa-percentage"></i>
               </div>
-              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="400" data-aos-offset="350">No 3rd Party</h3>
+              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="400" data-aos-offset="300">No 3rd Party</h3>
               <p>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="350"><strong>No Hidden Fees, No Commission</strong> – Your deal is directly with verified vehicle owners — no agents, no extra charges.</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="650" data-aos-offset="350">Enjoy transparent pricing and fair communication, so you always know exactly what you’re paying for.</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="800" data-aos-offset="350">Because trust, clarity, and affordability should come standard in every transaction.</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="900" data-aos-offset="350">Trust made simple.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="300"><strong>No Hidden Fees, No Commission</strong> – Your deal is directly with verified vehicle owners — no agents, no extra charges.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="550" data-aos-offset="300">Enjoy transparent pricing and fair communication, so you always know exactly what you’re paying for.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="600" data-aos-offset="300">Because trust, clarity, and affordability should come standard in every transaction.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="650" data-aos-offset="300">Trust made simple.</span>
               </p>
             </div>
-            <div class="why-feature-image" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200" data-aos-offset="350">
+            <div class="why-feature-image" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200" data-aos-offset="300">
               <img src="attached_assets/images/no-hidden-fees.webp" alt="No Hidden Fees" title="No Hidden Fees or Commission" loading="lazy">
             </div>
           </div>
 
           <!-- Feature 5: Free Listing (Image Left) -->
           <div class="why-feature-card left-image">
-            <div class="why-feature-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="350">
+            <div class="why-feature-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="300">
               <img src="attached_assets/images/free-listing.webp" alt="Free Listing" title="Free Listing for Transport Owners" loading="lazy">
             </div>
-            <div class="why-feature-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="300" data-aos-offset="350">
-              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500" data-aos-offset="350">
+            <div class="why-feature-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="300" data-aos-offset="300">
+              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500" data-aos-offset="300">
                 <i class="fas fa-list"></i>
               </div>
-              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="600" data-aos-offset="350">Free For Vehicle Owners</h3>
+              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="600" data-aos-offset="300">Free For Vehicle Owners</h3>
               <p>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="700" data-aos-offset="350">Free Listing for Transport Owners – If you own a truck, mini truck, crane, or other transport vehicles, List it completely free on Herapheri Goods and let nearby customers find you instantly.</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="850" data-aos-offset="350">No subscription. No hidden charges. Just genuine connections that help you grow your Service faster — without spending a single rupee.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="300">Free Listing for Transport Owners – If you own a truck, mini truck, crane, or other transport vehicles, List it completely free on Herapheri Goods and let nearby customers find you instantly.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="550" data-aos-offset="300">No subscription. No hidden charges. Just genuine connections that help you grow your Service faster — without spending a single rupee.</span>
               </p>
             </div>
           </div>
 
           <!-- Feature 6: Paid Listing (Image Right) -->
           <div class="why-feature-card right-image">
-            <div class="why-feature-content" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="350">
-              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300" data-aos-offset="350">
+            <div class="why-feature-content" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="300">
+              <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="300" data-aos-offset="300">
                 <i class="fas fa-chart-line"></i>
               </div>
-              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="400" data-aos-offset="350">Boost Your Reach</h3>
+              <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="400" data-aos-offset="300">Boost Your Reach</h3>
               <p>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="350">Boost Your Reach with <strong>Featured Listings</strong></span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="650" data-aos-offset="350">Want more customers to notice your vehicles first? Upgrade to a featured listing and appear at the <strong>top of search results</strong> in your area.</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="800" data-aos-offset="350">Gain higher visibility, attract more direct bookings, and increase your income — all while staying ahead of the competition.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="300">Boost Your Reach with <strong>Featured Listings</strong></span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="550" data-aos-offset="300">Want more customers to notice your vehicles first? Upgrade to a featured listing and appear at the <strong>top of search results</strong> in your area.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="600" data-aos-offset="300">Gain higher visibility, attract more direct bookings, and increase your income — all while staying ahead of the competition.</span>
               </p>
             </div>
-            <div class="why-feature-image" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200" data-aos-offset="350">
+            <div class="why-feature-image" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200" data-aos-offset="320">
               <img src="attached_assets/images/paid-listing.webp" alt="Paid Listing Feature" title="Paid Listing to Boost Visibility" loading="lazy">
             </div>
           </div>
@@ -1299,12 +1311,31 @@
       // Load when footer is near viewport
       window.addEventListener('DOMContentLoaded', function(){
         try{
+          if (!('IntersectionObserver' in window)) return;
+
+          // Trigger FA when icon-heavy sections get near viewport
+          var targets = [];
           var footer = document.querySelector('footer.footer');
-          if (!footer || !('IntersectionObserver' in window)) return;
+          if (footer) targets.push(footer);
+          var whyChoose = document.querySelector('.why-choose-section');
+          if (whyChoose) targets.push(whyChoose);
+          var usersSay = document.querySelector('.feedback-carousel-section');
+          if (usersSay) targets.push(usersSay);
+          var ownersSay = document.querySelector('.vehicle-owner-feedback-section');
+          if (ownersSay) targets.push(ownersSay);
+
+          if (!targets.length) return;
+
           var io = new IntersectionObserver(function(entries){
-            entries.forEach(function(e){ if (e.isIntersecting) { loadFA(); io.disconnect(); } });
-          }, { rootMargin: '300px' });
-          io.observe(footer);
+            entries.forEach(function(e){
+              if (e.isIntersecting) {
+                loadFA();
+                io.disconnect();
+              }
+            });
+          }, { rootMargin: '300px 0px', threshold: 0.01 });
+
+          targets.forEach(function(t){ try { io.observe(t); } catch(_){ } });
         } catch(_){}
       });
     })();
@@ -1708,10 +1739,21 @@ Best regards,
         } catch (_) { return false; }
       }
 
+      //  side drawers/toggles as "open" to avoid scroll glitches
+      function anyPanelOpen() {
+        try {
+          const reviewOpen = !!document.querySelector('.review-sidebar.active');
+          const shareOpen = !!document.querySelector('.share-drawer.active');
+          const dropdownOpen = !!document.querySelector('.dropdown.active');
+          const mobileMenuOpen = !!document.querySelector('.mobile-sidebar.open');
+          return reviewOpen || shareOpen || dropdownOpen || mobileMenuOpen;
+        } catch (_) { return false; }
+      }
+
       function startNudge() {
         if (prefersReduced || nudgeTimer) return;
         nudgeTimer = setInterval(() => {
-          if (window.scrollY <= 4 && !nudging && !anyModalOpen()) {
+          if (window.scrollY <= 4 && !nudging && !anyModalOpen() && !anyPanelOpen()) {
             nudging = true;
             // Scroll down a bit, then back to top to create a gentle hint
             window.scrollBy({ top: 60, behavior: 'smooth' });
