@@ -1,7 +1,13 @@
+User-agent: Googlebot
+Allow: /
+Allow: /ads.txt
+Allow: /sitemap.xml
+
 User-agent: *
 Allow: /
 Disallow: /login
 Disallow: /driver-dashboard
-Sitemap: https://www.herapherigoods.in/sitemap.xml
+Disallow: /ads.txt
+Disallow: /sitemap.xml
 
 
