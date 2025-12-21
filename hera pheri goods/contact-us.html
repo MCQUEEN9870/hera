@@ -630,10 +630,13 @@ document.addEventListener('DOMContentLoaded', function(){
             
             .contact-form { padding: 20px 16px; }
         }
+
+        #snowfallCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:10;}
+      @media (prefers-reduced-motion: reduce){#snowfallCanvas{display:none;}}
     </style>
 </head>
 <body>
- 
+ <canvas id="snowfallCanvas" aria-hidden="true"></canvas>
     <!-- Fixed Full-Screen Background Video -->
     <div class="contact-video-wrapper">
         <video class="contact-hero-gif" autoplay muted loop playsinline preload="auto" aria-label="Contact Us Background Animation" title="Contact Us Background Animation">
@@ -1455,6 +1458,106 @@ Best regards,
                 }
             });
         });
+
+        (function(){
+      try {
+        var canvas = document.getElementById('snowfallCanvas');
+        if (!canvas) return;
+
+        var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var saveData = !!(navigator.connection && navigator.connection.saveData);
+        if (prefersReduced || saveData) {
+          canvas.style.display = 'none';
+          return;
+        }
+
+        var ctx = canvas.getContext('2d', { alpha: true });
+        if (!ctx) return;
+
+        var dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        var w = 0, h = 0;
+        var flakes = [];
+        var running = true;
+
+        function resize(){
+          var rectW = window.innerWidth || document.documentElement.clientWidth || 0;
+          var rectH = window.innerHeight || document.documentElement.clientHeight || 0;
+          w = Math.max(1, rectW);
+          h = Math.max(1, rectH);
+          canvas.width = Math.floor(w * dpr);
+          canvas.height = Math.floor(h * dpr);
+          canvas.style.width = w + 'px';
+          canvas.style.height = h + 'px';
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function rand(min, max){ return min + Math.random() * (max - min); }
+        function makeFlake(resetToTop){
+          return {
+            x: rand(0, w),
+            y: resetToTop ? rand(-h, 0) : rand(0, h),
+            r: rand(1.8, 4.2),
+            vy: rand(0.7, 1.9),
+            vx: rand(-0.35, 0.35),
+            drift: rand(0.6, 1.4),
+            a: rand(0.35, 0.85)
+          };
+        }
+
+        function initFlakes(){
+          flakes.length = 0;
+          var density = 0.00012; // flakes per px^2
+          var count = Math.max(35, Math.min(120, Math.floor(w * h * density)));
+          for (var i = 0; i < count; i++) flakes.push(makeFlake(false));
+        }
+
+        var lastT = 0;
+        function tick(t){
+          if (!running) return;
+          if (!lastT) lastT = t;
+          var dt = Math.min(0.05, (t - lastT) / 1000);
+          lastT = t;
+
+          ctx.clearRect(0, 0, w, h);
+          for (var i = 0; i < flakes.length; i++) {
+            var f = flakes[i];
+            f.y += f.vy * (60 * dt);
+            f.x += (f.vx + Math.sin((f.y / 90) + i) * 0.08 * f.drift) * (60 * dt);
+
+            if (f.y - f.r > h) {
+              flakes[i] = makeFlake(true);
+              continue;
+            }
+            if (f.x < -10) f.x = w + 10;
+            if (f.x > w + 10) f.x = -10;
+
+            ctx.globalAlpha = f.a;
+            ctx.beginPath();
+            ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+          requestAnimationFrame(tick);
+        }
+
+        function start(){
+          resize();
+          initFlakes();
+          requestAnimationFrame(tick);
+        }
+
+        window.addEventListener('resize', function(){ resize(); initFlakes(); }, { passive: true });
+        document.addEventListener('visibilitychange', function(){
+          running = !document.hidden;
+          if (running) { lastT = 0; requestAnimationFrame(tick); }
+        });
+
+        start();
+      } catch (e) {
+        // no-op
+      }
+    })();
     </script>
 </body>
 </html>
