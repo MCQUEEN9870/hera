@@ -829,30 +829,44 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Share functionality
+    // Share functionality (robust class detection, fallback to href)
     shareIcons.forEach(icon => {
         icon.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            const platform = this.classList[1];
-            const url = encodeURIComponent(window.location.href);
-            const text = encodeURIComponent('Check out this awesome transport service!');
-            
-            let shareUrl;
-            switch(platform) {
-                case 'whatsapp':
-                    shareUrl = `https://wa.me/?text=${text} ${url}`;
-                    break;
-                case 'facebook':
-                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-                    break;
-                
-                case 'email':
-                    shareUrl = `mailto:?subject=Check this out&body=${text} ${url}`;
-                    break;
+
+            const classes = Array.from(this.classList);
+            const platform = (classes.includes('whatsapp') && 'whatsapp') ||
+                             (classes.includes('facebook') && 'facebook') ||
+                             (classes.includes('email') && 'email') || '';
+
+            const pageUrl = encodeURIComponent(window.location.href.split('#')[0]);
+            const text = encodeURIComponent('Herapheri Goods - Find reliable transport vehicle owners directly!');
+
+            let shareUrl = this.getAttribute('href');
+            const hasRealHref = shareUrl && shareUrl !== '#';
+            if (!hasRealHref) {
+                switch(platform) {
+                    case 'whatsapp':
+                        shareUrl = `https://wa.me/?text=${text}%20${pageUrl}`;
+                        break;
+                    case 'facebook':
+                        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`;
+                        break;
+                    case 'email':
+                        shareUrl = `mailto:?subject=Herapheri%20Goods&body=${text}%20${pageUrl}`;
+                        break;
+                    default:
+                        shareUrl = pageUrl;
+                }
             }
-            
-            window.open(shareUrl, '_blank');
+
+            // Use window.open for external shares; for mailto, navigate to avoid popup blockers
+            if (platform === 'email') {
+                window.location.href = shareUrl;
+            } else {
+                window.open(shareUrl, '_blank');
+            }
         });
     });
 });
