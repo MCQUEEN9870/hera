@@ -160,7 +160,7 @@ function generateMockVehicleOwnerFeedback() {
             name: "Ramesh Kumar",
             address: "Mumbai, Maharashtra", // This would be replaced with registered location
             rating: 5,
-            reviewText: "Herapheri Goods has transformed my truck business. I get regular bookings and the direct customer contact means better earnings!",
+            reviewText: "Herapheri goods has transformed my truck business. I get regular bookings and the direct customer contact means better earnings!",
             source: "user"
         },
         {
@@ -178,7 +178,7 @@ function generateMockVehicleOwnerFeedback() {
             name: "Jayesh Singh",
             address: "Delhi", // This would be replaced with registered location
             rating: 5,
-            reviewText: "As a JCB operator, finding consistent work was challenging. Herapheri Goods has connected me with multiple construction projects.",
+            reviewText: "As a JCB operator, finding consistent work was challenging. HerapheriGoods has connected me with multiple construction projects.",
             source: "user"
         },
         {

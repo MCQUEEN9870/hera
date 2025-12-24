@@ -3721,7 +3721,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 key: keyId,
                 amount: order.amount,
                 currency: order.currency,
-                name: 'Herapheri Goods',
+                name: 'Herapherigoods',
             description: `${plan} Premium Plan Subscription`,
                 image: 'attached_assets/images/new-logo.webp',
                 order_id: order.id,

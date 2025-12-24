@@ -1,5 +1,5 @@
 [build]
-  publish = "hera pheri goods"
+  publish = "Herapherigoods"
 
 [build.processing]
   skip_processing = false

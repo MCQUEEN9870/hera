@@ -507,7 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Google Merchant listings treats image as a REQUIRED property
                 'image': getPrimaryImage(v),
                 // Use Brand object form for clarity
-                'brand': { '@type': 'Brand', 'name': 'Herapheri Goods' },
+                'brand': { '@type': 'Brand', 'name': 'Herapherigoods' },
                 'areaServed': [v.locationCity, v.locationState].filter(Boolean).join(', '),
                 'offers': {
                     '@type': 'Offer',

@@ -57,16 +57,16 @@ document.addEventListener('DOMContentLoaded', function(){
         .dropdown-content { display: none; }
         .mobile-sidebar, .share-drawer .share-content, .review-content { display: none; }
     </style>
-    <title>Contact Us | Herapheri Goods</title>
-    <meta property="og:title" content="Contact Us | Herapheri Goods">
-    <meta name="twitter:title" content="Contact Us | Herapheri Goods">
-    <meta name="description" content="Contact Herapheri Goods for support, feedback, or questions. Quick responses and helpful FAQs to guide you." />
-    <meta property="og:description" content="Contact Herapheri Goods for support, feedback, or questions. Quick responses and helpful FAQs to guide you." />
-    <meta name="twitter:description" content="Contact Herapheri Goods for support, feedback, or questions. Quick responses and helpful FAQs to guide you." />
+    <title>Contact Us | Herapherigoods</title>
+    <meta property="og:title" content="Contact Us | Herapherigoods">
+    <meta name="twitter:title" content="Contact Us | Herapherigoods">
+    <meta name="description" content="Contact Herapherigoods for support, feedback, or questions. Quick responses and helpful FAQs to guide you." />
+    <meta property="og:description" content="Contact Herapherigoods for support, feedback, or questions. Quick responses and helpful FAQs to guide you." />
+    <meta name="twitter:description" content="Contact Herapherigoods for support, feedback, or questions. Quick responses and helpful FAQs to guide you." />
     <!-- Social Media Meta Tags -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://herapherigoods.in/contact-us" />
-    <meta property="og:site_name" content="Herapheri Goods" />
+    <meta property="og:site_name" content="Herapherigoods" />
     <meta property="og:image" content="attached_assets/images/1200x630.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -733,11 +733,11 @@ document.addEventListener('DOMContentLoaded', function(){
             <!-- General Tab Questions -->
             <div class="faq-item active">
                 <div class="faq-question">
-                    How does Herapheri Goods work?
+                    How does Herapherigoods work?
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="faq-answer">
-                    <p>Herapheri Goods is a platform that connects transport vehicle owners directly with customers. You can search for available vehicles in your area based on your requirements, view vehicle details and contact information, and connect directly with the vehicle owner without any middlemen or extra charges.</p>
+                    <p>Herapherigoods is a platform that connects transport vehicle owners directly with customers. You can search for available vehicles in your area based on your requirements, view vehicle details and contact information, and connect directly with the vehicle owner without any middlemen or extra charges.</p>
                 </div>
             </div>
             
@@ -773,7 +773,7 @@ document.addEventListener('DOMContentLoaded', function(){
             
             <div class="faq-item">
                 <div class="faq-question">
-                    Is my personal information safe with Herapheri Goods?
+                    Is my personal information safe with Herapherigoods?
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="faq-answer">
@@ -797,7 +797,7 @@ document.addEventListener('DOMContentLoaded', function(){
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="faq-answer">
-                    <p>Herapheri Goods is not responsible for the conduct or services provided by vehicle owners listed on our platform. We only provide a platform to connect vehicle owners with customers. We encourage users to report any misconduct so we can take appropriate action, but the transaction and service agreement is solely between you and the vehicle owner.</p>
+                    <p>Herapherigoods is not responsible for the conduct or services provided by vehicle owners listed on our platform. We only provide a platform to connect vehicle owners with customers. We encourage users to report any misconduct so we can take appropriate action, but the transaction and service agreement is solely between you and the vehicle owner.</p>
                 </div>
             </div>
             
@@ -932,7 +932,7 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="footer-column">
                 <h3>About Us</h3>
                 <div class="about-content">
-                    <p class="about-text">Herapheri Goods is a leading transport services platform connecting vehicle owners with customers needing transport solutions.</p>
+                    <p class="about-text">Herapherigoods is a leading transport services platform connecting vehicle owners with customers needing transport solutions.</p>
                 </div>
             </div>
 
@@ -979,7 +979,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
         <!-- Copyright Bar -->
         <div class="footer-bottom">
-            <p>&copy; 2025 Herapheri Goods. All rights reserved.</p>
+            <p>&copy; 2025 Herapherigoods. All rights reserved.</p>
         </div>
     </footer>
 
@@ -1010,7 +1010,7 @@ document.addEventListener('DOMContentLoaded', function(){
         
           // Function to open email compose, preferring Gmail app on mobile
     function openGmail(email) {
-        const subject = 'Inquiry from Herapheri Goods Website';
+        const subject = 'Inquiry from Herapherigoods Website';
         const body = 'Hello,\n\nI would like to get in touch regarding your services.\n\nBest regards,\n[Your Name]';
         const isAndroid = /Android/i.test(navigator.userAgent);
         const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -1058,53 +1058,7 @@ document.addEventListener('DOMContentLoaded', function(){
         }, 400);
     }
     
-    // Function to share via email (works on all devices)
-    function shareViaEmail(event) {
-        event.preventDefault();
-        
-        const subject = 'Check out Herapheri Goods';
-        const body = `Hi! I found this great platform for finding transport vehicles - Herapheri Goods.
-        
-No middlemen, no extra charges. Visit https://herapherigoods.in
 
-Best regards,
-[Your Name]`;
-        
-        // Try multiple email sharing methods
-        try {
-            // Method 1: Try mailto first (works on desktop with email clients)
-            const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            
-            // Method 2: Try Gmail web (works on mobile and desktop)
-            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            
-            // Method 3: Try Outlook web (alternative)
-            const outlookUrl = `https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            
-            // Check if we're on mobile
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            if (isMobile) {
-                // On mobile, prefer app via openGmail helper
-                openGmail('');
-            } else {
-                // On desktop, try mailto first, fallback to Gmail web
-                const mailtoLink = document.createElement('a');
-                mailtoLink.href = mailtoUrl;
-                mailtoLink.click();
-                
-                // Fallback: if mailto doesn't work, open Gmail web after a short delay
-                setTimeout(() => {
-                    window.open(gmailUrl, '_blank');
-                }, 500);
-            }
-            
-        } catch (error) {
-            console.error('Email sharing failed:', error);
-            // Fallback: always open Gmail web
-            window.open(gmailUrl, '_blank');
-        }
-    }
         
         // Initialize AOS animation
         AOS.init();

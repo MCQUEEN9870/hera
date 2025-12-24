@@ -22,9 +22,9 @@
         .dropdown-content { display: none; }
         .mobile-sidebar, .share-drawer .share-content, .review-content { display: none; }
     </style>
-    <title>Refer & Earn and Refund Policy | Herapheri Goods</title>
-    <meta property="og:title" content="Refer & Earn and Refund Policy | Herapheri Goods">
-    <meta name="twitter:title" content="Refer & Earn and Refund Policy | Herapheri Goods">
+    <title>Refer & Earn and Refund Policy | Herapherigoods</title>
+    <meta property="og:title" content="Refer & Earn and Refund Policy | Herapherigoods">
+    <meta name="twitter:title" content="Refer & Earn and Refund Policy | Herapherigoods">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- AOS (Animate On Scroll) library for animations -->
@@ -150,14 +150,14 @@
 </head>
 <body>
     <div class="content">
-    <img src="attached_assets\images\herapheri_logo-removebg-preview.webp" alt="Herapheri Logo" title="Herapheri Goods Logo" class="privacy-logo" data-aos="zoom-in" data-aos-duration="800">
+    <img src="attached_assets\images\herapheri_logo-removebg-preview.webp" alt="Herapherigoods Logo" title="Herapherigoods Logo" class="privacy-logo" data-aos="zoom-in" data-aos-duration="800">
         <h1 class="refer-earn-policy-heading" data-aos="fade-down" data-aos-duration="1000">Refer & Earn and Refund Policy</h1>
         <div class="refer-earn-policy-content">
             <p class="effective-date" data-aos="flip-up" data-aos-duration="800">Effective Date: March 15, 2025</p>
             
             <div class="policy-card" data-aos="zoom-in-up" data-aos-duration="800">
                 <h2 data-aos="fade-right" data-aos-duration="1000">How it works?</h2>
-                <p data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">Herapheri Goods's <span class="highlight-text">Refer & Earn Program</span> is an exclusive reward system that gives you money when you invite your friends or contacts to use Herapheri Goods! 💰</p>
+                <p data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">Herapherigoods's <span class="highlight-text">Refer & Earn Program</span> is an exclusive reward system that gives you money when you invite your friends or contacts to use Herapherigoods! 💰</p>
             </div>
 
             <div class="policy-card" data-aos="zoom-in-up" data-aos-duration="800" data-aos-delay="200">
@@ -242,7 +242,7 @@
             <div class="footer-column">
                 <h3>About Us</h3>
             <div class="about-content">
-                <p class="about-text">Welcome to Herapheri Goods, your one-stop platform for finding reliable transport vehicle owners across various locations. Whether you need a truck, mini truck, auto, e-rickshaw, JCB, or crane, we connect you directly with the right vehicle owners—no middlemen, no extra charges!</p>
+                <p class="about-text">Welcome to Herapherigoods, your one-stop platform for finding reliable transport vehicle owners across various locations. Whether you need a truck, mini truck, auto, e-rickshaw, JCB, or crane, we connect you directly with the right vehicle owners—no middlemen, no extra charges!</p>
                 <p class="about-text-more">Our mission is to make transportation hassle-free by providing authentic listings of vehicle owners, so you can contact them directly for your shifting, construction, or logistics needs. As we grow, we aim to expand our reach to more cities and offer additional services to make the process even smoother. Join us in building a trusted network of transport solutions!</p>
             </div>
             <button class="show-more-btn">Show More</button>
@@ -267,7 +267,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 Herapheri Goods. All rights reserved.</p>
+            <p>&copy; 2025 Herapherigoods. All rights reserved.</p>
         </div>
     </footer>
     <script src="env.js"></script>
@@ -293,7 +293,7 @@
         }
     // Function to open email compose, preferring Gmail app on mobile
     function openGmail(email) {
-        const subject = 'Inquiry from Herapheri Goods Website';
+        const subject = 'Inquiry from Herapherigoods Website';
         const body = 'Hello,\n\nI would like to get in touch regarding your services.\n\nBest regards,\n[Your Name]';
         const isAndroid = /Android/i.test(navigator.userAgent);
         const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -341,53 +341,7 @@
         }, 400);
     }
     
-    // Function to share via email (works on all devices)
-    function shareViaEmail(event) {
-        event.preventDefault();
-        
-        const subject = 'Check out Herapheri Goods';
-        const body = `Hi! I found this great platform for finding transport vehicles - Herapheri Goods.
-        
-No middlemen, no extra charges. Visit https://herapherigoods.in
 
-Best regards,
-[Your Name]`;
-        
-        // Try multiple email sharing methods
-        try {
-            // Method 1: Try mailto first (works on desktop with email clients)
-            const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            
-            // Method 2: Try Gmail web (works on mobile and desktop)
-            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            
-            // Method 3: Try Outlook web (alternative)
-            const outlookUrl = `https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            
-            // Check if we're on mobile
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            if (isMobile) {
-                // On mobile, prefer app via openGmail helper
-                openGmail('');
-            } else {
-                // On desktop, try mailto first, fallback to Gmail web
-                const mailtoLink = document.createElement('a');
-                mailtoLink.href = mailtoUrl;
-                mailtoLink.click();
-                
-                // Fallback: if mailto doesn't work, open Gmail web after a short delay
-                setTimeout(() => {
-                    window.open(gmailUrl, '_blank');
-                }, 500);
-            }
-            
-        } catch (error) {
-            console.error('Email sharing failed:', error);
-            // Fallback: always open Gmail web
-            window.open(gmailUrl, '_blank');
-        }
-    }
 
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize AOS
