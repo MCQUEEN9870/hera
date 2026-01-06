@@ -2,18 +2,20 @@ package com.example.demo.service;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-@Service
-public class Fast2SMSService {
+import jakarta.annotation.PostConstruct;
 
-    // Repurposed to use 2factor.in SMS API
+@Service
+public class TwoFactorService {
+
     // Simple SMS API: GET https://2factor.in/API/V1/{API_KEY}/SMS/{phone}/{message}
 
-    @Value("${twofactor.api.key:ba5ce1cc-7aaa-11f0-a562-0200cd936042}")
+    @Value("${twofactor.api.key:}")
     private String twoFactorApiKey;
 
     @Value("${sms.enabled:true}")
@@ -30,6 +32,35 @@ public class Fast2SMSService {
 
     @Value("${twofactor.autogen.template-only:true}")
     private boolean autogenTemplateOnly;
+
+    private final Environment environment;
+
+    public TwoFactorService(Environment environment) {
+        this.environment = environment;
+    }
+
+    @PostConstruct
+    void validateSmsConfig() {
+        boolean keyMissing = (twoFactorApiKey == null || twoFactorApiKey.trim().isEmpty());
+        if (!smsEnabled || !keyMissing) {
+            return;
+        }
+
+        boolean isProd = false;
+        for (String profile : environment.getActiveProfiles()) {
+            if ("prod".equalsIgnoreCase(profile) || "production".equalsIgnoreCase(profile)) {
+                isProd = true;
+                break;
+            }
+        }
+
+        if (isProd) {
+            throw new IllegalStateException("2Factor SMS is enabled but 'twofactor.api.key' is missing. Set TWOFACTOR_API_KEY / twofactor.api.key in production.");
+        }
+
+        System.err.println("[WARN] SMS is enabled but 'twofactor.api.key' is missing. Disabling SMS for this run.");
+        smsEnabled = false;
+    }
 
     private static final String TWOFACTOR_SMS_URL_TEMPLATE = "https://2factor.in/API/V1/%s/SMS/%s/%s";
     private static final String TWOFACTOR_SMS_WITH_OTP_URL_TEMPLATE = "https://2factor.in/API/V1/%s/SMS/%s/%s/%s";

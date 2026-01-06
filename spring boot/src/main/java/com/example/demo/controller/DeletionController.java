@@ -29,7 +29,6 @@ import com.example.demo.service.SupabaseService;
  * This controller handles all vehicle deletion operations with robust error handling
  */
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/api")
 public class DeletionController {
 

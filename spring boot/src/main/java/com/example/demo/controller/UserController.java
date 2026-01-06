@@ -28,7 +28,6 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.service.SupabaseService;
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/api/users")
 public class UserController {
 

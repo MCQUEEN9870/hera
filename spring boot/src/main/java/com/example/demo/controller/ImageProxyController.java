@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
  * Simply redirects to the public Supabase object. New images are already processed at upload.
  */
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/api/images")
 public class ImageProxyController {
 

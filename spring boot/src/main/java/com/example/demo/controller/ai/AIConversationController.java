@@ -18,7 +18,6 @@ import com.example.demo.service.ai.AIConversationService;
 
 @RestController
 @RequestMapping("/api/ai")
-@CrossOrigin(origins = "*") // Allow cross-origin requests from any domain
 public class AIConversationController {
 
     @Autowired

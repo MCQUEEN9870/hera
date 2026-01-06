@@ -26,7 +26,6 @@ import com.example.demo.repository.RegistrationRepository;
 import com.example.demo.service.SupabaseService;
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/api/registration-images")
 public class RegistrationImageController {
 

@@ -20,6 +20,44 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentContactNumber = '';
     let wrongPasswordCount = 0;
 
+    // Two-step login state: 1) verify mobile exists 2) show password
+    const loginFormEl = document.getElementById('loginForm');
+    const loginPhoneEl = document.getElementById('loginContactNumber');
+    const loginPasswordEl = document.getElementById('loginPassword');
+    const loginPasswordGroupEl = document.getElementById('loginPasswordGroup');
+    const forgotPasswordBlockEl = document.getElementById('forgotPasswordBlock');
+    let loginStage = 'phone'; // 'phone' | 'password'
+    let verifiedContactNumber = '';
+
+    function setLoginStage(stage) {
+        loginStage = stage;
+        if (loginStage === 'phone') {
+            verifiedContactNumber = '';
+            wrongPasswordCount = 0;
+            if (loginPasswordGroupEl) loginPasswordGroupEl.style.display = 'none';
+            if (forgotPasswordBlockEl) forgotPasswordBlockEl.style.display = 'none';
+            if (loginPasswordEl) loginPasswordEl.value = '';
+            if (loginBtn) loginBtn.textContent = 'Continue';
+            return;
+        }
+
+        if (loginPasswordGroupEl) loginPasswordGroupEl.style.display = 'block';
+        if (forgotPasswordBlockEl) forgotPasswordBlockEl.style.display = 'block';
+        if (loginBtn) loginBtn.textContent = 'Login';
+    }
+
+    // Initialize login form to phone-only
+    if (loginFormEl && loginPhoneEl) {
+        setLoginStage('phone');
+        loginPhoneEl.addEventListener('input', function () {
+            const normalized = (loginPhoneEl.value || '').trim();
+            if (!verifiedContactNumber) return;
+            if (normalized !== verifiedContactNumber) {
+                setLoginStage('phone');
+            }
+        });
+    }
+
     // 🔹 Switch between login and signup forms
     showSignupLink.addEventListener('click', (e) => {
         e.preventDefault();
@@ -33,28 +71,69 @@ document.addEventListener('DOMContentLoaded', function () {
         loginForm.style.display = 'block';
     });
 
-    // 🔹 Login Form Submission (password-first; no login-page OTP UI)
+    // 🔹 Login Form Submission (two-step: verify mobile -> password)
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
         e.preventDefault();
         const button = this.querySelector('button');
-            const mobileInput = this.querySelector('input[type="tel"]');
+        const mobileInput = document.getElementById('loginContactNumber') || this.querySelector('input[type="tel"]');
         // Use ID so it works even when toggled to type="text"
         const passwordInput = document.getElementById('loginPassword');
+
         if (!validateMobile(mobileInput.value)) {
             showToast('Please enter a valid 10-digit mobile number', 'error');
             return;
         }
+        const contactNumber = (mobileInput.value || '').trim();
+
+        // Step 1: verify number exists (reduce scams / stop random password attempts)
+        if (loginStage === 'phone') {
+            button.disabled = true;
+            button.textContent = 'Checking...';
+            try {
+                const res = await fetch(`${API_BASE_URL}/check-user`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contactNumber })
+                });
+                const data = await handleApiResponse(res);
+                const exists = !!(data && (data.exists === true || data.exists === 'true'));
+                if (!exists) {
+                    showToast('Number not registered. Please sign up first.', 'error');
+                    setLoginStage('phone');
+                    return;
+                }
+                verifiedContactNumber = contactNumber;
+                setLoginStage('password');
+                showToast('Number verified. Please enter password.', 'success');
+                if (passwordInput) passwordInput.focus();
+                return;
+            } catch (err) {
+                showToast((err && err.message) ? err.message : 'Failed to verify number. Please try again.', 'error');
+                return;
+            } finally {
+                button.disabled = false;
+                button.textContent = (loginStage === 'phone') ? 'Continue' : 'Login';
+            }
+        }
+
+        // Step 2: password login
+        if (verifiedContactNumber && contactNumber !== verifiedContactNumber) {
+            setLoginStage('phone');
+            showToast('Number changed. Please verify again.', 'error');
+            return;
+        }
+
         const pwTrimmed = passwordInput ? passwordInput.value.trim() : '';
         const hasPassword = !!pwTrimmed;
-        // Enforce password-first login from this form
         if (!hasPassword) {
             showToast('Please enter your password', 'error');
             return;
         }
+
         button.disabled = true;
         button.textContent = 'Logging in...';
         try {
-            const payload = { contactNumber: mobileInput.value.trim() };
+            const payload = { contactNumber: contactNumber };
             if (hasPassword) payload.password = pwTrimmed;
             const res = await fetch(`${API_BASE_URL}/login`, {
                 method: 'POST',
@@ -64,7 +143,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await handleApiResponse(res);
             if (data && data.message && data.message.includes('Login successful')) {
                 localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('userPhone', mobileInput.value.trim());
+                localStorage.setItem('userPhone', contactNumber);
+                if (data.token) {
+                    localStorage.setItem('authToken', data.token);
+                }
                 showToast('Login successful!', 'success');
                 setTimeout(() => {
                     const params = new URLSearchParams(window.location.search);
@@ -96,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } finally {
             button.disabled = false;
-            button.textContent = 'Login';
+            button.textContent = (loginStage === 'phone') ? 'Continue' : 'Login';
         }
     });
 
@@ -355,6 +437,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         showToast(data.message || 'Login successful!');
                         localStorage.setItem('isLoggedIn', 'true');
                         localStorage.setItem('userPhone', mobileInput.value.trim());
+                        if (data.token) {
+                            localStorage.setItem('authToken', data.token);
+                        }
                         localStorage.removeItem('userMembership');
                         let redirectPage = 'index';
                         if (type === 'Signup' && form.dataset.userExists === 'false') { redirectPage = 'register'; }

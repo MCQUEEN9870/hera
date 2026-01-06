@@ -31,7 +31,6 @@ import com.example.demo.service.SupabaseService;
  
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/api/registration")
 public class RegistrationController {
 

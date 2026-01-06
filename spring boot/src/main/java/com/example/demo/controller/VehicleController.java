@@ -33,7 +33,6 @@ import com.example.demo.repository.RegistrationRepository;
 import com.example.demo.service.SupabaseService;
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/api")
 public class VehicleController {
 

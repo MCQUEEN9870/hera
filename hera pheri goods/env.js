@@ -149,5 +149,49 @@ window.isLocalEnvironment = isLocalEnvironment;
     }
 })();
 
+// Attach JWT auth token to API calls (if present)
+(function patchFetchForAuth() {
+    try {
+        if (!window.fetch || window.__AUTH_FETCH_PATCHED__) return;
+        window.__AUTH_FETCH_PATCHED__ = true;
+
+        const originalFetch = window.fetch.bind(window);
+        const base = (window.API_BASE_URL || '').replace(/\/+$/, '');
+
+        window.fetch = function(input, init) {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (token && base) {
+                    const url = (typeof input === 'string')
+                        ? input
+                        : (input && typeof input.url === 'string' ? input.url : '');
+
+                    const isApiCall = url === base || url.startsWith(base + '/');
+                    if (isApiCall) {
+                        const nextInit = init ? { ...init } : {};
+                        const headers = new Headers(nextInit.headers || (input && input.headers) || undefined);
+                        if (!headers.has('Authorization')) {
+                            headers.set('Authorization', 'Bearer ' + token);
+                        }
+                        nextInit.headers = headers;
+
+                        if (typeof input === 'string') {
+                            return originalFetch(input, nextInit);
+                        }
+                        // If it's a Request, clone it with merged headers
+                        const req = new Request(input, nextInit);
+                        return originalFetch(req);
+                    }
+                }
+            } catch (_e) {
+                // Fall through to default fetch
+            }
+            return originalFetch(input, init);
+        };
+    } catch (_e) {
+        // no-op
+    }
+})();
+
 
 

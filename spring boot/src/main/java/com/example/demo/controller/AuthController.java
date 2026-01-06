@@ -18,20 +18,23 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.service.Fast2SMSService;
+import com.example.demo.security.JwtService;
+import com.example.demo.service.TwoFactorService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*") // Frontend requests allow karne ke liye
 public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
     
     @Autowired
-    private Fast2SMSService fast2SMSService;
+    private TwoFactorService twoFactorService;
+
+    @Autowired
+    private JwtService jwtService;
 
     @Value("${captcha.enabled:false}")
     private boolean captchaEnabled;
@@ -111,7 +114,7 @@ public class AuthController {
                 }
 
                 // Use 2Factor AUTOGEN for existing user as well (template-based)
-                String sessionIdExisting = fast2SMSService.sendAutogenOtp(contactNumber, twoFactorTemplateSignup, true);
+                String sessionIdExisting = twoFactorService.sendAutogenOtp(contactNumber, twoFactorTemplateSignup, true);
                 if (sessionIdExisting == null || sessionIdExisting.isEmpty()) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                             .body(Map.of("message", "Failed to initiate OTP. Please try again."));
@@ -132,7 +135,7 @@ public class AuthController {
             }
 
             // Initiate AUTOGEN OTP for signup
-            String sessionId = fast2SMSService.sendAutogenOtp(contactNumber, twoFactorTemplateSignup, true);
+            String sessionId = twoFactorService.sendAutogenOtp(contactNumber, twoFactorTemplateSignup, true);
             if (sessionId == null || sessionId.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(Map.of("message", "Failed to initiate OTP. Please try again."));
@@ -257,6 +260,17 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/check-user")
+    public ResponseEntity<Map<String, Object>> checkUser(@RequestBody Map<String, String> request) {
+        String contactNumber = request.get("contactNumber");
+        if (contactNumber == null || !contactNumber.matches("^[6-9]\\d{9}$")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Please enter a valid 10-digit mobile number."));
+        }
+        boolean exists = userRepository.existsByContactNumber(contactNumber);
+        return ResponseEntity.ok(Map.of("exists", exists));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody Map<String, String> request, HttpServletRequest httpReq) {
         String contactNumber = request.get("contactNumber");
@@ -320,10 +334,12 @@ public class AuthController {
                         if (user.getRating() == null) user.setRating(0);
                         if (user.getReviewText() == null) user.setReviewText("");
                         userRepository.save(user);
+                        String token = jwtService.issueTokenForContact(contactNumber);
                         return ResponseEntity.ok(Map.of(
                             "message", "Login successful via password!",
                             "contactNumber", contactNumber,
-                            "userExists", "true"
+                            "userExists", "true",
+                            "token", token
                         ));
                     } else {
                         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -347,7 +363,7 @@ public class AuthController {
         }
 
         // Use 2Factor AUTOGEN (lets 2Factor generate OTP and deliver using approved template)
-        String sessionId = fast2SMSService.sendAutogenOtp(contactNumber, twoFactorTemplateLogin, true);
+        String sessionId = twoFactorService.sendAutogenOtp(contactNumber, twoFactorTemplateLogin, true);
         if (sessionId == null || sessionId.isEmpty()) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to initiate OTP. Please try again."));
@@ -414,7 +430,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", "User not found."));
         }
-        String sessionId = fast2SMSService.sendAutogenOtp(contactNumber, twoFactorTemplateLogin, true);
+        String sessionId = twoFactorService.sendAutogenOtp(contactNumber, twoFactorTemplateLogin, true);
         if (sessionId == null || sessionId.isEmpty()) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to initiate OTP. Please try again."));
@@ -440,7 +456,7 @@ public class AuthController {
                     .body(Map.of("message", "User not found."));
         }
         String sessionId = user.getOtp();
-        boolean valid = (sessionId != null && !sessionId.isEmpty()) && fast2SMSService.verifyAutogenOtp(sessionId, otp);
+        boolean valid = (sessionId != null && !sessionId.isEmpty()) && twoFactorService.verifyAutogenOtp(sessionId, otp);
         if (!valid || user.getOtpExpiresAt() == null || user.getOtpExpiresAt().isBefore(LocalDateTime.now())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Invalid or expired OTP."));
@@ -474,7 +490,7 @@ public class AuthController {
                     .body(Map.of("message", "User not found."));
         }
         String sessionId = user.getOtp();
-        boolean valid = (sessionId != null && !sessionId.isEmpty()) && fast2SMSService.verifyAutogenOtp(sessionId, otp);
+        boolean valid = (sessionId != null && !sessionId.isEmpty()) && twoFactorService.verifyAutogenOtp(sessionId, otp);
         if (!valid || user.getOtpExpiresAt() == null || user.getOtpExpiresAt().isBefore(LocalDateTime.now())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Invalid or expired OTP."));
@@ -507,7 +523,7 @@ public class AuthController {
 
             // Verify via 2Factor using stored sessionId
             String sessionId = user.getOtp();
-            boolean valid = (sessionId != null && !sessionId.isEmpty()) && fast2SMSService.verifyAutogenOtp(sessionId, otp);
+            boolean valid = (sessionId != null && !sessionId.isEmpty()) && twoFactorService.verifyAutogenOtp(sessionId, otp);
             if (!valid || user.getOtpExpiresAt() == null || user.getOtpExpiresAt().isBefore(LocalDateTime.now())) {
                 
                 String errorReason;
@@ -543,7 +559,8 @@ public class AuthController {
                 "message", "OTP verified successfully! You are logged in.",
                 "contactNumber", user.getContactNumber(),
                 "fullName", user.getFullName() != null ? user.getFullName() : "",
-                "verified", "true"
+                "verified", "true",
+                "token", jwtService.issueTokenForContact(user.getContactNumber())
             ));
         } catch (Exception e) {
             System.err.println("Error in OTP verification: " + e.getMessage());

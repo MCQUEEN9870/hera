@@ -25,7 +25,6 @@ import com.example.demo.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {org.springframework.web.bind.annotation.RequestMethod.POST, org.springframework.web.bind.annotation.RequestMethod.GET})
 public class FeedbackController {
 
     private static final Logger logger = Logger.getLogger(FeedbackController.class.getName());
