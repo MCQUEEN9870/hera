@@ -45,8 +45,6 @@
   "shortcuts": [
     {
       "name": "Find Vehicle",
-      "short_name": "Find Vehicle",
-      "description": "Search for available transport vehicles",
       "url": "/vehicles.html",
       "icons": [
         {
@@ -57,9 +55,7 @@
       ]
     },
     {
-      "name": "Register Vehicle",
-      "short_name": "Register",
-      "description": "Register your transport vehicle",
+      "name": "Register Your Vehicle",
       "url": "/register.html",
       "icons": [
         {
@@ -71,8 +67,6 @@
     },
     {
       "name": "Contact Us",
-      "short_name": "Contact",
-      "description": "Get in touch with us",
       "url": "/contact-us.html",
       "icons": [
         {

@@ -22,7 +22,7 @@
         .dropdown-content { display: none; }
         .mobile-sidebar, .share-drawer .share-content, .review-content { display: none; }
     </style>
-    <title>Find Transport Vehicles Near You - Get Owner Details Free</title>
+    <title>Find Vehicles Near You - Transport Owner Details Free</title>
     <meta property="og:title" content="Find Transport Vehicles Near You | Herapherigoods">
     <meta name="twitter:title" content="Find Transport Vehicles Near You | Herapherigoods">
     <meta name="description" content="Find transport vehicles by pincode. View images, check capacity & contact owners directly — No brokers, no commission." />
@@ -30,13 +30,14 @@
     <meta name="twitter:description" content="Find transport vehicles by pincode. View images, check capacity & contact owners directly — No brokers, No commission." />
     <!-- Social Media Meta Tags -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://herapherigoods.in/vehicles" />
+    <meta property="og:url" content="https://herapherigoods.in/find-vehicles" />
     <meta property="og:site_name" content="Herapherigoods" />
     <meta property="og:image" content="attached_assets/images/1200x630.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="attached_assets/images/1200x630.jpg" />
+    <link rel="canonical" href="https://herapherigoods.in/find-vehicles" />
     <link rel="stylesheet" href="style.css?v=20251116-3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
      
@@ -1435,7 +1436,7 @@
     <!-- Vehicles JavaScript -->
     <script src="env.js?v=20251116-3"></script>
     <script src="seo.js"></script>
-    <!-- Convert clean URLs /vehicles/{City}/{Type} -> ?city=...&type=... before vehicles.js runs -->
+    <!-- Convert clean URLs /find-vehicles/{City}/{Type} (or legacy /vehicles/{City}/{Type}) -> ?city=...&type=... before vehicles.js runs -->
     <script>
         (function(){
             try {
@@ -1444,7 +1445,7 @@
                 var vi = -1;
                 for (var i = 0; i < segs.length; i++) {
                     var s = (segs[i] || '').toLowerCase();
-                    if (s === 'vehicles' || s === 'vehicles.html') { vi = i; break; }
+                    if (s === 'find-vehicles' || s === 'find-vehicles.html' || s === 'vehicles' || s === 'vehicles.html') { vi = i; break; }
                 }
                 if (vi !== -1 && segs.length >= vi + 3) {
                     var citySeg = segs[vi + 1] || '';

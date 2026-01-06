@@ -26,8 +26,29 @@ function buildUrl(path) {
     const extension = getUrlExtension();
     // Remove leading slash if present
     const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+
+    // Preserve query/hash while normalizing the base path
+    const hashIndex = cleanPath.indexOf('#');
+    const queryIndex = cleanPath.indexOf('?');
+    const cutIndex = (queryIndex === -1)
+        ? hashIndex
+        : (hashIndex === -1 ? queryIndex : Math.min(queryIndex, hashIndex));
+
+    const basePath = (cutIndex === -1) ? cleanPath : cleanPath.substring(0, cutIndex);
+    const suffix = (cutIndex === -1) ? '' : cleanPath.substring(cutIndex);
+    const lowerBase = (basePath || '').toLowerCase();
+
+    // Canonical public slug is /find-vehicles on live.
+    // Local file:// development still uses vehicles.html.
+    let mappedBase = basePath;
+    if (isLocalEnvironment()) {
+        if (lowerBase === 'find-vehicles') mappedBase = 'vehicles';
+    } else {
+        if (lowerBase === 'vehicles') mappedBase = 'find-vehicles';
+    }
+
     // Add .html extension for local, none for live
-    return extension ? `${cleanPath}${extension}` : cleanPath;
+    return extension ? `${mappedBase}${extension}${suffix}` : `${mappedBase}${suffix}`;
 }
 
 // Set API base URL based on environment (initial guess)

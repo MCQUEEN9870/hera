@@ -942,7 +942,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 <ul>
                     <li><a href="index"><i class="fas fa-chevron-right"></i> Home</a></li>
                     <li><a href="register"><i class="fas fa-chevron-right"></i> Register Vehicle</a></li>
-                    <li><a href="vehicles"><i class="fas fa-chevron-right"></i> Find Vehicles</a></li>
+                    <li><a href="find-vehicles"><i class="fas fa-chevron-right"></i> Find Vehicles</a></li>
                     <li><a href="contact-us"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
                 </ul>
             </div>
@@ -992,7 +992,7 @@ document.addEventListener('DOMContentLoaded', function(){
         // Smart URL conversion - automatically adds .html for local development
         if (typeof window.buildUrl === 'function') {
             // Convert all internal links to use smart URLs
-            const links = document.querySelectorAll('a[href^="index"], a[href^="register"], a[href^="vehicles"], a[href^="contact-us"], a[href^="terms-and-condition"], a[href^="privacy-policy"], a[href^="refer-and-refund-policy"]');
+            const links = document.querySelectorAll('a[href^="index"], a[href^="register"], a[href^="find-vehicles"], a[href^="vehicles"], a[href^="contact-us"], a[href^="terms-and-condition"], a[href^="privacy-policy"], a[href^="refer-and-refund-policy"]');
             links.forEach(link => {
                 const href = link.getAttribute('href');
                 if (href && !href.includes('?')) {

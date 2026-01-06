@@ -19,6 +19,31 @@
   compress = true
 
 # Prefer static pages for these exact paths (place BEFORE any SSR rewrites)
+
+# Canonical vehicles slug: /find-vehicles (keep old /vehicles working via 301)
+[[redirects]]
+  from = "/vehicles"
+  to = "/find-vehicles"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/vehicles/"
+  to = "/find-vehicles"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/vehicles/*"
+  to = "/find-vehicles/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/vehicles.html"
+  to = "/find-vehicles"
+  status = 301
+  force = true
 [[redirects]]
   from = "/register"
   to = "/register.html"
@@ -32,20 +57,20 @@
   force = true
 
 [[redirects]]
-  from = "/vehicles"
+  from = "/find-vehicles"
   to = "/vehicles.html"
   status = 200
   force = true
 
 [[redirects]]
-  from = "/vehicles/"
+  from = "/find-vehicles/"
   to = "/vehicles.html"
   status = 200
   force = true
 
 # Vehicles deep-links should render the SPA vehicles page
 [[redirects]]
-  from = "/vehicles/*"
+  from = "/find-vehicles/*"
   to = "/vehicles.html"
   status = 200
   force = true
@@ -78,7 +103,7 @@
   force = true
 
 [[redirects]]
-  from = "/vehicles"
+  from = "/find-vehicles"
   to = "/vehicles.html"
   status = 200
   force = true
@@ -91,6 +116,16 @@
 [[redirects]]
   from = "/contact-us"
   to = "/contact-us.html"
+  status = 200
+
+[[redirects]]
+  from = "/posts"
+  to = "/posts.html"
+  status = 200
+
+[[redirects]]
+  from = "/posts/"
+  to = "/posts.html"
   status = 200
 
 [[redirects]]
@@ -120,8 +155,13 @@
   status = 301
 
 [[redirects]]
+  from = "/find-vehicles.html"
+  to = "/find-vehicles"
+  status = 301
+
+[[redirects]]
   from = "/vehicles.html"
-  to = "/vehicles"
+  to = "/find-vehicles"
   status = 301
 
 [[redirects]]
@@ -132,6 +172,11 @@
 [[redirects]]
   from = "/contact-us.html"
   to = "/contact-us"
+  status = 301
+
+[[redirects]]
+  from = "/posts.html"
+  to = "/posts"
   status = 301
 
 [[redirects]]
