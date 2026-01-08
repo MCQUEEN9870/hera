@@ -13,12 +13,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.demo.security.JwtAuthenticationFilter;
+import com.example.demo.security.RateLimitingFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -30,9 +32,12 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(Environment environment, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    private final RateLimitingFilter rateLimitingFilter;
+
+    public SecurityConfig(Environment environment, JwtAuthenticationFilter jwtAuthenticationFilter, RateLimitingFilter rateLimitingFilter) {
         this.environment = environment;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.rateLimitingFilter = rateLimitingFilter;
     }
 
     private boolean isProdProfile() {
@@ -48,6 +53,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // Step 7: rate limiting for auth/OTP/payment endpoints (blocks brute-force & OTP spamming)
+            .addFilterBefore(rateLimitingFilter, SecurityContextHolderFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(eh -> eh
                 .authenticationEntryPoint((req, res, ex) -> {
@@ -91,6 +98,13 @@ public class SecurityConfig {
                         "/sitemap.xml"
                     ).permitAll();
 
+                // Require auth for endpoints that would otherwise match /api/registration/*
+                auth
+                    .requestMatchers(HttpMethod.GET,
+                        "/api/registration/search",
+                        "/api/registration/migrate-urls"
+                    ).authenticated();
+
                 // Public read-only APIs
                 auth
                     .requestMatchers(HttpMethod.GET,
@@ -98,7 +112,8 @@ public class SecurityConfig {
                         "/api/posts/**",
                         "/api/vehicles/search",
                         "/api/vehicles/check",
-                        "/api/registration/**",
+                        // NOTE: keep registration details fetch public, but not nested endpoints like documents
+                        "/api/registration/*",
                         "/api/registration-images/**",
                         "/api/images/**",
                         "/api/get-feedback",

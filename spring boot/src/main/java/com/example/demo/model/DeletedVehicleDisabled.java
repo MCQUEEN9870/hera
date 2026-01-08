@@ -60,14 +60,7 @@ public class DeletedVehicleDisabled implements Serializable {
         }
         
         // Check if we have any URLs and log them
-        if (!archivedUrls.isEmpty()) {
-            System.out.println("Creating DeletedVehicle with " + archivedUrls.size() + " archived URLs:");
-            for (int i = 0; i < archivedUrls.size(); i++) {
-                System.out.println((i + 1) + ". " + archivedUrls.get(i));
-            }
-        } else {
-            System.out.println("Creating DeletedVehicle with no archived URLs");
-        }
+        // Intentionally do not log archived URLs (sensitive)
         
         // Set the URLs using our improved setter method
         this.setVehicleImageUrls(archivedUrls);
@@ -89,7 +82,6 @@ public class DeletedVehicleDisabled implements Serializable {
             jsonArray.append("]");
             
             this.vehicleImageUrlsJson = jsonArray.toString();
-            System.out.println("JSON field manually set in constructor to: " + this.vehicleImageUrlsJson);
         }
     }
 
@@ -162,8 +154,6 @@ public class DeletedVehicleDisabled implements Serializable {
                         }
                     }
                 } catch (Exception e) {
-                    System.err.println("Error parsing vehicleImageUrlsJson: " + e.getMessage());
-                    System.err.println("Raw JSON: " + vehicleImageUrlsJson);
                     vehicleImageUrls = new ArrayList<>();
                 }
             } else {
@@ -208,9 +198,7 @@ public class DeletedVehicleDisabled implements Serializable {
                 this.vehicleImageUrlsJson = "[]";
             }
             
-            System.out.println("Set vehicleImageUrlsJson to: " + this.vehicleImageUrlsJson);
         } catch (Exception e) {
-            System.err.println("Error converting vehicleImageUrls to JSON: " + e.getMessage());
             this.vehicleImageUrlsJson = "[]";
         }
     }
@@ -232,7 +220,6 @@ public class DeletedVehicleDisabled implements Serializable {
         } else {
             this.vehicleImageUrlsJson = vehicleImageUrlsJson;
         }
-        System.out.println("vehicleImageUrlsJson directly set to: " + this.vehicleImageUrlsJson);
     }
 
     @Override

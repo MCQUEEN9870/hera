@@ -1,6 +1,8 @@
 package com.example.demo.service;
 
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,8 @@ import jakarta.annotation.PostConstruct;
 
 @Service
 public class TwoFactorService {
+
+    private static final Logger log = LoggerFactory.getLogger(TwoFactorService.class);
 
     // Simple SMS API: GET https://2factor.in/API/V1/{API_KEY}/SMS/{phone}/{message}
 
@@ -58,7 +62,7 @@ public class TwoFactorService {
             throw new IllegalStateException("2Factor SMS is enabled but 'twofactor.api.key' is missing. Set TWOFACTOR_API_KEY / twofactor.api.key in production.");
         }
 
-        System.err.println("[WARN] SMS is enabled but 'twofactor.api.key' is missing. Disabling SMS for this run.");
+        log.warn("SMS is enabled but 'twofactor.api.key' is missing. Disabling SMS for this run.");
         smsEnabled = false;
     }
 
@@ -83,7 +87,7 @@ public class TwoFactorService {
 
     private void sendViaTwoFactor(String phoneNumber, String message) {
         if (!smsEnabled) {
-            System.out.println("[SMS disabled] Would send to " + phoneNumber + ": " + message);
+            log.debug("[SMS disabled] Suppressed SMS send");
             return;
         }
         try {
@@ -94,18 +98,18 @@ public class TwoFactorService {
             String url = String.format(TWOFACTOR_SMS_URL_TEMPLATE, twoFactorApiKey, normalized, encodedMsg);
 
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-            System.out.println("2Factor SMS Response: " + response.getStatusCode() + " - " + response.getBody());
+            log.info("2Factor SMS request completed with status {}", response.getStatusCode());
         } catch (RestClientException e) {
-            System.err.println("Failed to send SMS via 2Factor API: " + e.getMessage());
+            log.warn("Failed to send SMS via 2Factor API: {}", e.getMessage());
         } catch (Exception e) {
-            System.err.println("Unexpected error while sending SMS: " + e.getMessage());
+            log.warn("Unexpected error while sending SMS: {}", e.getMessage());
         }
     }
 
     public void sendOtpSms(String phoneNumber, String otp) {
         try {
             if (!smsEnabled) {
-                System.out.println("[SMS disabled] Would send OTP to " + phoneNumber + ": " + otp);
+                log.debug("[SMS disabled] Suppressed OTP send");
                 return;
             }
             RestTemplate restTemplate = new RestTemplate();
@@ -114,11 +118,11 @@ public class TwoFactorService {
             String encodedMsg = java.net.URLEncoder.encode(message, java.nio.charset.StandardCharsets.UTF_8);
             String url = String.format(TWOFACTOR_SMS_WITH_OTP_URL_TEMPLATE, twoFactorApiKey, normalized, encodedMsg, otp);
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-            System.out.println("2Factor SMS OTP Response: " + response.getStatusCode() + " - " + response.getBody());
+            log.info("2Factor OTP-SMS request completed with status {}", response.getStatusCode());
         } catch (RestClientException e) {
-            System.err.println("Failed to send OTP via 2Factor API: " + e.getMessage());
+            log.warn("Failed to send OTP via 2Factor API: {}", e.getMessage());
         } catch (Exception e) {
-            System.err.println("Unexpected error while sending OTP: " + e.getMessage());
+            log.warn("Unexpected error while sending OTP: {}", e.getMessage());
         }
     }
 
@@ -126,7 +130,7 @@ public class TwoFactorService {
     public void sendOtpViaTemplate(String phoneNumber, String otp, String senderId, String templateName) {
         try {
             if (!smsEnabled) {
-                System.out.println("[SMS disabled] Would send OTP (TSMS) to " + phoneNumber + ": " + otp + " via template " + templateName);
+                log.debug("[SMS disabled] Suppressed TSMS OTP send");
                 return;
             }
             RestTemplate restTemplate = new RestTemplate();
@@ -144,11 +148,11 @@ public class TwoFactorService {
 
             String url = String.format(TWOFACTOR_TSMS_URL, twoFactorApiKey);
             ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-            System.out.println("2Factor TSMS Response: " + response.getStatusCode() + " - " + response.getBody());
+            log.info("2Factor TSMS request completed with status {}", response.getStatusCode());
         } catch (RestClientException e) {
-            System.err.println("Failed to send OTP via 2Factor TSMS API: " + e.getMessage());
+            log.warn("Failed to send OTP via 2Factor TSMS API: {}", e.getMessage());
         } catch (Exception e) {
-            System.err.println("Unexpected error while sending OTP (TSMS): " + e.getMessage());
+            log.warn("Unexpected error while sending OTP (TSMS): {}", e.getMessage());
         }
     }
 
@@ -164,7 +168,7 @@ public class TwoFactorService {
     public String sendAutogenOtp(String phoneNumber, String templateName, boolean fourDigit) {
         try {
             if (!smsEnabled) {
-                System.out.println("[SMS disabled] Would AUTOGEN send to " + phoneNumber + " via template " + templateName);
+                log.debug("[SMS disabled] Suppressed AUTOGEN send");
                 return null;
             }
             RestTemplate restTemplate = new RestTemplate();
@@ -172,19 +176,19 @@ public class TwoFactorService {
             String mode = fourDigit ? "AUTOGEN3" : "AUTOGEN";
             String url = String.format(TWOFACTOR_AUTOGEN_URL, twoFactorApiKey, normalized, mode, templateName);
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-            System.out.println("2Factor AUTOGEN Response: " + response.getStatusCode() + " - " + response.getBody());
+            log.info("2Factor AUTOGEN request completed with status {}", response.getStatusCode());
             if (response.getBody() != null) {
                 JSONObject obj = new JSONObject(response.getBody());
                 if ("Success".equalsIgnoreCase(obj.optString("Status"))) {
                     return obj.optString("Details", null); // session_id
                 }
-                System.err.println("AUTOGEN with template failed: " + obj.optString("Details"));
+                log.warn("AUTOGEN with template failed");
             }
             if (!autogenTemplateOnly) {
                 // Fallback: try AUTOGEN without template to isolate template/header issues
                 String urlNoTpl = String.format(TWOFACTOR_AUTOGEN_NO_TEMPLATE_URL, twoFactorApiKey, normalized, mode);
                 ResponseEntity<String> fallback = restTemplate.getForEntity(urlNoTpl, String.class);
-                System.out.println("2Factor AUTOGEN (no-template) Response: " + fallback.getStatusCode() + " - " + fallback.getBody());
+                log.info("2Factor AUTOGEN (no-template) request completed with status {}", fallback.getStatusCode());
                 if (fallback.getBody() != null) {
                     JSONObject obj2 = new JSONObject(fallback.getBody());
                     if ("Success".equalsIgnoreCase(obj2.optString("Status"))) {
@@ -192,12 +196,12 @@ public class TwoFactorService {
                     }
                 }
             } else {
-                System.out.println("Template-only AUTOGEN enforced. Skipping no-template fallback.");
+                log.debug("Template-only AUTOGEN enforced. Skipping no-template fallback.");
             }
         } catch (RestClientException e) {
-            System.err.println("Failed to send AUTOGEN via 2Factor API: " + e.getMessage());
+            log.warn("Failed to send AUTOGEN via 2Factor API: {}", e.getMessage());
         } catch (Exception e) {
-            System.err.println("Unexpected error while AUTOGEN: " + e.getMessage());
+            log.warn("Unexpected error while AUTOGEN: {}", e.getMessage());
         }
         return null;
     }
@@ -207,15 +211,15 @@ public class TwoFactorService {
             RestTemplate restTemplate = new RestTemplate();
             String url = String.format(TWOFACTOR_VERIFY_URL, twoFactorApiKey, sessionId, otp);
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-            System.out.println("2Factor VERIFY Response: " + response.getStatusCode() + " - " + response.getBody());
+            log.info("2Factor VERIFY request completed with status {}", response.getStatusCode());
             if (response.getBody() != null) {
                 JSONObject obj = new JSONObject(response.getBody());
                 return "Success".equalsIgnoreCase(obj.optString("Status"));
             }
         } catch (RestClientException e) {
-            System.err.println("Failed to verify OTP via 2Factor API: " + e.getMessage());
+            log.warn("Failed to verify OTP via 2Factor API: {}", e.getMessage());
         } catch (Exception e) {
-            System.err.println("Unexpected error while OTP verify: " + e.getMessage());
+            log.warn("Unexpected error while OTP verify: {}", e.getMessage());
         }
         return false;
     }

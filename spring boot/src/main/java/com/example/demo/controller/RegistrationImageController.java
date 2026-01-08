@@ -24,10 +24,14 @@ import com.example.demo.model.RegistrationImageFolder;
 import com.example.demo.repository.RegistrationImageFolderRepository;
 import com.example.demo.repository.RegistrationRepository;
 import com.example.demo.service.SupabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/registration-images")
 public class RegistrationImageController {
+
+    private static final Logger log = LoggerFactory.getLogger(RegistrationImageController.class);
 
     @Autowired
     private SupabaseService supabaseService;
@@ -69,12 +73,7 @@ public class RegistrationImageController {
             if (imageUrls != null && !imageUrls.isEmpty()) {
                 registrationEntity.setVehicleImageUrls(imageUrls);
                 registrationRepository.save(registrationEntity);
-                
-                // Log the URLs being saved
-                System.out.println("Saved image URLs to registration via API: " + registrationId);
-                for (String url : imageUrls) {
-                    System.out.println(" - " + url);
-                }
+                log.debug("Saved image URLs to registration via API (registrationId={}, count={})", registrationId, imageUrls.size());
             }
             
             Map<String, Object> response = new HashMap<>();
@@ -86,10 +85,10 @@ public class RegistrationImageController {
             
             return ResponseEntity.ok(response);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Error uploading images (registrationId={})", registrationId, e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error uploading images: " + e.getMessage());
+            errorResponse.put("message", "Error uploading images");
             
             return ResponseEntity.badRequest().body(errorResponse);
         }
@@ -115,27 +114,14 @@ public class RegistrationImageController {
             List<String> imageUrls = reg.getVehicleImageUrls();
             
             if (imageUrls != null && !imageUrls.isEmpty()) {
-                System.out.println("Found " + imageUrls.size() + " direct image URLs in registration " + registrationId);
-                
-                // Debug log all URLs
-                for (int i = 0; i < Math.min(imageUrls.size(), 5); i++) {
-                    System.out.println("Direct image URL " + (i+1) + " for registration " + registrationId + ": " + imageUrls.get(i));
-                }
-                if (imageUrls.size() > 5) {
-                    System.out.println("... and " + (imageUrls.size() - 5) + " more URLs");
-                }
+                log.debug("Found direct image URLs in registration (registrationId={}, count={})", registrationId, imageUrls.size());
                 
                 // Filter out any hidden folder markers
                 imageUrls = imageUrls.stream()
                     .filter(url -> !url.endsWith(".hidden_folder") && !url.endsWith(".folder"))
                     .toList();
                 
-                System.out.println("After filtering, returning " + imageUrls.size() + " direct image URLs for registration " + registrationId);
-                
-                // Log filtered URLs
-                for (int i = 0; i < Math.min(imageUrls.size(), 5); i++) {
-                    System.out.println("Filtered URL " + (i+1) + ": " + imageUrls.get(i));
-                }
+                log.debug("After filtering, returning direct image URLs (registrationId={}, count={})", registrationId, imageUrls.size());
                 
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
@@ -149,7 +135,7 @@ public class RegistrationImageController {
                         .header("Access-Control-Allow-Headers", "Content-Type")
                         .body(response);
             } else {
-                System.out.println("No direct image URLs found in registration entity " + registrationId + ", checking folder...");
+                log.debug("No direct image URLs found in registration entity; checking folder (registrationId={})", registrationId);
             }
             
             // If no direct URLs, check for folder
@@ -157,7 +143,7 @@ public class RegistrationImageController {
                     registrationImageFolderRepository.findFirstByRegistrationId(registrationId);
             
             if (!folderInfo.isPresent()) {
-                System.out.println("No folder found for registration " + registrationId);
+                log.debug("No folder found for registration (registrationId={})", registrationId);
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
                 response.put("registrationId", registrationId);
@@ -169,8 +155,7 @@ public class RegistrationImageController {
                         .header("Access-Control-Allow-Headers", "Content-Type")
                         .body(response);
             }
-            
-            System.out.println("Found folder for registration " + registrationId + ": " + folderInfo.get().getFolderPath());
+            log.debug("Found folder for registration (registrationId={})", registrationId);
             
             // Get all image URLs for the registration from Supabase
             try {
@@ -178,30 +163,19 @@ public class RegistrationImageController {
                 
                 // Filter out any hidden folder markers just to be safe
                 if (imageUrls != null && !imageUrls.isEmpty()) {
-                    System.out.println("Before filtering: " + imageUrls.size() + " URLs");
                     imageUrls = imageUrls.stream()
                         .filter(url -> !url.endsWith(".hidden_folder") && !url.endsWith(".folder"))
                         .toList();
-                    System.out.println("After filtering: " + imageUrls.size() + " URLs");
+                    log.debug("Filtered storage image URLs (registrationId={}, count={})", registrationId, imageUrls.size());
                 }
                 
                 // Update the registration with these URLs for future use
                 if (imageUrls != null && !imageUrls.isEmpty()) {
                     reg.setVehicleImageUrls(imageUrls);
                     registrationRepository.save(reg);
-                    System.out.println("Updated registration " + registrationId + " with " + imageUrls.size() + " image URLs");
-                    
-                    // Debug log first few updated URLs
-                    for (int i = 0; i < Math.min(imageUrls.size(), 5); i++) {
-                        System.out.println("Updated image URL " + (i+1) + " for registration " + registrationId + ": " + imageUrls.get(i));
-                    }
-                    if (imageUrls.size() > 5) {
-                        System.out.println("... and " + (imageUrls.size() - 5) + " more URLs");
-                    }
+                    log.debug("Updated registration with storage image URLs (registrationId={}, count={})", registrationId, imageUrls.size());
                 }
-                
-                // Log the retrieved URLs for debugging
-                System.out.println("Retrieved " + (imageUrls != null ? imageUrls.size() : 0) + " image URLs for registration ID " + registrationId);
+                log.debug("Retrieved image URLs from storage (registrationId={}, count={})", registrationId, imageUrls != null ? imageUrls.size() : 0);
                 
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
@@ -215,15 +189,14 @@ public class RegistrationImageController {
                         .header("Access-Control-Allow-Headers", "Content-Type")
                         .body(response);
             } catch (Exception e) {
-                System.err.println("Error fetching images from Supabase: " + e.getMessage());
-                e.printStackTrace();
+                log.warn("Error fetching images from Supabase (registrationId={})", registrationId, e);
                 // Return the direct URLs we found initially
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
                 response.put("registrationId", registrationId);
                 response.put("folderPath", folderInfo.get().getFolderPath());
                 response.put("imageUrls", imageUrls != null ? imageUrls : List.of());
-                response.put("error", "Error fetching from storage: " + e.getMessage());
+                response.put("error", "Error fetching from storage");
                 
                 return ResponseEntity.ok()
                         .header("Access-Control-Allow-Origin", "*")
@@ -232,10 +205,10 @@ public class RegistrationImageController {
                         .body(response);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Error retrieving images (registrationId={})", registrationId, e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error retrieving images: " + e.getMessage());
+            errorResponse.put("message", "Error retrieving images");
             
             return ResponseEntity.badRequest()
                     .header("Access-Control-Allow-Origin", "*")
@@ -270,10 +243,10 @@ public class RegistrationImageController {
             
             return ResponseEntity.ok(response);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Error deleting registration images (registrationId={})", registrationId, e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error deleting images: " + e.getMessage());
+            errorResponse.put("message", "Error deleting images");
             
             return ResponseEntity.badRequest().body(errorResponse);
         }

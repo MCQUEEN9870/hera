@@ -48,6 +48,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Log the API base URL for debugging
     console.log('Using API base URL:', API_BASE_URL);
 
+    // Basic HTML escaping for any untrusted text inserted via innerHTML
+    function escapeHtml(value) {
+        const s = (value === null || value === undefined) ? '' : String(value);
+        return s
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // Allow only safe URL schemes/paths for <img src> etc.
+    function safeUrl(input) {
+        const raw = (input === null || input === undefined) ? '' : String(input).trim();
+        if (!raw) return '';
+        if (raw.startsWith('attached_assets/') || raw.startsWith('./') || raw.startsWith('../') || raw.startsWith('/')) return raw;
+        if (/^https?:\/\//i.test(raw)) return raw;
+        if (/^data:image\//i.test(raw)) return raw;
+        return '';
+    }
+
     // Pagination state (temporary PAGE_SIZE=2 for visual testing; will revert to 20)
     let currentPage = 1;
     const PAGE_SIZE = 20; // Restored standard page size
@@ -1118,6 +1139,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const vehicleState = vehicle.locationState || vehicle.state || 'Unknown State';
         const vehiclePincodeCard = vehicle.locationPincode || vehicle.pincode || '-';
         const ownerName = vehicle.ownerName || vehicle.driverName || vehicle.owner || vehicle.fullName || 'Owner';
+
+        const vehicleNameEsc = escapeHtml(vehicleName);
+        const vehicleCityEsc = escapeHtml(vehicleCity);
+        const vehicleStateEsc = escapeHtml(vehicleState);
+        const vehiclePincodeCardEsc = escapeHtml(vehiclePincodeCard);
+        const ownerNameEsc = escapeHtml(ownerName);
         // Premium flag used later inside modal content rendering (scoped to modal only)
         let isPremiumForModal = false;
         try {
@@ -1185,7 +1212,7 @@ document.addEventListener('DOMContentLoaded', function() {
             highlightsHTML = `
                 <div class="service-highlights ${isPremium ? 'premium-highlights' : ''}">
                     ${vehicle.serviceHighlights.slice(0, 2).map(highlight => 
-                        `<span class="highlight-tag ${isPremium ? 'premium-tag' : ''}">${highlight}</span>`
+                        `<span class="highlight-tag ${isPremium ? 'premium-tag' : ''}">${escapeHtml(highlight)}</span>`
                     ).join('')}
                     ${vehicle.serviceHighlights.length > 2 ? `<span class="highlight-more ${isPremium ? 'premium-more' : ''}"">+${vehicle.serviceHighlights.length - 2}</span>` : ''}
                 </div>
@@ -1219,19 +1246,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const realDetails = document.createElement('div');
         realDetails.className = 'details-real pending';
         realDetails.innerHTML = `
-            <h3 class="vehicle-title ${isPremium ? 'premium-title' : ''}">${vehicleName}</h3>
+            <h3 class="vehicle-title ${isPremium ? 'premium-title' : ''}">${vehicleNameEsc}</h3>
             <div class="vehicle-info">
                 <div class="info-item">
                     <i class="fas fa-map-marker-alt"></i>
-                    <span>${vehicleCity}, ${vehicleState}</span>
+                    <span>${vehicleCityEsc}, ${vehicleStateEsc}</span>
                 </div>
                 <div class="info-item">
                     <i class="fas fa-thumbtack"></i>
-                    <span>${vehiclePincodeCard}</span>
+                    <span>${vehiclePincodeCardEsc}</span>
                 </div>
                 <div class="info-item">
                     <i class="fas fa-user"></i>
-                    <span>${ownerName}</span>
+                    <span>${ownerNameEsc}</span>
                 </div>
                 ${getTrustIndicatorText()}
                 ${highlightsHTML}
@@ -1360,6 +1387,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const vehiclePincode = vehicle.locationPincode || vehicle.pincode || '-';
     const ownerName = vehicle.ownerName || vehicle.driverName || vehicle.owner || vehicle.fullName || 'Owner';
         const ownerPhone = vehicle.ownerPhone || vehicle.driverPhone || vehicle.contactNumber || vehicle.contact || vehicle.phone || '-';
+
+        const vehicleNameEsc = escapeHtml(vehicleName);
+        const vehicleTypeEsc = escapeHtml(vehicleType);
+        const vehicleCityEsc = escapeHtml(vehicleCity);
+        const vehicleStateEsc = escapeHtml(vehicleState);
+        const vehiclePincodeEsc = escapeHtml(vehiclePincode);
+        const ownerNameEsc = escapeHtml(ownerName);
+        const ownerPhoneEsc = escapeHtml(ownerPhone);
     // Modal-scoped premium flag used in rendering below
     const isPremiumForModal = (vehicle && vehicle.membership ? String(vehicle.membership).toLowerCase() : '') === 'premium';
         // Check all possible field names for WhatsApp number
@@ -1387,11 +1422,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (value === '-' || value === '' || value == null) {
                 return `<div class="info-value">-</div>`;
             }
-            const safe = String(value);
+            const raw = String(value);
+            const safeText = escapeHtml(raw);
+            const safeAttr = escapeHtml(raw);
             return `
                 <div class="info-value-container">
-                    <div class="info-value">${safe}</div>
-                    <i class="fas fa-copy copy-btn" title="Copy to clipboard" data-value="${safe}"></i>
+                    <div class="info-value">${safeText}</div>
+                    <i class="fas fa-copy copy-btn" title="Copy to clipboard" data-value="${safeAttr}"></i>
                 </div>
             `;
         }
@@ -1837,8 +1874,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // We'll create document badges later after the modal HTML is populated
             
             // Populate modal header
+            const headerImageSrc = safeUrl(images[0]) || 'attached_assets/images/default-vehicle.png';
+            const vehicleNameForAlt = escapeHtml(vehicleName);
             modalHeader.innerHTML = `
-                <img src="${images[0]}" alt="${vehicleName}" class="modal-header-image" onerror="this.src='attached_assets/images/default-vehicle.png'">
+                <img src="${headerImageSrc}" alt="${vehicleNameForAlt}" class="modal-header-image" onerror="this.src='attached_assets/images/default-vehicle.png'">
                 ${badgeHTML}
             `;
             // Bind click to open full image
@@ -2001,7 +2040,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <div class="info-icon"><i class="fas fa-truck"></i></div>
                                 <div class="info-content">
                                     <div class="info-label">Vehicle Type</div>
-                                    <div class="info-value">${vehicleType}</div>
+                                    <div class="info-value">${vehicleTypeEsc}</div>
                                 </div>
                             </li>
                             ${registrationNumberSection}
@@ -2009,14 +2048,14 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
                                 <div class="info-content">
                                     <div class="info-label">Location</div>
-                                    <div class="info-value">${vehicleCity}, ${vehicleState}</div>
+                                    <div class="info-value">${vehicleCityEsc}, ${vehicleStateEsc}</div>
                                 </div>
                             </li>
                             <li class="modal-info-item">
                                 <div class="info-icon"><i class="fas fa-thumbtack"></i></div>
                                 <div class="info-content">
                                     <div class="info-label">Pincode</div>
-                                    <div class="info-value">${vehiclePincode}</div>
+                                    <div class="info-value">${vehiclePincodeEsc}</div>
                                 </div>
                             </li>
                         </ul>
@@ -2034,7 +2073,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <div class="info-icon"><i class="fas fa-user"></i></div>
                                 <div class="info-content">
                                     <div class="info-label">Name</div>
-                                    <div class="info-value">${ownerName}</div>
+                                    <div class="info-value">${ownerNameEsc}</div>
                                 </div>
                             </li>
                             <li class="modal-info-item">
@@ -2063,7 +2102,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <div class="info-icon"><i class="fas fa-calendar-alt"></i></div>
                                 <div class="info-content">
                                     <div class="info-label">Registered Since</div>
-                                    <div class="info-value">${formatDate(registrationDate)}</div>
+                                    <div class="info-value">${escapeHtml(formatDate(registrationDate))}</div>
                                 </div>
                             </li>` : ''}
                         </ul>
@@ -2260,7 +2299,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Fallback minimal content to ensure modal is usable
                     const fallbackTitle = vehicle.name || vehicle.vehicleName || vehicle.fullName || 'Vehicle Details';
                     if (modalHeader) {
-                        modalHeader.innerHTML = `<div class="modal-header-overlay"><div class="modal-vehicle-title">${fallbackTitle}</div></div>`;
+                        modalHeader.innerHTML = `<div class="modal-header-overlay"><div class="modal-vehicle-title">${escapeHtml(fallbackTitle)}</div></div>`;
                     }
                     if (modalGallery) {
                         modalGallery.innerHTML = '<img src="attached_assets/images/default-vehicle.png" alt="Vehicle" style="width:100%;max-height:300px;object-fit:cover;">';
@@ -2270,13 +2309,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         const vehicleCity = vehicle.locationCity || vehicle.city || 'Unknown';
                         const vehicleState = vehicle.locationState || vehicle.state || 'Unknown';
                         const ownerName = vehicle.ownerName || vehicle.driverName || vehicle.owner || vehicle.fullName || 'Owner';
+                        const vehicleTypeEsc = escapeHtml(vehicleType);
+                        const vehicleCityEsc = escapeHtml(vehicleCity);
+                        const vehicleStateEsc = escapeHtml(vehicleState);
+                        const ownerNameEsc = escapeHtml(ownerName);
                         modalInfo.innerHTML = `
                             <div class="left-column">
                                 <div class="modal-section">
                                     <h4 class="modal-section-title">Vehicle Details</h4>
                                     <ul class="modal-info-list">
-                                        <li class="modal-info-item"><div class="info-icon"><i class="fas fa-truck"></i></div><div class="info-content"><div class="info-label">Vehicle Type</div><div class="info-value">${vehicleType}</div></div></li>
-                                        <li class="modal-info-item"><div class="info-icon"><i class="fas fa-map-marker-alt"></i></div><div class="info-content"><div class="info-label">Location</div><div class="info-value">${vehicleCity}, ${vehicleState}</div></div></li>
+                                        <li class="modal-info-item"><div class="info-icon"><i class="fas fa-truck"></i></div><div class="info-content"><div class="info-label">Vehicle Type</div><div class="info-value">${vehicleTypeEsc}</div></div></li>
+                                        <li class="modal-info-item"><div class="info-icon"><i class="fas fa-map-marker-alt"></i></div><div class="info-content"><div class="info-label">Location</div><div class="info-value">${vehicleCityEsc}, ${vehicleStateEsc}</div></div></li>
                                     </ul>
                                 </div>
                             </div>
@@ -2284,7 +2327,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <div class="modal-section">
                                     <h4 class="modal-section-title">Owner Information</h4>
                                     <ul class="modal-info-list">
-                                        <li class="modal-info-item"><div class="info-icon"><i class="fas fa-user"></i></div><div class="info-content"><div class="info-label">Name</div><div class="info-value">${ownerName}</div></div></li>
+                                        <li class="modal-info-item"><div class="info-icon"><i class="fas fa-user"></i></div><div class="info-content"><div class="info-label">Name</div><div class="info-value">${ownerNameEsc}</div></div></li>
                                     </ul>
                                 </div>
                             </div>`;
@@ -2299,22 +2342,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Modal image loader with retry attempts
     function loadModalImage(imgEl, url, skeletonEl, retryWrap, attempt=0) {
         const MAX_ATTEMPTS = 2;
+        const safe = safeUrl(url);
+        if (!safe) {
+            if (skeletonEl) skeletonEl.remove();
+            retryWrap.classList.remove('hidden');
+            return;
+        }
         const tester = new Image();
         tester.onload = () => {
-            imgEl.src = url;
+            imgEl.src = safe;
             if (skeletonEl) skeletonEl.remove();
             imgEl.style.opacity='0';
             requestAnimationFrame(()=>{ imgEl.style.transition='opacity .4s'; imgEl.style.opacity='1'; });
         };
         tester.onerror = () => {
             if (attempt < MAX_ATTEMPTS) {
-                setTimeout(()=> loadModalImage(imgEl, url, skeletonEl, retryWrap, attempt+1), 900);
+                setTimeout(()=> loadModalImage(imgEl, safe, skeletonEl, retryWrap, attempt+1), 900);
             } else {
                 if (skeletonEl) skeletonEl.remove();
                 retryWrap.classList.remove('hidden');
             }
         };
-        tester.src = url;
+        tester.src = safe;
     }
     
     // Function to format date

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,6 +24,7 @@ import com.example.demo.model.Registration;
 import com.example.demo.model.User;
 import com.example.demo.repository.RegistrationRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.security.SecurityUtils;
 import com.example.demo.service.SupabaseService;
 
 /**
@@ -31,6 +34,8 @@ import com.example.demo.service.SupabaseService;
 @RestController
 @RequestMapping("/api")
 public class DeletionController {
+
+    private static final Logger log = LoggerFactory.getLogger(DeletionController.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -50,11 +55,29 @@ public class DeletionController {
      */
     @DeleteMapping("/vehicles/delete/{registrationId}")
     public ResponseEntity<?> deleteVehicle(@PathVariable Long registrationId) {
-        System.out.println("DeletionController: Starting deletion for vehicle ID: " + registrationId);
+        log.debug("Vehicle deletion requested (registrationId={})", registrationId);
         
         Map<String, Object> response = new HashMap<>();
         
         try {
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+            User currentUser = userRepository.findByContactNumber(currentContact);
+            if (currentUser == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+            Registration regOwnerCheck = registrationRepository.findById(registrationId).orElse(null);
+            if (regOwnerCheck == null) {
+                response.put("success", false);
+                response.put("message", "Vehicle not found with ID: " + registrationId);
+                return ResponseEntity.status(404).body(response);
+            }
+            if (regOwnerCheck.getUserId() == null || !regOwnerCheck.getUserId().equals(currentUser.getId())) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+
             // Step 1: Check if vehicle exists
             Integer count = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM registration WHERE id = ?", 
@@ -74,18 +97,18 @@ public class DeletionController {
                     "SELECT id, vehicle_plate_number FROM registration WHERE id = ?",
                     registrationId
                 );
-                System.out.println("DeletionController: Found vehicle: " + vehicle.get("vehicle_plate_number") + " (ID: " + vehicle.get("id") + ")");
+                log.debug("Vehicle found for deletion (registrationId={})", vehicle.get("id"));
             } catch (Exception e) {
-                System.out.println("DeletionController: Could not get vehicle details: " + e.getMessage());
+                log.debug("Could not fetch vehicle details for logging (registrationId={}): {}", registrationId, e.toString());
             }
             
             // Step 3: Delete images from Supabase storage first
             try {
-                System.out.println("DeletionController: Deleting vehicle images from storage");
+                log.debug("Deleting vehicle images from storage (registrationId={})", registrationId);
                 supabaseService.deleteAllVehicleImages(registrationId);
-                System.out.println("DeletionController: Successfully deleted images from storage");
+                log.debug("Deleted vehicle images from storage (registrationId={})", registrationId);
             } catch (Exception e) {
-                System.err.println("DeletionController: Error deleting images from storage: " + e.getMessage());
+                log.warn("Error deleting vehicle images from storage (registrationId={}): {}", registrationId, e.toString());
                 // Continue with deletion even if image deletion fails
             }
             
@@ -95,9 +118,9 @@ public class DeletionController {
                     "DELETE FROM registration_image_folders WHERE registration_id = ?",
                     registrationId
                 );
-                System.out.println("DeletionController: Deleted " + folderRows + " rows from registration_image_folders");
+                log.debug("Deleted registration_image_folders rows (registrationId={}, rows={})", registrationId, folderRows);
             } catch (Exception e) {
-                System.err.println("DeletionController: Error deleting from registration_image_folders: " + e.getMessage());
+                log.warn("Error deleting registration_image_folders rows (registrationId={}): {}", registrationId, e.toString());
                 // Continue anyway
             }
             
@@ -107,9 +130,9 @@ public class DeletionController {
                     "UPDATE registration SET vehicle_image_urls_json = '[]' WHERE id = ?",
                     registrationId
                 );
-                System.out.println("DeletionController: Cleared image URLs for " + updated + " rows");
+                log.debug("Cleared image URLs JSON (registrationId={}, rows={})", registrationId, updated);
             } catch (Exception e) {
-                System.err.println("DeletionController: Error clearing image URLs: " + e.getMessage());
+                log.warn("Error clearing image URLs JSON (registrationId={}): {}", registrationId, e.toString());
                 // Continue anyway
             }
             
@@ -118,10 +141,10 @@ public class DeletionController {
                 "DELETE FROM registration WHERE id = ?",
                 registrationId
             );
-            System.out.println("DeletionController: Deleted " + regRows + " rows from registration");
+            log.debug("Deleted registration row (registrationId={}, rows={})", registrationId, regRows);
             
             if (regRows == 0) {
-                System.err.println("DeletionController: No rows deleted from registration table");
+                log.warn("No rows deleted from registration table (registrationId={})", registrationId);
                 response.put("success", false);
                 response.put("message", "Failed to delete vehicle - no rows affected");
                 return ResponseEntity.status(500).body(response);
@@ -135,7 +158,7 @@ public class DeletionController {
             );
             
             if (remaining != null && remaining > 0) {
-                System.err.println("DeletionController: Vehicle still exists after deletion!");
+                log.warn("Vehicle still exists after deletion attempt (registrationId={})", registrationId);
                 response.put("success", false);
                 response.put("message", "Failed to delete vehicle - it still exists after deletion attempt");
                 return ResponseEntity.status(500).body(response);
@@ -147,11 +170,10 @@ public class DeletionController {
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-            System.err.println("DeletionController: Error in deletion: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error deleting vehicle (registrationId={})", registrationId, e);
             
             response.put("success", false);
-            response.put("message", "Failed to delete vehicle: " + e.getMessage());
+            response.put("message", "Failed to delete vehicle");
             return ResponseEntity.status(500).body(response);
         }
     }
@@ -162,11 +184,29 @@ public class DeletionController {
      */
     @DeleteMapping("/vehicles/force-delete/{registrationId}")
     public ResponseEntity<?> forceDeleteVehicle(@PathVariable Long registrationId) {
-        System.out.println("DeletionController: Starting FORCE deletion for vehicle ID: " + registrationId);
+        log.warn("FORCE vehicle deletion requested (registrationId={})", registrationId);
         
         Map<String, Object> response = new HashMap<>();
         
         try {
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+            User currentUser = userRepository.findByContactNumber(currentContact);
+            if (currentUser == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+            Registration regOwnerCheck = registrationRepository.findById(registrationId).orElse(null);
+            if (regOwnerCheck == null) {
+                response.put("success", false);
+                response.put("message", "Vehicle not found with ID: " + registrationId);
+                return ResponseEntity.status(404).body(response);
+            }
+            if (regOwnerCheck.getUserId() == null || !regOwnerCheck.getUserId().equals(currentUser.getId())) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+
             // Step 1: Check if vehicle exists
             Integer count = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM registration WHERE id = ?", 
@@ -182,16 +222,16 @@ public class DeletionController {
             
             // Step 2: Delete images from Supabase storage first
             try {
-                System.out.println("DeletionController: FORCE deleting vehicle images from storage");
+                log.debug("FORCE deleting vehicle images from storage (registrationId={})", registrationId);
                 supabaseService.deleteAllVehicleImages(registrationId);
-                System.out.println("DeletionController: Successfully deleted images from storage");
+                log.debug("FORCE deleted vehicle images from storage (registrationId={})", registrationId);
             } catch (Exception e) {
-                System.err.println("DeletionController: Error deleting images from storage: " + e.getMessage());
+                log.warn("Error deleting vehicle images from storage during FORCE delete (registrationId={}): {}", registrationId, e.toString());
                 // Continue with deletion even if image deletion fails
             }
             
             // Step 3: Disable foreign key checks temporarily
-            System.out.println("DeletionController: Disabling foreign key checks");
+            log.debug("Disabling foreign key checks (registrationId={})", registrationId);
             jdbcTemplate.execute("SET CONSTRAINTS ALL DEFERRED");
             
             // Step 4: Delete from registration_image_folders first
@@ -200,9 +240,9 @@ public class DeletionController {
                     "DELETE FROM registration_image_folders WHERE registration_id = ?",
                     registrationId
                 );
-                System.out.println("DeletionController: Deleted " + folderRows + " rows from registration_image_folders");
+                log.debug("Deleted registration_image_folders rows (registrationId={}, rows={})", registrationId, folderRows);
             } catch (Exception e) {
-                System.err.println("DeletionController: Error deleting from registration_image_folders: " + e.getMessage());
+                log.warn("Error deleting registration_image_folders rows (registrationId={}): {}", registrationId, e.toString());
                 // Continue anyway
             }
             
@@ -212,9 +252,9 @@ public class DeletionController {
                     "UPDATE registration SET vehicle_image_urls_json = '[]' WHERE id = ?",
                     registrationId
                 );
-                System.out.println("DeletionController: Cleared image URLs for " + updated + " rows");
+                log.debug("Cleared image URLs JSON (registrationId={}, rows={})", registrationId, updated);
             } catch (Exception e) {
-                System.err.println("DeletionController: Error clearing image URLs: " + e.getMessage());
+                log.warn("Error clearing image URLs JSON (registrationId={}): {}", registrationId, e.toString());
                 // Continue anyway
             }
             
@@ -223,10 +263,10 @@ public class DeletionController {
                 "DELETE FROM registration WHERE id = ?",
                 registrationId
             );
-            System.out.println("DeletionController: Deleted " + regRows + " rows from registration");
+            log.debug("Deleted registration row (registrationId={}, rows={})", registrationId, regRows);
             
             // Step 7: Re-enable foreign key checks
-            System.out.println("DeletionController: Re-enabling foreign key checks");
+            log.debug("Re-enabling foreign key checks (registrationId={})", registrationId);
             jdbcTemplate.execute("SET CONSTRAINTS ALL IMMEDIATE");
             
             // Step 8: Verify deletion
@@ -237,7 +277,7 @@ public class DeletionController {
             );
             
             if (remaining != null && remaining > 0) {
-                System.err.println("DeletionController: Vehicle still exists after force deletion!");
+                log.warn("Vehicle still exists after FORCE deletion attempt (registrationId={})", registrationId);
                 response.put("success", false);
                 response.put("message", "Failed to delete vehicle - it still exists after deletion attempt");
                 return ResponseEntity.status(500).body(response);
@@ -249,11 +289,10 @@ public class DeletionController {
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-            System.err.println("DeletionController: Error in forced deletion: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error in FORCE vehicle deletion (registrationId={})", registrationId, e);
             
             response.put("success", false);
-            response.put("message", "Failed to delete vehicle: " + e.getMessage());
+            response.put("message", "Failed to delete vehicle");
             return ResponseEntity.status(500).body(response);
         }
     }
@@ -268,6 +307,15 @@ public class DeletionController {
     @DeleteMapping("/deleteUser/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
         try {
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+            User currentUser = userRepository.findByContactNumber(currentContact);
+            if (currentUser == null || userId == null || !userId.equals(currentUser.getId())) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+
             // Find the user
             Optional<User> optionalUser = userRepository.findById(userId);
             
@@ -281,14 +329,14 @@ public class DeletionController {
             User user = optionalUser.get();
             
             // Log the account deletion request
-            System.out.println("Account deletion requested for user ID: " + userId);
+            log.info("Account deletion requested (userId={})", userId);
             
             // Create a list to track any deletion errors
             List<String> deletionErrors = new ArrayList<>();
             
             // Find all registrations associated with this user by userId
             List<Registration> userRegistrations = registrationRepository.findByUserId(userId);
-            System.out.println("Found " + userRegistrations.size() + " vehicle registrations for user ID: " + userId);
+            log.debug("Found registrations for deletion (userId={}, count={})", userId, userRegistrations.size());
             
             // First handle all potential foreign key constraint issues, in correct order
             
@@ -298,16 +346,16 @@ public class DeletionController {
             for (Registration registration : userRegistrations) {
                 try {
                     Long registrationId = registration.getId();
-                    System.out.println("Processing registration ID: " + registrationId);
+                    log.debug("Processing registration deletion (registrationId={})", registrationId);
                     // IMPORTANT: Delete images BEFORE removing folder records so path info is still available
                     // 2.1 Delete vehicle images from storage
                     try {
-                        System.out.println("Deleting vehicle images for registration: " + registrationId);
+                        log.debug("Deleting vehicle images for registration (registrationId={})", registrationId);
                         supabaseService.deleteAllVehicleImages(registrationId);
-                        System.out.println("Successfully deleted vehicle images for registration: " + registrationId);
+                        log.debug("Deleted vehicle images for registration (registrationId={})", registrationId);
                     } catch (Exception e) {
                         String errorMsg = "Error deleting vehicle images for registration " + registrationId + ": " + e.getMessage();
-                        System.err.println(errorMsg);
+                        log.warn(errorMsg);
                         deletionErrors.add(errorMsg);
                         // Continue with deletion
                     }
@@ -318,10 +366,10 @@ public class DeletionController {
                             "DELETE FROM registration_image_folders WHERE registration_id = ?", 
                             registrationId
                         );
-                        System.out.println("Deleted " + rowsDeleted + " rows from registration_image_folders for registration: " + registrationId);
+                        log.debug("Deleted registration_image_folders rows (registrationId={}, rows={})", registrationId, rowsDeleted);
                     } catch (Exception e) {
                         String errorMsg = "Error deleting from registration_image_folders for registration " + registrationId + ": " + e.getMessage();
-                        System.err.println(errorMsg);
+                        log.warn(errorMsg);
                         deletionErrors.add(errorMsg);
                         // Continue with deletion
                     }
@@ -332,24 +380,23 @@ public class DeletionController {
                     
                     // 2.4 Delete the registration
                     registrationRepository.delete(registration);
-                    System.out.println("Successfully deleted registration: " + registrationId);
+                    log.debug("Deleted registration record (registrationId={})", registrationId);
                     
                 } catch (Exception e) {
                     String errorMsg = "Error deleting registration " + registration.getId() + ": " + e.getMessage();
-                    System.err.println(errorMsg);
-                    e.printStackTrace();
+                    log.warn(errorMsg, e);
                     deletionErrors.add(errorMsg);
                     
                     // Try direct SQL as fallback
                     try {
                         int rowsDeleted = jdbcTemplate.update("DELETE FROM registration WHERE id = ?", registration.getId());
                         if (rowsDeleted > 0) {
-                            System.out.println("Successfully deleted registration using SQL: " + registration.getId());
+                            log.debug("Deleted registration using SQL fallback (registrationId={})", registration.getId());
                         } else {
-                            System.err.println("No rows deleted with SQL for registration: " + registration.getId());
+                            log.warn("No rows deleted with SQL fallback (registrationId={})", registration.getId());
                         }
                     } catch (Exception ex) {
-                        System.err.println("SQL fallback also failed for registration " + registration.getId() + ": " + ex.getMessage());
+                        log.warn("SQL fallback failed (registrationId={}): {}", registration.getId(), ex.toString());
                     }
                 }
             }
@@ -357,13 +404,13 @@ public class DeletionController {
             // 3. Delete profile photo if exists
             try {
                 if (user.getProfilePhotoUrl() != null && !user.getProfilePhotoUrl().isEmpty()) {
-                    System.out.println("Deleting profile photo for user ID: " + userId);
+                    log.debug("Deleting profile photo for user (userId={})", userId);
                     supabaseService.deleteProfilePhoto(user.getProfilePhotoUrl());
-                    System.out.println("Successfully deleted profile photo for user ID: " + userId);
+                    log.debug("Deleted profile photo for user (userId={})", userId);
                 }
             } catch (Exception e) {
                 String errorMsg = "Error deleting profile photo: " + e.getMessage();
-                System.err.println(errorMsg);
+                log.warn(errorMsg);
                 deletionErrors.add(errorMsg);
                 // Continue with user deletion
             }
@@ -376,16 +423,15 @@ public class DeletionController {
                 
                 // Delete the user record
                 userRepository.delete(user);
-                System.out.println("Successfully deleted user from database: " + userId);
+                log.info("Deleted user from database (userId={})", userId);
             } catch (Exception e) {
                 String errorMsg = "Error deleting user from database: " + e.getMessage();
-                System.err.println(errorMsg);
-                e.printStackTrace();
+                log.error(errorMsg, e);
                 deletionErrors.add(errorMsg);
                 
                 Map<String, Object> errorResponse = new HashMap<>();
                 errorResponse.put("success", false);
-                errorResponse.put("message", "Failed to delete user: " + e.getMessage());
+                errorResponse.put("message", "Failed to delete user");
                 errorResponse.put("errors", deletionErrors);
                 return ResponseEntity.status(500).body(errorResponse);
             }
@@ -406,12 +452,11 @@ public class DeletionController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.err.println("Error in deleteUser: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error in deleteUser (userId={})", userId, e);
             
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Failed to delete user: " + e.getMessage());
+            errorResponse.put("message", "Failed to delete user");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
@@ -431,7 +476,7 @@ public class DeletionController {
             return ResponseEntity.badRequest().body(response);
         }
         
-        System.out.println("ADMIN DELETE: Attempting to delete vehicle with plate number: " + vehiclePlateNumber);
+        log.info("ADMIN DELETE: Attempting to delete vehicle by plate number");
         
         try {
             // Find the registration by vehicle plate number
@@ -445,14 +490,14 @@ public class DeletionController {
             }
             
             Long registrationId = registration.getId();
-            System.out.println("ADMIN DELETE: Found vehicle with ID: " + registrationId);
+            log.info("ADMIN DELETE: Found vehicle (registrationId={})", registrationId);
             
             // Delete registration_image_folders entries
             int deletedFolders = jdbcTemplate.update(
                 "DELETE FROM registration_image_folders WHERE registration_id = ?", 
                 registrationId
             );
-            System.out.println("ADMIN DELETE: Deleted " + deletedFolders + " folder records");
+            log.debug("ADMIN DELETE: Deleted folder records (registrationId={}, rows={})", registrationId, deletedFolders);
             
             // Clear image URLs to avoid LOB issues
             registration.setVehicleImageUrls(new ArrayList<>());
@@ -460,14 +505,14 @@ public class DeletionController {
             
             // Delete the registration
             registrationRepository.delete(registration);
-            System.out.println("ADMIN DELETE: Successfully deleted registration record");
+            log.info("ADMIN DELETE: Deleted registration record (registrationId={})", registrationId);
             
             // Clean up storage buckets
             try {
                 supabaseService.deleteAllVehicleImages(registrationId);
-                System.out.println("ADMIN DELETE: Successfully cleaned up storage buckets");
+                log.debug("ADMIN DELETE: Cleaned up storage (registrationId={})", registrationId);
             } catch (IOException e) {
-                System.err.println("ADMIN DELETE: Error cleaning up storage buckets: " + e.getMessage());
+                log.warn("ADMIN DELETE: Error cleaning up storage (registrationId={}): {}", registrationId, e.toString());
                 // Continue with response as the database record is deleted
             }
             
@@ -481,12 +526,11 @@ public class DeletionController {
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-            System.err.println("ADMIN DELETE: Error deleting vehicle: " + e.getMessage());
-            e.printStackTrace();
+            log.error("ADMIN DELETE: Error deleting vehicle", e);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
-            response.put("message", "Error deleting vehicle: " + e.getMessage());
+            response.put("message", "Error deleting vehicle");
             return ResponseEntity.internalServerError().body(response);
         }
     }
@@ -496,7 +540,7 @@ public class DeletionController {
      */
     @DeleteMapping("/admin/vehicles/{registrationId}")
     public ResponseEntity<?> deleteVehicleById(@PathVariable Long registrationId) {
-        System.out.println("ADMIN DELETE: Attempting to delete vehicle with ID: " + registrationId);
+        log.info("ADMIN DELETE: Attempting to delete vehicle (registrationId={})", registrationId);
         
         try {
             // Find the registration
@@ -511,14 +555,14 @@ public class DeletionController {
             }
             
             String vehiclePlateNumber = registration.getVehiclePlateNumber();
-            System.out.println("ADMIN DELETE: Found vehicle: " + vehiclePlateNumber);
+            log.debug("ADMIN DELETE: Found vehicle (registrationId={})", registrationId);
             
             // Delete registration_image_folders entries
             int deletedFolders = jdbcTemplate.update(
                 "DELETE FROM registration_image_folders WHERE registration_id = ?", 
                 registrationId
             );
-            System.out.println("ADMIN DELETE: Deleted " + deletedFolders + " folder records");
+            log.debug("ADMIN DELETE: Deleted folder records (registrationId={}, rows={})", registrationId, deletedFolders);
             
             // Clear image URLs to avoid LOB issues
             registration.setVehicleImageUrls(new ArrayList<>());
@@ -526,14 +570,14 @@ public class DeletionController {
             
             // Delete the registration
             registrationRepository.delete(registration);
-            System.out.println("ADMIN DELETE: Successfully deleted registration record");
+            log.info("ADMIN DELETE: Deleted registration record (registrationId={})", registrationId);
             
             // Clean up storage buckets
             try {
                 supabaseService.deleteAllVehicleImages(registrationId);
-                System.out.println("ADMIN DELETE: Successfully cleaned up storage buckets");
+                log.debug("ADMIN DELETE: Cleaned up storage (registrationId={})", registrationId);
             } catch (IOException e) {
-                System.err.println("ADMIN DELETE: Error cleaning up storage buckets: " + e.getMessage());
+                log.warn("ADMIN DELETE: Error cleaning up storage (registrationId={}): {}", registrationId, e.toString());
                 // Continue with response as the database record is deleted
             }
             
@@ -547,12 +591,11 @@ public class DeletionController {
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-            System.err.println("ADMIN DELETE: Error deleting vehicle: " + e.getMessage());
-            e.printStackTrace();
+            log.error("ADMIN DELETE: Error deleting vehicle (registrationId={})", registrationId, e);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
-            response.put("message", "Error deleting vehicle: " + e.getMessage());
+            response.put("message", "Error deleting vehicle");
             return ResponseEntity.internalServerError().body(response);
         }
     }

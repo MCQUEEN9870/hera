@@ -259,8 +259,6 @@ public class Registration implements Serializable {
                         }
                     }
                 } catch (Exception e) {
-                    System.err.println("Error parsing vehicleImageUrlsJson: " + e.getMessage());
-                    System.err.println("Raw JSON: " + vehicleImageUrlsJson);
                     vehicleImageUrls = new ArrayList<>();
                 }
             } else {
@@ -285,7 +283,6 @@ public class Registration implements Serializable {
             ObjectMapper objectMapper = new ObjectMapper();
             this.vehicleImageUrlsJson = objectMapper.writeValueAsString(this.vehicleImageUrls);
         } catch (Exception e) {
-            System.err.println("Error converting vehicleImageUrls to JSON: " + e.getMessage());
             this.vehicleImageUrlsJson = "[]";
         }
     }
@@ -314,8 +311,6 @@ public class Registration implements Serializable {
                     }
                 }
             } catch (Exception e) {
-                System.err.println("Error parsing vehicleImageUrlsJson: " + e.getMessage());
-                System.err.println("Raw JSON: " + vehicleImageUrlsJson);
                 this.vehicleImageUrls = new ArrayList<>();
             }
         } else {

@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.security.LoginAttemptService;
 import com.example.demo.security.JwtService;
 import com.example.demo.service.TwoFactorService;
 
@@ -27,6 +30,8 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/auth")
 public class AuthController {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+
     @Autowired
     private UserRepository userRepository;
     
@@ -35,6 +40,9 @@ public class AuthController {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private LoginAttemptService loginAttemptService;
 
     @Value("${captcha.enabled:false}")
     private boolean captchaEnabled;
@@ -48,6 +56,13 @@ public class AuthController {
     @Value("${twofactor.template.signup:usersignup}")
     private String twoFactorTemplateSignup;
 
+    private static String maskPhone(String phone) {
+        if (phone == null) return "<null>";
+        String normalized = phone.trim();
+        if (normalized.length() <= 4) return "****";
+        return "******" + normalized.substring(normalized.length() - 4);
+    }
+
     private boolean verifyCaptcha(String token, String ip) {
         try {
             RestTemplate restTemplate = new RestTemplate();
@@ -56,7 +71,7 @@ public class AuthController {
             Object success = res != null ? res.get("success") : null;
             return Boolean.TRUE.equals(success);
         } catch (Exception e) {
-            System.err.println("Captcha verification error: " + e.getMessage());
+            log.warn("Captcha verification error: {}", e.toString());
             return false;
         }
     }
@@ -98,7 +113,7 @@ public class AuthController {
                 
                 if (existingUser == null) {
                     // This should not happen if existsByContactNumber returned true
-                    System.err.println("ERROR: User existence check passed but findByContactNumber returned null");
+                    log.error("User existence check passed but user lookup returned null");
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                         .body(Map.of("message", "Failed to retrieve user data. Please try again later."));
                 }
@@ -109,7 +124,7 @@ public class AuthController {
                         String hash = new BCryptPasswordEncoder().encode(password);
                         existingUser.setPasswordHash(hash);
                     } catch (Exception ex) {
-                        System.err.println("Password hash error: " + ex.getMessage());
+                        log.warn("Password hash error while updating existing user: {}", ex.toString());
                     }
                 }
 
@@ -125,7 +140,7 @@ public class AuthController {
 
                 // Save and log the values
                 User savedUser = userRepository.save(existingUser);
-                System.out.println("Existing user updated sessionId after save: " + savedUser.getOtp() + ", Expires at: " + savedUser.getOtpExpiresAt());
+                log.debug("Existing user updated OTP session id (maskedContact={})", maskPhone(savedUser.getContactNumber()));
                 
                 return ResponseEntity.ok(Map.of(
                     "message", "OTP sent successfully!", 
@@ -157,24 +172,24 @@ public class AuthController {
                     String hash = new BCryptPasswordEncoder().encode(password);
                     newUser.setPasswordHash(hash);
                 } catch (Exception ex) {
-                    System.err.println("Password hash error: " + ex.getMessage());
+                    log.warn("Password hash error while creating new user: {}", ex.toString());
                 }
             }
             
             // Store the new user
             User savedUser = userRepository.save(newUser);
-            System.out.println("New user OTP after save: " + savedUser.getOtp() + ", Expires at: " + savedUser.getOtpExpiresAt());
+            log.debug("New user created and OTP session id stored (maskedContact={})", maskPhone(savedUser.getContactNumber()));
             
             // Verify OTP was saved correctly
             User verifiedUser = userRepository.findByContactNumber(contactNumber);
             if (verifiedUser == null) {
-                System.err.println("ERROR: Failed to retrieve newly created user! Database may be having issues.");
+                log.error("Failed to retrieve newly created user after save");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(Map.of("message", "Failed to create user account. Please try again later."));
             }
             
             if (verifiedUser.getOtp() == null || verifiedUser.getOtp().isEmpty()) {
-                System.err.println("WARNING: OTP not properly saved to database for new user!");
+                log.warn("OTP session id was missing after save; attempting repository update (maskedContact={})", maskPhone(contactNumber));
                 userRepository.updateOtp(contactNumber, sessionId);
             }
 
@@ -186,8 +201,7 @@ public class AuthController {
                 "userExists", "false"
             ));
         } catch (Exception e) {
-            System.err.println("Error in signup process: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error in signup process (maskedContact={})", maskPhone(request.get("contactNumber")), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to process signup. Please try again later."));
         }
@@ -253,8 +267,7 @@ public class AuthController {
                     "contactNumber", contactNumber
             ));
         } catch (Exception e) {
-            System.err.println("Error in direct signup: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error in direct signup (maskedContact={})", maskPhone(request.get("contactNumber")), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to process signup. Please try again later."));
         }
@@ -278,17 +291,15 @@ public class AuthController {
         String otpLoginFlag = request.getOrDefault("otpLogin", "false");
         boolean otpLogin = Boolean.parseBoolean(otpLoginFlag);
 
-        System.out.println("Login attempt for number: " + contactNumber);
+        log.debug("Login attempt (maskedContact={}, otpLogin={})", maskPhone(contactNumber), otpLogin);
 
         if (contactNumber == null || contactNumber.isEmpty()) {
-            System.out.println("Login failed: Contact number is empty");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                  .body(Map.of("message", "Contact number is required."));
         }
         
         // Validate phone number
         if (!contactNumber.matches("^[6-9]\\d{9}$")) {
-            System.out.println("Login failed: Invalid phone number format");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                  .body(Map.of("message", "Please enter a valid 10-digit mobile number."));
         }
@@ -305,10 +316,9 @@ public class AuthController {
 
         // Check if user exists
         boolean userExists = userRepository.existsByContactNumber(contactNumber);
-        System.out.println("User exists check for " + contactNumber + ": " + userExists);
+        log.debug("User exists check (maskedContact={}): {}", maskPhone(contactNumber), userExists);
         
         if (!userExists) {
-            System.out.println("Login failed: User not found for number: " + contactNumber);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                                  .body(Map.of("message", "User not found, please sign up."));
         }
@@ -316,7 +326,7 @@ public class AuthController {
         // Get user after confirming existence
         User user = userRepository.findByContactNumber(contactNumber);
         if (user == null) {
-            System.err.println("ERROR: User existence check passed but findByContactNumber returned null for: " + contactNumber);
+            log.error("User existence check passed but user lookup returned null (maskedContact={})", maskPhone(contactNumber));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                  .body(Map.of("message", "Failed to retrieve user data. Please try again later."));
         }
@@ -324,10 +334,18 @@ public class AuthController {
         // If password provided, try password login first
         if (password != null && !password.isEmpty()) {
             try {
+                if (loginAttemptService.isLocked(contactNumber)) {
+                    long retryAfter = loginAttemptService.secondsUntilUnlock(contactNumber);
+                    return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                            .header("Retry-After", String.valueOf(retryAfter))
+                            .body(Map.of("message", "Too many failed login attempts. Try again later."));
+                }
+
                 if (user.getPasswordHash() != null && !user.getPasswordHash().isEmpty()) {
                     boolean match = new BCryptPasswordEncoder().matches(password, user.getPasswordHash());
                     if (match) {
                         // Successful password login
+                        loginAttemptService.reset(contactNumber);
                         // Ensure verified flag
                         user.setVerified(true);
                         if (user.getJoinDate() == null) user.setJoinDate(LocalDateTime.now());
@@ -342,17 +360,18 @@ public class AuthController {
                             "token", token
                         ));
                     } else {
+                        loginAttemptService.recordFailure(contactNumber);
                         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                             .body(Map.of("message", "Invalid password"));
                     }
                 } else {
                     // No password set yet -> do NOT fallback to OTP from password flow
-                    System.out.println("Password not set for this user; rejecting password login and suggesting reset.");
+                    log.debug("Password login rejected: password not set (maskedContact={})", maskPhone(contactNumber));
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                             .body(Map.of("message", "No password set for this account. Please use Forgot Password to set one."));
                 }
             } catch (Exception ex) {
-                System.err.println("Password verify error: " + ex.getMessage());
+                log.warn("Password verify error (maskedContact={}): {}", maskPhone(contactNumber), ex.toString());
             }
         }
         
@@ -392,7 +411,7 @@ public class AuthController {
         try {
             // Save and log the values
             User savedUser = userRepository.save(user);
-            System.out.println("Login OTP after save: " + savedUser.getOtp() + ", Expires at: " + savedUser.getOtpExpiresAt());
+            log.debug("Stored OTP session id for login (maskedContact={})", maskPhone(savedUser.getContactNumber()));
 
             // No direct SMS here; sent via AUTOGEN already
 
@@ -402,8 +421,7 @@ public class AuthController {
                 "userExists", "true"
             ));
         } catch (Exception e) {
-            System.err.println("Error saving OTP: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error saving OTP session id (maskedContact={})", maskPhone(contactNumber), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to process login. Please try again later."));
         }
@@ -519,8 +537,6 @@ public class AuthController {
                                      .body(Map.of("message", "User not found."));
             }
             
-            System.out.println("Verifying OTP: User provided [" + otp + "], Stored in database [" + user.getOtp() + "]");
-
             // Verify via 2Factor using stored sessionId
             String sessionId = user.getOtp();
             boolean valid = (sessionId != null && !sessionId.isEmpty()) && twoFactorService.verifyAutogenOtp(sessionId, otp);
@@ -529,7 +545,7 @@ public class AuthController {
                 String errorReason;
                 errorReason = "Invalid or expired OTP";
                 
-                System.out.println("OTP verification failed: " + errorReason);
+                log.debug("OTP verification failed (maskedContact={}): {}", maskPhone(contactNumber), errorReason);
                 
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                                      .body(Map.of("message", "Invalid or expired OTP."));
@@ -551,8 +567,7 @@ public class AuthController {
             // Verify changes were applied correctly
             User verifiedUser = userRepository.findByContactNumber(contactNumber);
             if (verifiedUser != null) {
-                System.out.println("After verification - User in DB: OTP=[" + verifiedUser.getOtp() + 
-                                   "], OTP Expires=[" + verifiedUser.getOtpExpiresAt() + "]");
+                log.debug("OTP cleared after verification (maskedContact={})", maskPhone(contactNumber));
             }
 
             return ResponseEntity.ok(Map.of(
@@ -563,8 +578,7 @@ public class AuthController {
                 "token", jwtService.issueTokenForContact(user.getContactNumber())
             ));
         } catch (Exception e) {
-            System.err.println("Error in OTP verification: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error in OTP verification (maskedContact={})", maskPhone(request.get("contactNumber")), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to verify OTP. Please try again."));
         }

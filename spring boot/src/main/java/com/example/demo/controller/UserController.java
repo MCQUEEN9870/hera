@@ -25,11 +25,26 @@ import com.example.demo.model.Registration;
 import com.example.demo.model.User;
 import com.example.demo.repository.RegistrationRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.security.SecurityUtils;
+import com.example.demo.service.RazorpayPaymentService;
 import com.example.demo.service.SupabaseService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
+
+    private static String maskPhone(String phone) {
+        if (phone == null) return null;
+        String s = phone.trim();
+        if (s.length() <= 4) return "****";
+        String last4 = s.substring(s.length() - 4);
+        return "******" + last4;
+    }
 
     @Autowired
     private SupabaseService supabaseService;
@@ -43,9 +58,13 @@ public class UserController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private RazorpayPaymentService razorpayPaymentService;
+
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
-        System.out.println("Received Data: " + user);
+        // Endpoint kept for backward-compat; avoid logging full payload.
+        log.debug("/api/users/register called");
         
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
@@ -60,6 +79,9 @@ public class UserController {
     @PutMapping("/{contactNumber}/email")
     public ResponseEntity<?> updateUserEmail(@PathVariable String contactNumber, @RequestBody Map<String, Object> requestBody) {
         try {
+            if (!SecurityUtils.isCurrentContact(contactNumber)) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
             if (contactNumber == null || contactNumber.isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Contact number is required"));
             }
@@ -87,7 +109,8 @@ public class UserController {
             response.put("email", email);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Failed to update email: " + e.getMessage()));
+            log.warn("Failed to update email (maskedContact={})", maskPhone(contactNumber), e);
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Failed to update email"));
         }
     }
     
@@ -96,6 +119,9 @@ public class UserController {
      */
     @GetMapping("/{contactNumber}")
     public ResponseEntity<?> getUserProfile(@PathVariable String contactNumber) {
+        if (!SecurityUtils.isCurrentContact(contactNumber)) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
         User user = userRepository.findByContactNumber(contactNumber);
         
         if (user == null) {
@@ -138,6 +164,9 @@ public class UserController {
      */
     @GetMapping("/{contactNumber}/vehicles")
     public ResponseEntity<?> getUserVehicles(@PathVariable String contactNumber) {
+        if (!SecurityUtils.isCurrentContact(contactNumber)) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
         // Find the user
         User user = userRepository.findByContactNumber(contactNumber);
         
@@ -214,7 +243,7 @@ public class UserController {
      */
     @GetMapping("/get-user-locations")
     public ResponseEntity<?> getUserLocations() {
-        System.out.println("Fetching user locations for feedback carousel");
+        log.debug("Fetching user locations for feedback carousel");
         
         // Find all registrations to get user locations
         List<Registration> registrations = registrationRepository.findAll();
@@ -244,6 +273,9 @@ public class UserController {
      */
     @GetMapping("/{contactNumber}/profile-photo")
     public ResponseEntity<?> getProfilePhoto(@PathVariable String contactNumber) {
+        if (!SecurityUtils.isCurrentContact(contactNumber)) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
         User user = userRepository.findByContactNumber(contactNumber);
         
         if (user == null || user.getProfilePhotoUrl() == null) {
@@ -267,11 +299,15 @@ public class UserController {
     public ResponseEntity<?> uploadProfilePhoto(
             @PathVariable String contactNumber,
             @RequestParam("photo") MultipartFile photo) {
+
+        if (!SecurityUtils.isCurrentContact(contactNumber)) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
         
-        System.out.println("Received profile photo upload request for user: " + contactNumber);
-        System.out.println("Photo details - Name: " + photo.getOriginalFilename() + 
-                          ", Size: " + photo.getSize() + 
-                          " bytes, ContentType: " + photo.getContentType());
+        log.debug("Received profile photo upload request (maskedContact={}, sizeBytes={}, contentType={})",
+            maskPhone(contactNumber),
+            photo != null ? photo.getSize() : null,
+            photo != null ? photo.getContentType() : null);
         
         // Validate photo size and format
         if (photo.isEmpty()) {
@@ -299,21 +335,20 @@ public class UserController {
         // Find or create user if needed
         User user = userRepository.findByContactNumber(contactNumber);
         if (user == null) {
-            System.out.println("User not found. Creating new user for: " + contactNumber);
+            log.info("User not found during profile photo upload; creating minimal user (maskedContact={})", maskPhone(contactNumber));
             user = new User();
             user.setContactNumber(contactNumber);
             // Set default values for required fields
             user.setFullName("User " + contactNumber.substring(Math.max(0, contactNumber.length() - 4)));
         } else {
-            System.out.println("Found existing user: " + user.getFullName() + " (" + contactNumber + ")");
+            log.debug("Found existing user for profile photo upload (maskedContact={})", maskPhone(contactNumber));
             
             // If user already has a profile photo, delete the old one
             if (user.getProfilePhotoUrl() != null && !user.getProfilePhotoUrl().isEmpty()) {
                 try {
-                    System.out.println("Deleting old profile photo: " + user.getProfilePhotoUrl());
                     supabaseService.deleteProfilePhoto(user.getProfilePhotoUrl());
                 } catch (Exception e) {
-                    System.err.println("Warning: Failed to delete old profile photo: " + e.getMessage());
+                    log.warn("Failed to delete old profile photo from storage (maskedContact={})", maskPhone(contactNumber), e);
                     // Continue with upload even if delete fails
                 }
             }
@@ -323,8 +358,8 @@ public class UserController {
             String photoUrl = supabaseService.uploadProfilePhoto(photo);
             user.setProfilePhotoUrl(photoUrl);
             userRepository.save(user);
-            
-            System.out.println("Profile photo upload successful. URL: " + photoUrl);
+
+            log.info("Profile photo upload successful (maskedContact={})", maskPhone(contactNumber));
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -333,10 +368,10 @@ public class UserController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            e.printStackTrace(); // Print full stack trace for debugging
+            log.warn("Failed to upload profile photo (maskedContact={})", maskPhone(contactNumber), e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Failed to upload profile photo: " + e.getMessage());
+            errorResponse.put("message", "Failed to upload profile photo");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
@@ -346,7 +381,11 @@ public class UserController {
      */
     @DeleteMapping("/{contactNumber}/profile-photo")
     public ResponseEntity<?> deleteProfilePhoto(@PathVariable String contactNumber) {
-        System.out.println("Received profile photo delete request for user: " + contactNumber);
+        log.debug("Received profile photo delete request (maskedContact={})", maskPhone(contactNumber));
+
+        if (!SecurityUtils.isCurrentContact(contactNumber)) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
         
         User user = userRepository.findByContactNumber(contactNumber);
         
@@ -367,8 +406,6 @@ public class UserController {
             return ResponseEntity.ok(response);
         }
         
-        System.out.println("Attempting to delete profile photo: " + profilePhotoUrl);
-        
         try {
             // Delete from Supabase
             supabaseService.deleteProfilePhoto(profilePhotoUrl);
@@ -377,7 +414,7 @@ public class UserController {
             user.setProfilePhotoUrl(null);
             userRepository.save(user);
             
-            System.out.println("Profile photo deleted successfully");
+            log.info("Profile photo deleted successfully (maskedContact={})", maskPhone(contactNumber));
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -385,21 +422,20 @@ public class UserController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            e.printStackTrace(); // Full stack trace for debugging
-            System.err.println("Error deleting profile photo: " + e.getMessage());
+            log.warn("Error deleting profile photo from storage (maskedContact={})", maskPhone(contactNumber), e);
             
             // Even if Supabase deletion fails, still remove the URL from the user
             try {
                 user.setProfilePhotoUrl(null);
                 userRepository.save(user);
-                System.out.println("Removed profile photo URL from user record despite storage deletion failure");
+                log.warn("Removed profile photo URL from user record despite storage deletion failure (maskedContact={})", maskPhone(contactNumber));
             } catch (Exception ex) {
-                System.err.println("Failed to update user record: " + ex.getMessage());
+                log.warn("Failed to update user record while removing profile photo URL (maskedContact={})", maskPhone(contactNumber), ex);
             }
             
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Failed to delete profile photo: " + e.getMessage());
+            errorResponse.put("message", "Failed to delete profile photo");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
@@ -410,6 +446,9 @@ public class UserController {
     @GetMapping("/{contactNumber}/check-vehicle-limit")
     public ResponseEntity<?> checkVehicleLimit(@PathVariable String contactNumber) {
         try {
+            if (!SecurityUtils.isCurrentContact(contactNumber)) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
             // Find the user
             User user = userRepository.findByContactNumber(contactNumber);
             
@@ -445,9 +484,10 @@ public class UserController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            log.warn("Error checking vehicle limit (maskedContact={})", maskPhone(contactNumber), e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error checking vehicle limit: " + e.getMessage());
+            errorResponse.put("message", "Error checking vehicle limit");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
@@ -458,6 +498,9 @@ public class UserController {
     @DeleteMapping("/{contactNumber}")
     public ResponseEntity<?> deleteUserAccount(@PathVariable String contactNumber) {
         try {
+            if (!SecurityUtils.isCurrentContact(contactNumber)) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
             // Find the user
             User user = userRepository.findByContactNumber(contactNumber);
             
@@ -468,21 +511,21 @@ public class UserController {
                 return ResponseEntity.status(404).body(errorResponse);
             }
             
-            // Log the account deletion request
-            System.out.println("Account deletion requested for: " + contactNumber + " (User ID: " + user.getId() + ")");
+            log.info("Account deletion requested (maskedContact={}, userId={})", maskPhone(contactNumber), user.getId());
             
             // Create a list to track any deletion errors
             List<String> deletionErrors = new ArrayList<>();
             
             // Find all registrations associated with this user by userId
             List<Registration> userRegistrations = registrationRepository.findByUserId(user.getId());
-            System.out.println("Found " + userRegistrations.size() + " vehicle registrations for user: " + contactNumber);
+            log.info("Found registrations for account deletion (maskedContact={}, count={})", maskPhone(contactNumber), userRegistrations.size());
             
             // Clear the registration_user_id_fkey constraint
             for (Registration registration : userRegistrations) {
                 try {
                     // Delete each vehicle registration
-                    System.out.println("Deleting vehicle registration: " + registration.getId());
+                    Long registrationId = registration.getId();
+                    log.info("Deleting vehicle registration (registrationId={})", registrationId);
                     
                     // Delete registration_image_folders entries
                     try {
@@ -490,23 +533,20 @@ public class UserController {
                             "DELETE FROM registration_image_folders WHERE registration_id = ?", 
                             registration.getId()
                         );
-                        System.out.println("Deleted " + rowsDeleted + " rows from registration_image_folders for registration: " + registration.getId());
+                        log.debug("Deleted registration_image_folders rows (registrationId={}, rowsDeleted={})", registrationId, rowsDeleted);
                     } catch (Exception e) {
-                        String errorMsg = "Error deleting from registration_image_folders for registration " + registration.getId() + ": " + e.getMessage();
-                        System.err.println(errorMsg);
-                        deletionErrors.add(errorMsg);
+                        log.warn("Error deleting from registration_image_folders (registrationId={})", registrationId, e);
+                        deletionErrors.add("Some image-folder records could not be deleted for registrationId=" + registrationId);
                         // Continue with deletion
                     }
                     
                     // Delete vehicle images from storage
                     try {
-                        System.out.println("Deleting vehicle images for registration: " + registration.getId());
                         supabaseService.deleteRegistrationFolder(registration.getId());
-                        System.out.println("Successfully deleted vehicle images for registration: " + registration.getId());
+                        log.debug("Deleted vehicle images from storage (registrationId={})", registrationId);
                     } catch (Exception e) {
-                        String errorMsg = "Error deleting vehicle images for registration " + registration.getId() + ": " + e.getMessage();
-                        System.err.println(errorMsg);
-                        deletionErrors.add(errorMsg);
+                        log.warn("Error deleting vehicle images from storage (registrationId={})", registrationId, e);
+                        deletionErrors.add("Some vehicle images could not be deleted for registrationId=" + registrationId);
                         // Continue with deletion
                     }
                     
@@ -516,24 +556,23 @@ public class UserController {
                     
                     // Delete the registration
                     registrationRepository.delete(registration);
-                    System.out.println("Successfully deleted registration: " + registration.getId());
+                    log.info("Deleted registration record (registrationId={})", registrationId);
                     
                 } catch (Exception e) {
-                    String errorMsg = "Error deleting registration " + registration.getId() + ": " + e.getMessage();
-                    System.err.println(errorMsg);
-                    e.printStackTrace();
-                    deletionErrors.add(errorMsg);
+                    Long registrationId = registration.getId();
+                    log.warn("Error deleting registration (registrationId={})", registrationId, e);
+                    deletionErrors.add("Some registration records could not be deleted for registrationId=" + registrationId);
                     
                     // Try direct SQL as fallback
                     try {
                         int rowsDeleted = jdbcTemplate.update("DELETE FROM registration WHERE id = ?", registration.getId());
                         if (rowsDeleted > 0) {
-                            System.out.println("Successfully deleted registration using SQL: " + registration.getId());
+                            log.info("Deleted registration using SQL fallback (registrationId={})", registrationId);
                         } else {
-                            System.err.println("No rows deleted with SQL for registration: " + registration.getId());
+                            log.warn("SQL fallback deleted no rows (registrationId={})", registrationId);
                         }
                     } catch (Exception ex) {
-                        System.err.println("SQL fallback also failed for registration " + registration.getId() + ": " + ex.getMessage());
+                        log.warn("SQL fallback also failed (registrationId={})", registrationId, ex);
                     }
                 }
             }
@@ -541,14 +580,12 @@ public class UserController {
             // Delete user's profile photo if exists
             try {
                 if (user.getProfilePhotoUrl() != null && !user.getProfilePhotoUrl().isEmpty()) {
-                    System.out.println("Deleting profile photo for user: " + contactNumber);
                     supabaseService.deleteProfilePhoto(user.getProfilePhotoUrl());
-                    System.out.println("Successfully deleted profile photo for user: " + contactNumber);
+                    log.debug("Deleted profile photo from storage during account deletion (maskedContact={})", maskPhone(contactNumber));
                 }
             } catch (Exception e) {
-                String errorMsg = "Error deleting profile photo: " + e.getMessage();
-                System.err.println(errorMsg);
-                deletionErrors.add(errorMsg);
+                log.warn("Error deleting profile photo during account deletion (maskedContact={})", maskPhone(contactNumber), e);
+                deletionErrors.add("Profile photo could not be deleted from storage");
                 // Continue with user deletion
             }
             
@@ -557,19 +594,16 @@ public class UserController {
                 userRepository.save(user);
                 
                 // Delete the user record
-                System.out.println("Deleting user from database: " + contactNumber);
                 userRepository.delete(user);
-                System.out.println("Successfully deleted user from database: " + contactNumber);
+                log.info("Deleted user from database (maskedContact={}, userId={})", maskPhone(contactNumber), user.getId());
             } catch (Exception e) {
-                String errorMsg = "Error deleting user from database: " + e.getMessage();
-                System.err.println(errorMsg);
-                e.printStackTrace();
-                deletionErrors.add(errorMsg);
+                log.warn("Error deleting user from database (maskedContact={}, userId={})", maskPhone(contactNumber), user.getId(), e);
+                deletionErrors.add("User record could not be deleted from database");
                 
                 if (deletionErrors.size() > 0) {
                     Map<String, Object> errorResponse = new HashMap<>();
                     errorResponse.put("success", false);
-                    errorResponse.put("message", "Failed to delete user completely: " + String.join("; ", deletionErrors));
+                    errorResponse.put("message", "Failed to delete user completely");
                     return ResponseEntity.status(500).body(errorResponse);
                 }
             }
@@ -590,12 +624,11 @@ public class UserController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.err.println("Error in deleteUserAccount: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error in deleteUserAccount (maskedContact={})", maskPhone(contactNumber), e);
             
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Failed to delete user account: " + e.getMessage());
+            errorResponse.put("message", "Failed to delete user account");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
@@ -608,6 +641,9 @@ public class UserController {
             @PathVariable String contactNumber,
             @RequestBody Map<String, Object> requestBody) {
         try {
+            if (!SecurityUtils.isCurrentContact(contactNumber)) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
             // Find the user
             User user = userRepository.findByContactNumber(contactNumber);
             
@@ -621,12 +657,30 @@ public class UserController {
             // Extract plan details from request body
             String plan = (String) requestBody.get("plan");
             String paymentId = (String) requestBody.get("paymentId");
+            String orderId = (String) requestBody.get("razorpay_order_id");
+            String signature = (String) requestBody.get("razorpay_signature");
             
             if (plan == null || plan.isEmpty()) {
                 Map<String, Object> errorResponse = new HashMap<>();
                 errorResponse.put("success", false);
                 errorResponse.put("message", "Plan is required");
                 return ResponseEntity.badRequest().body(errorResponse);
+            }
+
+            // Require verified Razorpay payment before upgrading.
+            // (Client-side checks are not enough; attackers can call this endpoint directly.)
+            if (orderId == null || orderId.isBlank() || paymentId == null || paymentId.isBlank() || signature == null || signature.isBlank()) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Payment verification fields are required");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+
+            if (!razorpayPaymentService.verifyPremiumPayment(contactNumber, plan, orderId, paymentId, signature)) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Payment could not be verified");
+                return ResponseEntity.status(402).body(errorResponse);
             }
             
             // Calculate membership duration based on plan
@@ -670,7 +724,7 @@ public class UserController {
                 }
             } catch (Exception syncEx) {
                 // Log but do not fail the premium upgrade response
-                System.err.println("Warning: Failed to sync registration membership for user " + user.getId() + ": " + syncEx.getMessage());
+                log.warn("Failed to sync registration membership after premium upgrade (userId={})", user.getId(), syncEx);
             }
             
             // Create success response
@@ -678,15 +732,20 @@ public class UserController {
             response.put("success", true);
             response.put("message", "Premium membership activated successfully");
             response.put("plan", plan);
+            try {
+                response.put("price", razorpayPaymentService.premiumAmountInInr(plan));
+            } catch (Exception ignored) {
+                // no-op
+            }
             response.put("purchaseTime", user.getMembershipPurchaseTime());
             response.put("expireTime", user.getMembershipExpireTime());
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Failed to upgrade to premium (maskedContact={})", maskPhone(contactNumber), e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Failed to upgrade to premium: " + e.getMessage());
+            errorResponse.put("message", "Failed to upgrade to premium");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }

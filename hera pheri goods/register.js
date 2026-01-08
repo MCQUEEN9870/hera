@@ -15,11 +15,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const celebrationOverlay = document.getElementById('celebrationOverlay');
     const stateInput = document.getElementById('state');
     const cityInput = document.getElementById('city');
+    const stateClickCapture = document.getElementById('stateClickCapture');
     const vehicleNumberField = document.getElementById('vehicleNumber');
     const vehicleNumberContainer = vehicleNumberField.parentNode;
     
     // Add variable to track pincode verification status
     let isPincodeVerified = false;
+
+    function escapeHtml(value) {
+        const s = (value === null || value === undefined) ? '' : String(value);
+        return s
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // Toggle bilingual hint on every click
+    let pincodeHintToggle = 0;
     
     // Add variable to track if selected vehicle is a manual cart
     let isManualCartSelected = false;
@@ -40,6 +54,45 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add visual indication that these fields can't be edited directly
     cityInput.style.backgroundColor = '#f8f8f8';
     stateInput.style.backgroundColor = '#f8f8f8';
+
+    function shakeUseLocationButton() {
+        if (!useLocationBtn) return;
+        useLocationBtn.classList.remove('shake-attention');
+        // Force reflow so animation re-triggers reliably
+        void useLocationBtn.offsetWidth;
+        useLocationBtn.classList.add('shake-attention');
+        window.setTimeout(() => useLocationBtn.classList.remove('shake-attention'), 600);
+    }
+
+    function maybeShowPincodeHintToast() {
+        // Only guide when pincode is missing/incomplete
+        if (!pincode || (pincode.value || '').trim().length >= 6) return false;
+
+        const message = (pincodeHintToggle++ % 2 === 0)
+            ? 'कृपया अपना पिनकोड भरें'
+            : 'Please Fill/ Enter Your pincode';
+
+        showToast(message, 'error');
+        shakeUseLocationButton();
+        return true;
+    }
+
+    // When user clicks City/State while pincode is not filled, show bilingual toast
+    if (cityInput) {
+        cityInput.addEventListener('click', function() {
+            // If pincode is already verified, don't distract
+            if (isPincodeVerified) return;
+            maybeShowPincodeHintToast();
+        });
+    }
+
+    // State select is disabled, so clicks won't fire on it; we capture clicks via an overlay button
+    if (stateClickCapture) {
+        stateClickCapture.addEventListener('click', function() {
+            if (isPincodeVerified) return;
+            maybeShowPincodeHintToast();
+        });
+    }
     
     // Check if manual cart is selected on page load
     const vehicleTypeInputs = document.querySelectorAll('input[name="vehicleType"]');
@@ -393,7 +446,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function showToast(message, type = 'success') {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        toast.innerHTML = message; // Use innerHTML to support HTML content
+        toast.textContent = String(message ?? '');
         document.body.appendChild(toast);
 
         toast.style.position = 'fixed';
@@ -967,7 +1020,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const modalContent = document.createElement('div');
         modalContent.className = 'limit-modal-content';
         
-        const isPremium = limitData.membership === 'Premium';
+        const membership = (limitData && limitData.membership) ? String(limitData.membership) : 'Standard';
+        const isPremium = membership === 'Premium';
+        const membershipEsc = escapeHtml(membership);
+        const vehicleCountEsc = escapeHtml((limitData && limitData.vehicleCount != null) ? limitData.vehicleCount : '');
+        const maxVehiclesEsc = escapeHtml((limitData && limitData.maxVehicles != null) ? limitData.maxVehicles : '');
         
         modalContent.innerHTML = `
             <div class="limit-modal-header">
@@ -978,10 +1035,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="limit-icon">
                     <i class="fas fa-exclamation-circle"></i>
                 </div>
-                <p>You have already registered <strong>${limitData.vehicleCount}</strong> vehicles with your ${limitData.membership} account, which is the maximum limit.</p>
+                <p>You have already registered <strong>${vehicleCountEsc}</strong> vehicles with your ${membershipEsc} account, which is the maximum limit.</p>
                 
                 ${isPremium ? 
-                    `<p>As a Premium member, you can register up to ${limitData.maxVehicles} vehicles. To register more vehicles, please use a different phone number to create a new account.</p>` : 
+                    `<p>As a Premium member, you can register up to ${maxVehiclesEsc} vehicles. To register more vehicles, please use a different phone number to create a new account.</p>` : 
                     `<p>You can upgrade to Premium to register up to 5 vehicles, or use a different phone number to create a new account.</p>
                     <button class="upgrade-button">Upgrade to Premium</button>`
                 }
@@ -1128,6 +1185,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to show logout confirmation modal
     function showLogoutConfirmationModal() {
         const currentPhone = localStorage.getItem('userPhone');
+        const currentPhoneEsc = escapeHtml(currentPhone);
         
         const modal = document.createElement('div');
         modal.className = 'logout-confirm-modal';
@@ -1146,7 +1204,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <p>Now You are going to logout from your account</p>
                 <p>If you click on "Yes", you will logout from your account and you will be redirected to the login page where you can login with a new number.</p>
-                <p>If you want to login back to your account, please remember your phone number: <strong>${currentPhone}</strong></p>
+                <p>If you want to login back to your account, please remember your phone number: <strong>${currentPhoneEsc}</strong></p>
                 <div class="button-group">
                     <button class="confirm-logout-btn">Yes, Logout</button>
                     <button class="cancel-logout-btn">No, Go back</button>

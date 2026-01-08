@@ -20,6 +20,17 @@ const SUPPORT_DOMAIN = 'herapherigoods.in';
 const SUPPORT_AT = String.fromCharCode(64); // '@' without using the literal to avoid plaintext email in source
 const SUPPORT_EMAIL = SUPPORT_USER + SUPPORT_AT + SUPPORT_DOMAIN;
 
+// Basic HTML escaping for any untrusted text inserted via innerHTML
+function escapeHtml(value) {
+  const s = (value === null || value === undefined) ? '' : String(value);
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // List of vehicle types to detect in conversations
 const vehicleTypes = [
   "Manual Cart", "Thel", "Rickshaw", "Auto Loader", "CNG loader", "Tata Ace", "Chhota Hathi", 
@@ -1128,7 +1139,7 @@ function createAIAssistantModal() {
       </div>
       <div class="ai-assistant-faq" id="ai-assistant-faq">
         <ul id="ai-assistant-faq-list">
-          ${(window.frequentlyAskedQuestions || []).map(q => `<li class="ai-assistant-faq-item">${q}</li>`).join('')}
+          ${(window.frequentlyAskedQuestions || []).map(q => `<li class="ai-assistant-faq-item">${escapeHtml(q)}</li>`).join('')}
         </ul>
       </div>
     </div>
@@ -1334,7 +1345,7 @@ function addMessageToConversation(message, sender) {
   avatar.innerHTML = '<img src="attached_assets/images/ai.webp" alt="AI Assistant" title="AI Assistant" class="ai-icon-img">';
     const bubble = document.createElement('div');
     bubble.className = 'ai-assistant-bubble';
-    bubble.innerHTML = message; // controlled content from trainingData
+    bubble.textContent = message;
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(bubble);
   }

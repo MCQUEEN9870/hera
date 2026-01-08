@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ import okhttp3.Response;
 
 @Service
 public class ImageMigrationService {
+
+    private static final Logger log = LoggerFactory.getLogger(ImageMigrationService.class);
 
     @Value("${supabase.url}")
     private String supabaseUrl;
@@ -62,9 +66,10 @@ public class ImageMigrationService {
         
         // Process each image URL
         for (String imageUrl : existingImageUrls) {
+            String filename = null;
             try {
                 // Extract filename from URL
-                String filename = extractFilenameFromUrl(imageUrl);
+                filename = extractFilenameFromUrl(imageUrl);
                 
                 // Download the image content
                 byte[] imageContent = downloadImageContent(imageUrl);
@@ -76,7 +81,7 @@ public class ImageMigrationService {
                     migratedCount++;
                 }
             } catch (Exception e) {
-                System.err.println("Error migrating image " + imageUrl + ": " + e.getMessage());
+                log.warn("Error migrating image (registrationId={}, filename={}): {}", registrationId, filename, e.toString());
                 // Continue with other images even if one fails
             }
         }
@@ -101,10 +106,10 @@ public class ImageMigrationService {
                 // Update the registration with the new URLs
                 registration.setVehicleImageUrls(newImageUrls);
                 registrationRepository.save(registration);
-                
-                System.out.println("Updated registration " + registrationId + " with " + newImageUrls.size() + " new image URLs");
+
+                log.info("Updated registration image URLs after migration (registrationId={}, count={})", registrationId, newImageUrls.size());
             } catch (Exception e) {
-                System.err.println("Error updating registration with new URLs: " + e.getMessage());
+                log.warn("Error updating registration with new image URLs (registrationId={}): {}", registrationId, e.toString());
             }
         }
         
@@ -125,7 +130,8 @@ public class ImageMigrationService {
                 int migratedCount = migrateRegistrationImages(registration.getId());
                 results.add("Registration " + registration.getId() + ": Migrated " + migratedCount + " images");
             } catch (Exception e) {
-                results.add("Registration " + registration.getId() + ": Failed - " + e.getMessage());
+                log.warn("Migration failed for registration (registrationId={}): {}", registration.getId(), e.toString());
+                results.add("Registration " + registration.getId() + ": Failed");
             }
         }
         

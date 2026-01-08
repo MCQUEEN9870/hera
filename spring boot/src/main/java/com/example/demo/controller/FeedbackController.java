@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,13 @@ public class FeedbackController {
     
     @Autowired
     private RegistrationRepository registrationRepository;
+
+    private static String maskPhone(String phone) {
+        if (phone == null) return null;
+        String digits = phone.replaceAll("\\D", "");
+        if (digits.length() <= 4) return "****";
+        return "****" + digits.substring(digits.length() - 4);
+    }
 
     /**
      * Get feedback from feedback table only (non-signed-in users)
@@ -79,8 +87,7 @@ public class FeedbackController {
             return ResponseEntity.ok(result);
             
         } catch (Exception e) {
-            logger.severe("Error fetching feedback: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error fetching feedback", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -140,8 +147,7 @@ public class FeedbackController {
             return ResponseEntity.ok(result);
             
         } catch (Exception e) {
-            logger.severe("Error fetching feedback: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error fetching all feedback", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -190,8 +196,7 @@ public class FeedbackController {
             return ResponseEntity.ok(result);
             
         } catch (Exception e) {
-            logger.severe("Error fetching user feedback: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error fetching user feedback", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -223,7 +228,6 @@ public class FeedbackController {
                     
                     // Map the userId to the location
                     userLocations.put(reg.getUserId().toString(), location);
-                    logger.info("Added location for user " + reg.getUserId() + ": " + location);
                 }
             }
             
@@ -236,8 +240,7 @@ public class FeedbackController {
             return ResponseEntity.ok(userLocations);
             
         } catch (Exception e) {
-            logger.severe("Error fetching user locations: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error fetching user locations", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -251,7 +254,7 @@ public class FeedbackController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            logger.info("Received user feedback payload: " + payload);
+            logger.info("Received user feedback submission");
             
             // Extract and validate required fields
             if (!payload.containsKey("phone") || !payload.containsKey("rating")) {
@@ -262,8 +265,8 @@ public class FeedbackController {
             String phone = (String) payload.get("phone");
             Integer rating = Integer.parseInt(payload.get("rating").toString());
             String reviewText = payload.containsKey("review_text") ? (String) payload.get("review_text") : "";
-            
-            logger.info("Processing feedback for phone: " + phone + ", rating: " + rating);
+
+            logger.info("Processing user feedback (phone=" + maskPhone(phone) + ", rating=" + rating + ")");
             
             // Validate phone number (basic validation)
             if (phone == null || phone.isEmpty()) {
@@ -303,7 +306,7 @@ public class FeedbackController {
                             contactNum.contains(phone) ||
                             phone.contains(contactNum)) {
                             user = u;
-                            logger.info("Found matching user by pattern: " + contactNum);
+                            logger.info("Found matching user by pattern match");
                             break;
                         }
                     }
@@ -311,31 +314,30 @@ public class FeedbackController {
             }
             
             if (user == null) {
-                logger.warning("User not found for phone number: " + phone);
-                response.put("message", "User not found for phone: " + phone);
+                logger.warning("User not found for phone number: " + maskPhone(phone));
+                response.put("message", "User not found");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
             
-            logger.info("User found: " + user.getId() + ", name: " + user.getFullName());
+            logger.info("User found: " + user.getId());
             
             // Update user's rating and review
             user.setRating(rating);
             user.setReviewText(reviewText != null ? reviewText : "");
             userRepository.save(user);
             
-            logger.info("User feedback saved successfully for phone: " + phone);
+            logger.info("User feedback saved successfully (phone=" + maskPhone(phone) + ")");
             
             response.put("message", "Feedback submitted successfully");
             return ResponseEntity.ok(response);
             
         } catch (NumberFormatException e) {
-            logger.severe("Invalid rating format: " + e.getMessage());
+            logger.log(Level.WARNING, "Invalid rating format", e);
             response.put("message", "Invalid rating format");
             return ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
-            logger.severe("Error saving user feedback: " + e.getMessage());
-            e.printStackTrace();
-            response.put("message", "Error submitting feedback: " + e.getMessage());
+            logger.log(Level.SEVERE, "Error saving user feedback", e);
+            response.put("message", "Error submitting feedback");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -349,7 +351,7 @@ public class FeedbackController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            logger.info("Received non-user feedback payload: " + payload);
+            logger.info("Received non-user feedback submission");
             
             // Extract and validate required fields
             if (!payload.containsKey("name") || !payload.containsKey("address") || !payload.containsKey("rating")) {
@@ -361,8 +363,8 @@ public class FeedbackController {
             String address = (String) payload.get("address");
             Integer rating = Integer.parseInt(payload.get("rating").toString());
             String reviewText = payload.containsKey("review_text") ? (String) payload.get("review_text") : "";
-            
-            logger.info("Processing feedback for name: " + name + ", rating: " + rating);
+
+            logger.info("Processing non-user feedback (rating=" + rating + ")");
             
             // Validate name and address
             if (name == null || name.isEmpty() || address == null || address.isEmpty()) {
@@ -392,13 +394,12 @@ public class FeedbackController {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
             
         } catch (NumberFormatException e) {
-            logger.severe("Invalid rating format: " + e.getMessage());
+            logger.log(Level.WARNING, "Invalid rating format", e);
             response.put("message", "Invalid rating format");
             return ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
-            logger.severe("Error saving feedback: " + e.getMessage());
-            e.printStackTrace();
-            response.put("message", "Error submitting feedback: " + e.getMessage());
+            logger.log(Level.SEVERE, "Error saving feedback", e);
+            response.put("message", "Error submitting feedback");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

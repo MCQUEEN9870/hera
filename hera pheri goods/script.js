@@ -150,12 +150,37 @@ document.addEventListener('DOMContentLoaded', function() {
         link.addEventListener('click', closeMobileMenu);
     });
 
-    // Sync My Profile visibility with login state for sidebar too
-    const sidebarProfileLink = document.getElementById('profileLink');
-    const isLoggedInSidebar = localStorage.getItem('isLoggedIn') === 'true' || !!localStorage.getItem('userContact');
-    if (sidebarProfileLink) {
-        sidebarProfileLink.style.display = isLoggedInSidebar ? 'inline-block' : 'none';
-    }
+    // Sync "My Profile" visibility with login state for sidebar too
+    (function syncMobileProfileLink(){
+        const isLoggedInSidebar =
+            localStorage.getItem('isLoggedIn') === 'true' ||
+            !!localStorage.getItem('userPhone') ||
+            !!localStorage.getItem('authToken');
+
+        let sidebarProfileLink = document.getElementById('profileLink');
+        const mobileNav = document.querySelector('.mobile-nav-links');
+
+        // Some pages may not include the link in HTML; create it only when logged in.
+        if (!sidebarProfileLink && mobileNav && isLoggedInSidebar) {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.id = 'profileLink';
+            a.className = 'mobile-nav-item';
+            a.href = (window.buildUrl ? window.buildUrl('driver-dashboard') : 'driver-dashboard');
+            a.textContent = 'My Profile';
+            li.appendChild(a);
+            mobileNav.appendChild(li);
+            sidebarProfileLink = a;
+            // Ensure close-on-click is applied to newly added link
+            a.addEventListener('click', closeMobileMenu);
+        }
+
+        if (!sidebarProfileLink) return;
+        const li = sidebarProfileLink.closest('li');
+        if (li) li.style.display = isLoggedInSidebar ? '' : 'none';
+        // Keep link display default (mobile list items are block-level)
+        sidebarProfileLink.style.display = '';
+    })();
 });
 
 // Navigation Item Click Effects
@@ -949,15 +974,16 @@ if (vehicleOptions && vehicleOptions.length && vehicleSelectBtn && vehicleDropdo
 // Check if user is logged in
 // and update the profile link accordingly
 document.addEventListener("DOMContentLoaded", function() {
-    let userContact = localStorage.getItem("userContact");
-    
-    let profileLink = document.getElementById("profileLink"); 
+    const isLoggedIn =
+        localStorage.getItem('isLoggedIn') === 'true' ||
+        !!localStorage.getItem('userPhone') ||
+        !!localStorage.getItem('authToken');
 
-    if (userContact) {
-        profileLink.style.display = "inline-block"; // Show profile link
-    }else{
-        profileLink.style.display = "none";// hide rakho agar login nahi h 
-    }
+    const profileLink = document.getElementById("profileLink");
+    if (!profileLink) return;
+    const li = profileLink.closest('li');
+    if (li) li.style.display = isLoggedIn ? '' : 'none';
+    profileLink.style.display = '';
 });
 
 // ==========================================

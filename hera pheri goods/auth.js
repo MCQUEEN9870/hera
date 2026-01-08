@@ -74,7 +74,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // 🔹 Login Form Submission (two-step: verify mobile -> password)
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
         e.preventDefault();
-        const button = this.querySelector('button');
+        // Important: this form contains non-submit buttons (password eye toggle).
+        // Always target the real submit button to avoid replacing the eye with text.
+        const button = this.querySelector('button[type="submit"]') || document.getElementById('loginBtn');
         const mobileInput = document.getElementById('loginContactNumber') || this.querySelector('input[type="tel"]');
         // Use ID so it works even when toggled to type="text"
         const passwordInput = document.getElementById('loginPassword');
@@ -88,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Step 1: verify number exists (reduce scams / stop random password attempts)
         if (loginStage === 'phone') {
             button.disabled = true;
-            button.textContent = 'Checking...';
+            button.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Checking...';
             try {
                 const res = await fetch(`${API_BASE_URL}/check-user`, {
                     method: 'POST',
@@ -131,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         button.disabled = true;
-        button.textContent = 'Logging in...';
+        button.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Logging in...';
         try {
             const payload = { contactNumber: contactNumber };
             if (hasPassword) payload.password = pwTrimmed;
@@ -178,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } finally {
             button.disabled = false;
+            // Restore the default label (and avoid leaving spinner HTML behind)
             button.textContent = (loginStage === 'phone') ? 'Continue' : 'Login';
         }
     });
@@ -185,7 +188,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // 🔹 Signup Form Submission (direct signup, no OTP) with loading guard
     document.getElementById('signupForm').addEventListener('submit', async function (e) {
         e.preventDefault();
-        const button = this.querySelector('button');
+        // Important: this form contains non-submit buttons (password eye toggle).
+        // Always target the real submit button to avoid replacing the eye with text.
+        const button = this.querySelector('button[type="submit"]') || document.getElementById('signupBtn');
         if (button.disabled) return; // Prevent multiple submissions
         const originalHtml = button.innerHTML;
         const fullName = this.querySelector('input[name="fullName"]').value.trim();
@@ -556,9 +561,10 @@ document.addEventListener('DOMContentLoaded', function () {
             function sync(btn, input){
                 const isVisible = input.type === 'text';
                 const icon = btn.querySelector('i');
-                if (icon) icon.className = isVisible ? 'fas fa-eye' : 'fas fa-eye-slash';
+                // When visible, show "eye-slash" (tap to hide). When hidden, show "eye" (tap to show).
+                if (icon) icon.className = isVisible ? 'fas fa-eye-slash' : 'fas fa-eye';
                 btn.setAttribute('aria-pressed', String(isVisible));
-                btn.setAttribute('aria-label', isVisible ? 'show password' : 'hide password');
+                btn.setAttribute('aria-label', isVisible ? 'Hide password' : 'Show password');
             }
             document.querySelectorAll('.pw-eye[data-target]').forEach(function(btn){
                 if (btn.dataset.init === '1') return;

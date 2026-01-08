@@ -14,6 +14,7 @@ import java.time.Duration;
 import org.springframework.http.CacheControl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,13 +29,34 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.Registration;
+import com.example.demo.model.User;
 import com.example.demo.repository.RegistrationImageFolderRepository;
 import com.example.demo.repository.RegistrationRepository;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.security.SecurityUtils;
 import com.example.demo.service.SupabaseService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api")
 public class VehicleController {
+
+    private static final Logger log = LoggerFactory.getLogger(VehicleController.class);
+
+    @Autowired
+    private Environment environment;
+
+    private boolean isProdProfile() {
+        if (environment == null) return false;
+        String[] profiles = environment.getActiveProfiles();
+        if (profiles == null) return false;
+        for (String p : profiles) {
+            if ("prod".equalsIgnoreCase(p) || "production".equalsIgnoreCase(p)) return true;
+        }
+        return false;
+    }
 
     @Autowired
     private RegistrationRepository registrationRepository;
@@ -47,6 +69,9 @@ public class VehicleController {
     
     @Autowired
     private RegistrationImageFolderRepository registrationImageFolderRepository;
+
+    @Autowired
+    private UserRepository userRepository;
     
     @Autowired
     private DeletionController deletionController;
@@ -71,8 +96,7 @@ public class VehicleController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
             
-        System.out.println("Searching vehicles with: type=" + vehicleType + ", state=" + state + 
-                           ", city=" + city + ", pincode=" + pincode);
+        log.debug("Searching vehicles (type={}, pincode={}, page={}, size={})", vehicleType, pincode, page, size);
         
         // Get all registrations
         List<Registration> allRegistrations = registrationRepository.findAll();
@@ -106,7 +130,7 @@ public class VehicleController {
         int toIndex = Math.min(fromIndex + cappedSize, totalItems);
         List<Registration> pageSlice = fromIndex < totalItems ? filteredRegistrations.subList(fromIndex, toIndex) : List.of();
             
-        System.out.println("Found " + filteredRegistrations.size() + " matching vehicles");
+        log.debug("Vehicle search results (total={})", filteredRegistrations.size());
         
         // Create response
         Map<String, Object> response = new HashMap<>();
@@ -180,9 +204,8 @@ public class VehicleController {
     public ResponseEntity<?> updateVehicleHighlights(
             @PathVariable("vehicleId") Long vehicleId,
             @RequestBody Map<String, String> highlightsData) {
-        
-        System.out.println("Updating highlights for vehicle ID: " + vehicleId);
-        System.out.println("Highlights data: " + highlightsData);
+
+        log.debug("Updating vehicle highlights (vehicleId={}, keys={})", vehicleId, highlightsData != null ? highlightsData.keySet() : null);
         
         // Find the vehicle registration
         Optional<Registration> optionalRegistration = registrationRepository.findById(vehicleId);
@@ -195,6 +218,15 @@ public class VehicleController {
         }
         
         Registration registration = optionalRegistration.get();
+
+        String currentContact = SecurityUtils.currentContactOrNull();
+        if (currentContact == null) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
+        User currentUser = userRepository.findByContactNumber(currentContact);
+        if (currentUser == null || registration.getUserId() == null || !registration.getUserId().equals(currentUser.getId())) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
         
         // Update highlights
         registration.setHighlight1(highlightsData.get("highlight1"));
@@ -227,9 +259,8 @@ public class VehicleController {
     public ResponseEntity<?> updateVehicle(
             @PathVariable("vehicleId") Long vehicleId,
             @RequestBody Map<String, String> updateData) {
-        
-        System.out.println("Updating vehicle with ID: " + vehicleId);
-        System.out.println("Update data: " + updateData);
+
+        log.debug("Updating vehicle (vehicleId={}, keys={})", vehicleId, updateData != null ? updateData.keySet() : null);
         
         // Find the vehicle registration
         Optional<Registration> optionalRegistration = registrationRepository.findById(vehicleId);
@@ -242,6 +273,15 @@ public class VehicleController {
         }
         
         Registration registration = optionalRegistration.get();
+
+        String currentContact = SecurityUtils.currentContactOrNull();
+        if (currentContact == null) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
+        User currentUser = userRepository.findByContactNumber(currentContact);
+        if (currentUser == null || registration.getUserId() == null || !registration.getUserId().equals(currentUser.getId())) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
         
         // Update fields from the request
         if (updateData.containsKey("owner")) {
@@ -280,55 +320,46 @@ public class VehicleController {
                     
                     registration.setState(state);
                     registration.setCity(city);
-                    
-                    // Log the parsed city and state for debugging
-                    System.out.println("Updated location - City: " + city + ", State: " + state);
+                    log.debug("Updated location parsed for vehicleId={} (cityPresent={}, statePresent={})", vehicleId, !city.isBlank(), !state.isBlank());
                 } else {
                     // If only one part provided, assume it's the city and keep existing state
                     String city = parts[0].trim();
                     registration.setCity(city);
-                    System.out.println("Updated location - City only: " + city + ", keeping State: " + registration.getState());
+                    log.debug("Updated location parsed for vehicleId={} (cityOnly=true)", vehicleId);
                 }
             }
         }
-        
-        // Update highlights with logging
-        System.out.println("Processing highlights data:");
+
+        // Update highlights
         if (updateData.containsKey("highlight1")) {
             String value = updateData.get("highlight1");
-            System.out.println("Setting highlight1: " + value);
             registration.setHighlight1(value);
         }
         
         if (updateData.containsKey("highlight2")) {
             String value = updateData.get("highlight2");
-            System.out.println("Setting highlight2: " + value);
             registration.setHighlight2(value);
         }
         
         if (updateData.containsKey("highlight3")) {
             String value = updateData.get("highlight3");
-            System.out.println("Setting highlight3: " + value);
             registration.setHighlight3(value);
         }
         
         if (updateData.containsKey("highlight4")) {
             String value = updateData.get("highlight4");
-            System.out.println("Setting highlight4: " + value);
             registration.setHighlight4(value);
         }
         
         if (updateData.containsKey("highlight5")) {
             String value = updateData.get("highlight5");
-            System.out.println("Setting highlight5: " + value);
             registration.setHighlight5(value);
         }
         
         // Save the updated registration
-        System.out.println("Saving updated registration to database...");
         try {
             Registration updatedRegistration = registrationRepository.save(registration);
-            System.out.println("Successfully saved registration in database. ID: " + updatedRegistration.getId());
+            log.info("Vehicle updated successfully (vehicleId={})", updatedRegistration.getId());
             
             // Create response
             Map<String, Object> response = new HashMap<>();
@@ -365,19 +396,18 @@ public class VehicleController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.err.println("Error saving registration: " + e.getMessage());
-            e.printStackTrace();
+            log.warn("Error saving registration (vehicleId={})", vehicleId, e);
             
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Failed to update vehicle: " + e.getMessage());
+            errorResponse.put("message", "Failed to update vehicle");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
     
     @GetMapping("/vehicles/{vehicleId}")
     public ResponseEntity<?> getVehicleById(@PathVariable("vehicleId") Long vehicleId) {
-        System.out.println("Getting vehicle with ID: " + vehicleId);
+        log.debug("Getting vehicle by id (vehicleId={})", vehicleId);
         
         // Find the vehicle registration
         Optional<Registration> optionalRegistration = registrationRepository.findById(vehicleId);
@@ -460,7 +490,16 @@ public class VehicleController {
      */
     @GetMapping("/vehicles/user/{userId}")
     public ResponseEntity<?> getVehiclesByUserId(@PathVariable("userId") Long userId) {
-        System.out.println("Fetching vehicles for user ID: " + userId);
+        log.debug("Fetching vehicles for user (userId={})", userId);
+
+        String currentContact = SecurityUtils.currentContactOrNull();
+        if (currentContact == null) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
+        User currentUser = userRepository.findByContactNumber(currentContact);
+        if (currentUser == null || userId == null || !userId.equals(currentUser.getId())) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
         
         // Find the vehicles for this user
         List<Registration> registrations = registrationRepository.findByUserId(userId);
@@ -530,18 +569,34 @@ public class VehicleController {
      */
     @DeleteMapping("/registration/{registrationId}")
     public ResponseEntity<?> deleteRegistration(@PathVariable Long registrationId) {
-        System.out.println("VehicleController: Forwarding to DeletionController for ID: " + registrationId);
+        log.debug("Forwarding vehicle deletion to DeletionController (registrationId={})", registrationId);
+
+        String currentContact = SecurityUtils.currentContactOrNull();
+        if (currentContact == null) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
+        User currentUser = userRepository.findByContactNumber(currentContact);
+        if (currentUser == null) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
+        Optional<Registration> regOpt = registrationRepository.findById(registrationId);
+        if (regOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Vehicle not found with ID: " + registrationId));
+        }
+        Registration reg = regOpt.get();
+        if (reg.getUserId() == null || !reg.getUserId().equals(currentUser.getId())) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
         
         // Forward to the DeletionController's deleteVehicle method
         try {
             return deletionController.deleteVehicle(registrationId);
         } catch (Exception e) {
-            System.err.println("VehicleController: Error forwarding to DeletionController: " + e.getMessage());
-            e.printStackTrace();
+            log.warn("Error forwarding to DeletionController (registrationId={})", registrationId, e);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
-            response.put("message", "Failed to delete vehicle: " + e.getMessage());
+            response.put("message", "Failed to delete vehicle");
             return ResponseEntity.status(500).body(response);
         }
     }
@@ -552,7 +607,7 @@ public class VehicleController {
      */
     @DeleteMapping("/vehicles/{registrationId}")
     public ResponseEntity<?> deleteVehicle(@PathVariable Long registrationId) {
-        System.out.println("VehicleController: Redirecting from /api/vehicles endpoint to DeletionController: " + registrationId);
+        log.debug("Redirecting /api/vehicles delete to /api/registration (registrationId={})", registrationId);
         // Call the DeletionController
         return deleteRegistration(registrationId);
     }
@@ -563,6 +618,15 @@ public class VehicleController {
     @GetMapping("/debug/database-schema")
     public ResponseEntity<?> inspectDatabaseSchema() {
         Map<String, Object> result = new HashMap<>();
+
+        if (isProdProfile()) {
+            return ResponseEntity.status(404).body(Map.of("error", "Not found"));
+        }
+
+        String currentContact = SecurityUtils.currentContactOrNull();
+        if (currentContact == null) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
         
         try {
             // Get registration_image_folders table schema
@@ -612,8 +676,8 @@ public class VehicleController {
             
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+            log.warn("Error inspecting database schema (debug endpoint)", e);
+            return ResponseEntity.status(500).body(Map.of("error", "Failed"));
         }
     }
     
@@ -623,6 +687,15 @@ public class VehicleController {
     @DeleteMapping("/debug/direct-delete/{registrationId}")
     public ResponseEntity<?> debugDirectDelete(@PathVariable Long registrationId) {
         Map<String, Object> result = new HashMap<>();
+
+        if (isProdProfile()) {
+            return ResponseEntity.status(404).body(Map.of("error", "Not found"));
+        }
+
+        String currentContact = SecurityUtils.currentContactOrNull();
+        if (currentContact == null) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
         
         try {
             // Step 1: Check if the vehicle exists
@@ -689,8 +762,8 @@ public class VehicleController {
             
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+            log.warn("Error in debugDirectDelete (registrationId={})", registrationId, e);
+            return ResponseEntity.status(500).body(Map.of("error", "Failed"));
         }
     }
     
@@ -700,7 +773,16 @@ public class VehicleController {
      */
     @DeleteMapping("/force-delete-vehicle/{registrationId}")
     public ResponseEntity<?> forceDeleteVehicle(@PathVariable Long registrationId) {
-        System.out.println("FORCE DELETE: Starting forced deletion process for vehicle ID: " + registrationId);
+        if (isProdProfile()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Not found"));
+        }
+
+        String currentContact = SecurityUtils.currentContactOrNull();
+        if (currentContact == null) {
+            return SecurityUtils.forbidden("Forbidden");
+        }
+
+        log.warn("FORCE DELETE invoked (registrationId={})", registrationId);
         
         Map<String, Object> response = new HashMap<>();
         
@@ -724,13 +806,12 @@ public class VehicleController {
                     "SELECT id, vehicle_plate_number FROM registration WHERE id = ?",
                     registrationId
                 );
-                System.out.println("FORCE DELETE: Found vehicle: " + vehicle.get("vehicle_plate_number") + " (ID: " + vehicle.get("id") + ")");
+                log.debug("FORCE DELETE target found (registrationId={})", vehicle.get("id"));
             } catch (Exception e) {
-                System.out.println("FORCE DELETE: Could not get vehicle details: " + e.getMessage());
+                log.debug("FORCE DELETE could not fetch vehicle details (registrationId={})", registrationId);
             }
             
             // Step 3: Disable foreign key checks temporarily
-            System.out.println("FORCE DELETE: Disabling foreign key checks");
             jdbcTemplate.execute("SET CONSTRAINTS ALL DEFERRED");
             
             // Step 4: Delete from registration_image_folders first
@@ -739,9 +820,9 @@ public class VehicleController {
                     "DELETE FROM registration_image_folders WHERE registration_id = ?",
                     registrationId
                 );
-                System.out.println("FORCE DELETE: Deleted " + folderRows + " rows from registration_image_folders");
+                log.debug("FORCE DELETE deleted registration_image_folders rows (rowsDeleted={})", folderRows);
             } catch (Exception e) {
-                System.err.println("FORCE DELETE: Error deleting from registration_image_folders: " + e.getMessage());
+                log.warn("FORCE DELETE error deleting from registration_image_folders (registrationId={})", registrationId, e);
                 // Continue anyway
             }
             
@@ -751,9 +832,9 @@ public class VehicleController {
                     "UPDATE registration SET vehicle_image_urls_json = '[]' WHERE id = ?",
                     registrationId
                 );
-                System.out.println("FORCE DELETE: Cleared image URLs for " + updated + " rows");
+                log.debug("FORCE DELETE cleared image URLs (rowsUpdated={})", updated);
             } catch (Exception e) {
-                System.err.println("FORCE DELETE: Error clearing image URLs: " + e.getMessage());
+                log.warn("FORCE DELETE error clearing image URLs (registrationId={})", registrationId, e);
                 // Continue anyway
             }
             
@@ -762,10 +843,9 @@ public class VehicleController {
                 "DELETE FROM registration WHERE id = ?",
                 registrationId
             );
-            System.out.println("FORCE DELETE: Deleted " + regRows + " rows from registration");
+            log.debug("FORCE DELETE deleted registration rows (rowsDeleted={})", regRows);
             
             // Step 7: Re-enable foreign key checks
-            System.out.println("FORCE DELETE: Re-enabling foreign key checks");
             jdbcTemplate.execute("SET CONSTRAINTS ALL IMMEDIATE");
             
             // Step 8: Verify deletion
@@ -776,7 +856,7 @@ public class VehicleController {
             );
             
             if (remaining != null && remaining > 0) {
-                System.err.println("FORCE DELETE: Vehicle still exists after deletion!");
+                log.error("FORCE DELETE: Vehicle still exists after deletion (registrationId={})", registrationId);
                 response.put("success", false);
                 response.put("message", "Failed to delete vehicle - it still exists after deletion attempt");
                 return ResponseEntity.status(500).body(response);
@@ -785,9 +865,9 @@ public class VehicleController {
             // Step 9: Try to clean up storage (optional)
             try {
                 supabaseService.deleteAllVehicleImages(registrationId);
-                System.out.println("FORCE DELETE: Cleaned up storage");
+                log.debug("FORCE DELETE cleaned up storage (registrationId={})", registrationId);
             } catch (Exception e) {
-                System.err.println("FORCE DELETE: Error cleaning up storage: " + e.getMessage());
+                log.warn("FORCE DELETE error cleaning up storage (registrationId={})", registrationId, e);
                 // Continue as storage cleanup is optional
             }
             
@@ -797,11 +877,10 @@ public class VehicleController {
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-            System.err.println("FORCE DELETE: Error in forced deletion: " + e.getMessage());
-            e.printStackTrace();
+            log.error("FORCE DELETE: Error in forced deletion (registrationId={})", registrationId, e);
             
             response.put("success", false);
-            response.put("message", "Failed to delete vehicle: " + e.getMessage());
+            response.put("message", "Failed to delete vehicle");
             return ResponseEntity.status(500).body(response);
         }
     }

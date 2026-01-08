@@ -1,6 +1,30 @@
 // Driver Dashboard JavaScript
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Escape user-controlled strings before inserting into HTML.
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function renderUserNameWithBadge(name, membership) {
+        const el = document.querySelector('.user-name');
+        if (!el) return;
+
+        el.textContent = '';
+        el.append(document.createTextNode(name || 'Unknown User'));
+
+        const badge = document.createElement('span');
+        badge.className = 'membership-badge';
+        badge.id = 'membershipBadge';
+        badge.textContent = membership || 'Standard';
+        el.append(' ');
+        el.appendChild(badge);
+    }
     // Network error handling function
     function handleNetworkError(errorMessage = "Could not connect to server. Please check your internet connection and try again.") {
         // Create error modal if it doesn't exist
@@ -176,12 +200,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     };
                     
                     // Update UI with user data
-                    document.querySelector('.user-name').innerHTML = 
-                        `${userData.name} <span class="membership-badge" id="membershipBadge">${userData.membership}</span>`;
+                    renderUserNameWithBadge(userData.name, userData.membership);
                     document.querySelector('.user-contact').textContent = userData.contact;
                     try { setupEmailSettingsSection(); } catch (e) { console.warn('Email section init failed', e); }
                     
-                    console.log("Mock user data loaded successfully:", userData);
                     
                     // Also fetch vehicles data after user data is loaded
                     fetchVehiclesData();
@@ -206,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(data => {
-                console.log("User data received:", data);
+                // Avoid logging PII to the console
                 
                 // Update userData object with fetched data - Fix data structure handling
                     userData = {
@@ -239,8 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     // Update UI with user data
-                    document.querySelector('.user-name').innerHTML = 
-                        `${userData.name} <span class="membership-badge" id="membershipBadge">${userData.membership}</span>`;
+                    renderUserNameWithBadge(userData.name, userData.membership);
                     document.querySelector('.user-contact').textContent = userData.contact;
                     
                     // Update the badge color based on membership
@@ -254,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     updateProfilePhotoUI(userData.profilePhoto);
                     }
                     
-                    console.log("User data loaded successfully:", userData);
+                    // Avoid logging PII to the console
                     
                     // Also fetch vehicles data after user data is loaded
                     fetchVehiclesData();
@@ -266,8 +287,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error fetching user data:', error);
                 
                 // Show error state in user info area
-                document.querySelector('.user-name').innerHTML = 
-                    `Unknown User <span class="membership-badge" id="membershipBadge">Error</span>`;
+                renderUserNameWithBadge('Unknown User', 'Error');
                 document.querySelector('.user-contact').textContent = userPhone;
                 
                 // Show error state for vehicles
@@ -981,12 +1001,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isManualCart) {
                 card.innerHTML = `
                     <div class="vehicle-number">Manual Cart</div>
-                    <div class="vehicle-type">${vehicle.type}</div>
+                    <div class="vehicle-type">${escapeHtml(vehicle.type || '')}</div>
                 `;
             } else {
             card.innerHTML = `
-                <div class="vehicle-number">${vehicle.number}</div>
-                <div class="vehicle-type">${vehicle.type}</div>
+                <div class="vehicle-number">${escapeHtml(vehicle.number || '')}</div>
+                <div class="vehicle-type">${escapeHtml(vehicle.type || '')}</div>
             `;
             }
             
@@ -1100,7 +1120,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isManualCart) {
                 vehicleNumberElement.innerHTML = `Manual Cart ${badgesHtml}`;
             } else {
-            vehicleNumberElement.innerHTML = `${vehicle.number || 'Unknown'} ${badgesHtml}`;
+            vehicleNumberElement.innerHTML = `${escapeHtml(vehicle.number || 'Unknown')} ${badgesHtml}`;
             }
         }
         
@@ -1171,7 +1191,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div>
                 <div class="detail-group">
                     <div class="detail-label">Vehicle Type</div>
-                    <div class="detail-value">${vehicle.type || 'Unknown'}</div>
+                    <div class="detail-value">${escapeHtml(vehicle.type || 'Unknown')}</div>
                 </div>`;
                 
         // Only show vehicle number for non-manual carts
@@ -1179,7 +1199,7 @@ document.addEventListener('DOMContentLoaded', function() {
             detailsHTML += `
                 <div class="detail-group">
                     <div class="detail-label">Vehicle Number</div>
-                    <div class="detail-value">${vehicle.number || 'Unknown'}</div>
+                    <div class="detail-value">${escapeHtml(vehicle.number || 'Unknown')}</div>
                 </div>`;
         }
         
@@ -1187,33 +1207,33 @@ document.addEventListener('DOMContentLoaded', function() {
         detailsHTML += `
                 <div class="detail-group">
                     <div class="detail-label">Owner Name</div>
-                    <div class="detail-value">${vehicleOwner}</div>
+                    <div class="detail-value">${escapeHtml(vehicleOwner)}</div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">Registration Date</div>
-                    <div class="detail-value">${registrationDate}</div>
+                    <div class="detail-value">${escapeHtml(registrationDate)}</div>
                 </div>
             </div>
             <div>
                 <div class="detail-group">
                     <div class="detail-label">Contact Number</div>
-                    <div class="detail-value">${contactNumber}</div>
+                    <div class="detail-value">${escapeHtml(contactNumber)}</div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">WhatsApp Number</div>
-                    <div class="detail-value">${whatsappNumber}</div>
+                    <div class="detail-value">${escapeHtml(whatsappNumber)}</div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">Alternate Contact</div>
-                    <div class="detail-value">${alternateContactNumber}</div>
+                    <div class="detail-value">${escapeHtml(alternateContactNumber)}</div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">Location</div>
-                    <div class="detail-value">${location}</div>
+                    <div class="detail-value">${escapeHtml(location)}</div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">Pincode</div>
-                    <div class="detail-value">${pincode}</div>
+                    <div class="detail-value">${escapeHtml(pincode)}</div>
                 </div>
             </div>
         `;
@@ -1255,7 +1275,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="service-highlights-list">
                         ${activeHighlights.map(highlight => `
                             <div class="highlight-tag">
-                                <span>${highlight}</span>
+                                <span>${escapeHtml(highlight)}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -1289,7 +1309,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get photos from vehicle data
         let photos = vehicle.photos || {};
         
-        console.log("Vehicle photos data:", photos); // Logging photos data for debugging
+        // Avoid logging PII / user-uploaded URLs to the console
         
         // For mock data, create default photo URLs
         if (USE_MOCK_DATA && (!photos || Object.keys(photos).length === 0)) {
@@ -1315,24 +1335,30 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        photosGrid.innerHTML = `
-            <div class="photo-item">
-                <img src="${photos.front}" alt="Front View" onerror="this.src='${defaultImage}'">
-                <div class="photo-label">Front View</div>
-            </div>
-            <div class="photo-item">
-                <img src="${photos.side}" alt="Side View" onerror="this.src='${defaultImage}'">
-                <div class="photo-label">Side View</div>
-            </div>
-            <div class="photo-item">
-                <img src="${photos.back}" alt="Back View" onerror="this.src='${defaultImage}'">
-                <div class="photo-label">Back View</div>
-            </div>
-            <div class="photo-item">
-                <img src="${photos.loading}" alt="Loading Area" onerror="this.src='${defaultImage}'">
-                <div class="photo-label">Loading Area</div>
-            </div>
-        `;
+        photosGrid.textContent = '';
+        const photoDefs = [
+            { key: 'front', label: 'Front View', alt: 'Front View' },
+            { key: 'side', label: 'Side View', alt: 'Side View' },
+            { key: 'back', label: 'Back View', alt: 'Back View' },
+            { key: 'loading', label: 'Loading Area', alt: 'Loading Area' },
+        ];
+        photoDefs.forEach(({ key, label, alt }) => {
+            const wrap = document.createElement('div');
+            wrap.className = 'photo-item';
+
+            const img = document.createElement('img');
+            img.alt = alt;
+            img.src = photos[key] || defaultImage;
+            img.onerror = function () { this.src = defaultImage; };
+
+            const lab = document.createElement('div');
+            lab.className = 'photo-label';
+            lab.textContent = label;
+
+            wrap.appendChild(img);
+            wrap.appendChild(lab);
+            photosGrid.appendChild(wrap);
+        });
     }
     
     // Service Highlights functionality
@@ -3697,15 +3723,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // 1) Ask backend to create an order securely (uses server-side secret)
+        // 1) Ask backend to create an order securely (server decides amount from plan)
         fetch(getApiUrl('payments/create-order'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                amount: Number(price),
+                plan: plan,
                 currency: 'INR',
-                receipt: `premium_${userPhone}_${Date.now()}`,
-                notes: { plan, userPhone }
+                receipt: `premium_${userPhone}_${Date.now()}`
             })
         })
         .then(res => res.json())
@@ -3737,60 +3762,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 },
                 handler: function (response) {
-                    // 2) Verify payment signature on backend
-                    fetch(getApiUrl('payments/verify'), {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature
-                        })
-                    })
-                    .then(v => v.json())
-                    .then(v => {
-                        if (v && v.success) {
-                            updateMembershipOnServer(plan, response.razorpay_payment_id);
-                        } else {
-                            showAlertModal('Verification Failed', 'Payment could not be verified. Please contact support if amount was deducted.', 'OK');
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Verification error:', err);
-                        showAlertModal('Verification Error', 'Something went wrong during verification.', 'OK');
-                    });
+                    // 2) Upgrade membership only with server-side payment verification
+                    updateMembershipOnServer(plan, response);
                 }
             };
 
             try {
-            if (window.Razorpay) {
+                if (window.Razorpay) {
                     const rzp = new window.Razorpay(options);
                     rzp.open();
             } else {
-                    console.log('Razorpay not loaded, simulating payment success');
-                simulatePaymentSuccess(plan);
+                    console.error('Razorpay SDK not loaded');
+                    showAlertModal('Payment Error', 'Payment gateway not loaded. Please refresh and try again.', 'OK');
             }
         } catch (error) {
                 console.error('Error initializing Razorpay:', error);
-            simulatePaymentSuccess(plan);
+                showAlertModal('Payment Error', 'Unable to open payment gateway. Please try again.', 'OK');
         }
         })
         .catch(err => {
             console.error('Order create error:', err);
             showAlertModal('Payment Error', 'Unable to initiate payment. Please try again later.', 'OK');
         });
-    }
-    
-    // Function to simulate payment success for testing
-    function simulatePaymentSuccess(plan) {
-        console.log("Simulating payment success for plan:", plan);
-        showAlertModal('Processing Payment', 'Please wait while we process your payment...', '', null, false);
-        
-        // Simulate API delay
-        setTimeout(() => {
-            // Call the update membership function with a mock payment ID
-            updateMembershipOnServer(plan, `mock_payment_${Date.now()}`);
-        }, 2000);
     }
     
     // Helper function to get plan price based on plan type
@@ -3810,7 +3803,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Update membership status on server
-    function updateMembershipOnServer(plan, paymentId) {
+    function updateMembershipOnServer(plan, razorpayResponse) {
         // Get user phone from localStorage
         const userPhone = localStorage.getItem('userPhone');
         if (!userPhone) {
@@ -3823,7 +3816,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Prepare request data
         const requestData = {
             plan: plan,
-            paymentId: paymentId
+            paymentId: razorpayResponse && razorpayResponse.razorpay_payment_id ? razorpayResponse.razorpay_payment_id : '',
+            razorpay_order_id: razorpayResponse && razorpayResponse.razorpay_order_id ? razorpayResponse.razorpay_order_id : '',
+            razorpay_signature: razorpayResponse && razorpayResponse.razorpay_signature ? razorpayResponse.razorpay_signature : ''
         };
         
         // Make API call to update membership
@@ -4632,7 +4627,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (isManualCart) {
                                 vehicleNumberElement.innerHTML = `Manual Cart ${badgesHtml}`;
                             } else {
-                                vehicleNumberElement.innerHTML = `${selectedVehicle.number || 'Unknown'} ${badgesHtml}`;
+                                vehicleNumberElement.innerHTML = `${escapeHtml(selectedVehicle.number || 'Unknown')} ${badgesHtml}`;
                             }
                     }
 
@@ -4861,7 +4856,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (isManualCart) {
                                 vehicleNumberElement.innerHTML = `Manual Cart ${badgesHtml}`;
                             } else {
-                                vehicleNumberElement.innerHTML = `${selectedVehicle.number || 'Unknown'} ${badgesHtml}`;
+                                vehicleNumberElement.innerHTML = `${escapeHtml(selectedVehicle.number || 'Unknown')} ${badgesHtml}`;
                             }
                         }
                         
@@ -5225,7 +5220,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isManualCart) {
                 vehicleNumberElement.innerHTML = `Manual Cart ${badgesHtml}`;
             } else {
-                vehicleNumberElement.innerHTML = `${vehicle.number || 'Unknown'} ${badgesHtml}`;
+                vehicleNumberElement.innerHTML = `${escapeHtml(vehicle.number || 'Unknown')} ${badgesHtml}`;
             }
         }
         
@@ -5296,7 +5291,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div>
                 <div class="detail-group">
                     <div class="detail-label">Vehicle Type</div>
-                    <div class="detail-value">${vehicle.type || 'Unknown'}</div>
+                    <div class="detail-value">${escapeHtml(vehicle.type || 'Unknown')}</div>
                 </div>`;
                 
         // Only show vehicle number for non-manual carts
@@ -5304,7 +5299,7 @@ document.addEventListener('DOMContentLoaded', function() {
             detailsHTML += `
                 <div class="detail-group">
                     <div class="detail-label">Vehicle Number</div>
-                    <div class="detail-value">${vehicle.number || 'Unknown'}</div>
+                    <div class="detail-value">${escapeHtml(vehicle.number || 'Unknown')}</div>
                 </div>`;
         }
         
@@ -5312,33 +5307,33 @@ document.addEventListener('DOMContentLoaded', function() {
         detailsHTML += `
                 <div class="detail-group">
                     <div class="detail-label">Owner Name</div>
-                    <div class="detail-value">${vehicleOwner}</div>
+                    <div class="detail-value">${escapeHtml(vehicleOwner)}</div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">Registration Date</div>
-                    <div class="detail-value">${registrationDate}</div>
+                    <div class="detail-value">${escapeHtml(registrationDate)}</div>
                 </div>
             </div>
             <div>
                 <div class="detail-group">
                     <div class="detail-label">Contact Number</div>
-                    <div class="detail-value">${contactNumber}</div>
+                    <div class="detail-value">${escapeHtml(contactNumber)}</div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">WhatsApp Number</div>
-                    <div class="detail-value">${whatsappNumber}</div>
+                    <div class="detail-value">${escapeHtml(whatsappNumber)}</div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">Alternate Contact</div>
-                    <div class="detail-value">${alternateContactNumber}</div>
+                    <div class="detail-value">${escapeHtml(alternateContactNumber)}</div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">Location</div>
-                    <div class="detail-value">${location}</div>
+                    <div class="detail-value">${escapeHtml(location)}</div>
                 </div>
                 <div class="detail-group">
                     <div class="detail-label">Pincode</div>
-                    <div class="detail-value">${pincode}</div>
+                    <div class="detail-value">${escapeHtml(pincode)}</div>
                 </div>
             </div>
         `;
@@ -5380,7 +5375,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="service-highlights-list">
                         ${activeHighlights.map(highlight => `
                             <div class="highlight-tag">
-                                <span>${highlight}</span>
+                                <span>${escapeHtml(highlight)}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -5414,7 +5409,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get photos from vehicle data
         let photos = vehicle.photos || {};
         
-        console.log("Vehicle photos data:", photos); // Logging photos data for debugging
+        // Avoid logging PII / user-uploaded URLs to the console
         
         // For mock data, create default photo URLs
         if (USE_MOCK_DATA && (!photos || Object.keys(photos).length === 0)) {
@@ -5440,24 +5435,30 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        photosGrid.innerHTML = `
-            <div class="photo-item">
-                <img src="${photos.front}" alt="Front View" onerror="this.src='${defaultImage}'">
-                <div class="photo-label">Front View</div>
-            </div>
-            <div class="photo-item">
-                <img src="${photos.side}" alt="Side View" onerror="this.src='${defaultImage}'">
-                <div class="photo-label">Side View</div>
-            </div>
-            <div class="photo-item">
-                <img src="${photos.back}" alt="Back View" onerror="this.src='${defaultImage}'">
-                <div class="photo-label">Back View</div>
-            </div>
-            <div class="photo-item">
-                <img src="${photos.loading}" alt="Loading Area" onerror="this.src='${defaultImage}'">
-                <div class="photo-label">Loading Area</div>
-            </div>
-        `;
+        photosGrid.textContent = '';
+        const photoDefs = [
+            { key: 'front', label: 'Front View', alt: 'Front View' },
+            { key: 'side', label: 'Side View', alt: 'Side View' },
+            { key: 'back', label: 'Back View', alt: 'Back View' },
+            { key: 'loading', label: 'Loading Area', alt: 'Loading Area' },
+        ];
+        photoDefs.forEach(({ key, label, alt }) => {
+            const wrap = document.createElement('div');
+            wrap.className = 'photo-item';
+
+            const img = document.createElement('img');
+            img.alt = alt;
+            img.src = photos[key] || defaultImage;
+            img.onerror = function () { this.src = defaultImage; };
+
+            const lab = document.createElement('div');
+            lab.className = 'photo-label';
+            lab.textContent = label;
+
+            wrap.appendChild(img);
+            wrap.appendChild(lab);
+            photosGrid.appendChild(wrap);
+        });
     }
 });
 

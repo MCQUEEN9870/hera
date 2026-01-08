@@ -14,10 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.service.ImageMigrationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/migration")
 public class ImageMigrationController {
+
+    private static final Logger log = LoggerFactory.getLogger(ImageMigrationController.class);
 
     @Autowired
     private ImageMigrationService migrationService;
@@ -37,10 +41,10 @@ public class ImageMigrationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Error during image migration", e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error during migration: " + e.getMessage());
+            errorResponse.put("message", "Error during migration");
             
             return ResponseEntity.badRequest().body(errorResponse);
         }
@@ -61,10 +65,10 @@ public class ImageMigrationController {
             
             return ResponseEntity.ok(response);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Error during image migration (registrationId={})", registrationId, e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error during migration: " + e.getMessage());
+            errorResponse.put("message", "Error during migration");
             
             return ResponseEntity.badRequest().body(errorResponse);
         }

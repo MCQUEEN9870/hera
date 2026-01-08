@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,12 +28,17 @@ import com.example.demo.model.User;
 import com.example.demo.repository.RegistrationImageFolderRepository;
 import com.example.demo.repository.RegistrationRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.security.SecurityUtils;
 import com.example.demo.service.SupabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
  
 
 @RestController
 @RequestMapping("/api/registration")
 public class RegistrationController {
+
+    private static final Logger log = LoggerFactory.getLogger(RegistrationController.class);
 
     @Autowired
     private SupabaseService supabaseService;
@@ -45,6 +51,15 @@ public class RegistrationController {
     
     @Autowired
     private RegistrationImageFolderRepository registrationImageFolderRepository;
+
+    @Autowired
+    private Environment environment;
+
+    private boolean isProdProfile() {
+        if (environment == null) return false;
+        return Arrays.stream(environment.getActiveProfiles())
+                .anyMatch(p -> "prod".equalsIgnoreCase(p) || "production".equalsIgnoreCase(p));
+    }
 
     /**
      * Fetch a single registration by ID (used by frontend vehicle card/detail)
@@ -81,9 +96,10 @@ public class RegistrationController {
             data.put("membership", reg.getMembership());
             return ResponseEntity.ok(data);
         } catch (Exception e) {
+            log.warn("Error fetching registration by id={}", id, e);
             Map<String, Object> err = new HashMap<>();
             err.put("success", false);
-            err.put("message", "Error fetching registration: " + e.getMessage());
+            err.put("message", "Error fetching registration");
             return ResponseEntity.status(500).body(err);
         }
     }
@@ -102,8 +118,12 @@ public class RegistrationController {
             @RequestParam("vehicleImages") MultipartFile[] vehicleImages
     ) {
         try {
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null || !currentContact.equals(contactNumber)) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
             // Find the user by contactNumber
-            User user = userRepository.findByContactNumber(contactNumber);
+            User user = userRepository.findByContactNumber(currentContact);
             
             // If user doesn't exist, registration shouldn't proceed
             if (user == null) {
@@ -161,19 +181,14 @@ public class RegistrationController {
             if (imageUrls != null && !imageUrls.isEmpty()) {
                 savedRegistration.setVehicleImageUrls(imageUrls);
                 registrationRepository.save(savedRegistration);
-                
-                // Log the URLs being saved
-                System.out.println("Saved image URLs to registration: " + savedRegistration.getId());
-                for (String url : imageUrls) {
-                    System.out.println(" - " + url);
-                }
+                log.debug("Saved image URLs to registration (registrationId={}, count={})", savedRegistration.getId(), imageUrls.size());
             }
             
             // Additionally save to Supabase if needed
             try {
                 supabaseService.saveRegistration(registration);
             } catch (Exception e) {
-                System.err.println("Failed to save to Supabase: " + e.getMessage());
+                log.warn("Failed to save registration to Supabase (registrationId={})", savedRegistration.getId(), e);
             }
 
             Map<String, Object> response = new HashMap<>();
@@ -185,10 +200,10 @@ public class RegistrationController {
             
             return ResponseEntity.ok(response);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Error processing registration", e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error processing registration: " + e.getMessage());
+            errorResponse.put("message", "Error processing registration");
             
             return ResponseEntity.badRequest().body(errorResponse);
         }
@@ -196,7 +211,15 @@ public class RegistrationController {
     
     @GetMapping
     public ResponseEntity<List<Registration>> getAllRegistrations() {
-        return ResponseEntity.ok(registrationRepository.findAll());
+        String currentContact = SecurityUtils.currentContactOrNull();
+        if (currentContact == null) {
+            return ResponseEntity.status(403).body(List.of());
+        }
+        User currentUser = userRepository.findByContactNumber(currentContact);
+        if (currentUser == null) {
+            return ResponseEntity.status(403).body(List.of());
+        }
+        return ResponseEntity.ok(registrationRepository.findByUserId(currentUser.getId()));
     }
     
     @GetMapping("/{id}/entity")
@@ -220,6 +243,15 @@ public class RegistrationController {
 
             // Get the existing registration
             Registration registration = registrationRepository.findById(id).get();
+
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+            User currentUser = userRepository.findByContactNumber(currentContact);
+            if (currentUser == null || registration.getUserId() == null || !registration.getUserId().equals(currentUser.getId())) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
             
             // Update only the fields that can be changed
             if (updateData.containsKey("owner")) {
@@ -252,7 +284,7 @@ public class RegistrationController {
             try {
                 supabaseService.updateRegistration(registration);
             } catch (Exception e) {
-                System.err.println("Failed to update in Supabase: " + e.getMessage());
+                log.warn("Failed to update registration in Supabase (registrationId={})", registration.getId(), e);
             }
             
             Map<String, Object> response = new HashMap<>();
@@ -261,9 +293,10 @@ public class RegistrationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            log.warn("Error updating registration", e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error updating registration: " + e.getMessage());
+            errorResponse.put("message", "Error updating registration");
             
             return ResponseEntity.status(500).body(errorResponse);
         }
@@ -281,31 +314,33 @@ public class RegistrationController {
                 return ResponseEntity.status(404).body(errorResponse);
             }
 
-            System.out.println("DELETE REQUEST: Starting deletion of registration ID: " + id);
+            log.debug("Starting deletion of registration (registrationId={})", id);
             
             // Get registration to delete images from storage
             Registration registration = registrationRepository.findById(id).get();
+
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+            User currentUser = userRepository.findByContactNumber(currentContact);
+            if (currentUser == null || registration.getUserId() == null || !registration.getUserId().equals(currentUser.getId())) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
             List<String> imageUrls = registration.getVehicleImageUrls();
-            
-            // Log all the image URLs being deleted for debugging
             if (imageUrls != null && !imageUrls.isEmpty()) {
-                System.out.println("DELETE INFO: Found " + imageUrls.size() + " image URLs in registration " + id);
-                for (String url : imageUrls) {
-                    System.out.println("DELETE INFO: Image URL found: " + url);
-                }
+                log.debug("Found image URLs in registration (registrationId={}, count={})", id, imageUrls.size());
             } else {
-                System.out.println("DELETE INFO: No image URLs found in registration " + id);
+                log.debug("No image URLs found in registration (registrationId={})", id);
             }
             
             // First, delete any folder records from registration_image_folders
             // This is important to avoid foreign key constraint violations
             try {
-                System.out.println("DELETE DB: Deleting folder records for registration " + id);
                 registrationImageFolderRepository.deleteByRegistrationId(id);
-                System.out.println("DELETE DB: Successfully deleted folder records");
+                log.debug("Deleted folder records (registrationId={})", id);
             } catch (Exception e) {
-                System.err.println("DELETE ERROR: Failed to delete folder records: " + e.getMessage());
-                e.printStackTrace();
+                log.warn("Failed to delete folder records (registrationId={})", id, e);
                 // Continue with deletion process
             }
             
@@ -313,87 +348,78 @@ public class RegistrationController {
             // Try to delete the folder, but continue even if it fails
             try {
                 // Delete images from storage bucket using folder structure
-                System.out.println("DELETE STORAGE: Deleting folder for registration " + id);
                 supabaseService.deleteRegistrationFolder(id);
-                System.out.println("DELETE STORAGE: Successfully deleted folder");
+                log.debug("Deleted storage folder (registrationId={})", id);
             } catch (Exception e) {
                 // Log but continue since we still want to delete individual URLs
-                System.err.println("DELETE ERROR: Failed to delete images from folder: " + e.getMessage());
-                e.printStackTrace();
+                log.warn("Failed to delete images from folder (registrationId={})", id, e);
                 // Continue with individual file deletion
             }
             
             // Also try to delete any image URLs that might be stored directly
             // This is especially important if folder deletion failed
             if (imageUrls != null && !imageUrls.isEmpty()) {
-                System.out.println("DELETE URLS: Deleting " + imageUrls.size() + " individual image URLs");
                 int successCount = 0;
                 
                 for (String imageUrl : imageUrls) {
                     try {
-                        System.out.println("DELETE URL: Attempting to delete image: " + imageUrl);
                         supabaseService.deleteImage(imageUrl);
-                        System.out.println("DELETE URL: Successfully deleted image: " + imageUrl);
                         successCount++;
                     } catch (Exception e) {
-                        System.err.println("DELETE ERROR: Failed to delete image URL: " + imageUrl + " - " + e.getMessage());
+                        log.debug("Failed to delete an image URL during registration deletion (registrationId={})", id);
                         // Continue with other deletions even if one fails
                     }
                 }
-                
-                System.out.println("DELETE URLS: Successfully deleted " + successCount + " out of " + imageUrls.size() + " image URLs");
+
+                log.debug("Deleted {} out of {} image URLs (registrationId={})", successCount, imageUrls.size(), id);
             }
             
             // Also try a direct database cleanup approach for the folder entry
             try {
-                System.out.println("DELETE DB DIRECT: Running direct SQL cleanup for registration folder entries");
                 // This ensures that any orphaned folder entries are removed
                 registrationImageFolderRepository.deleteByRegistrationId(id);
-                System.out.println("DELETE DB DIRECT: Direct SQL cleanup completed");
+                log.debug("Direct DB cleanup completed (registrationId={})", id);
             } catch (Exception e) {
-                System.err.println("DELETE ERROR: Failed direct SQL cleanup: " + e.getMessage());
+                log.warn("Failed direct SQL cleanup (registrationId={})", id, e);
             }
             
             // Now delete the registration itself from the database
             try {
-                System.out.println("DELETE DB: Deleting registration record " + id);
                 registrationRepository.deleteById(id);
-                System.out.println("DELETE DB: Successfully deleted registration record");
+                log.debug("Deleted registration record (registrationId={})", id);
                 
                 // Extra verification - check if the registration is actually gone
                 boolean stillExists = registrationRepository.existsById(id);
                 if (stillExists) {
-                    System.err.println("DELETE WARNING: Registration still exists in database after deletion!");
+                    log.warn("Registration still exists after deletion attempt (registrationId={})", id);
                     
                     // One more attempt with a direct SQL approach
                     try {
-                        System.out.println("DELETE DB FINAL: Making one final attempt to remove registration record");
                         registrationRepository.deleteById(id);
                         
                         // Check again
                         stillExists = registrationRepository.existsById(id);
                         if (stillExists) {
-                            System.err.println("DELETE ERROR: Final attempt failed. Registration record persists in database.");
+                            log.warn("Final attempt failed; registration record persists (registrationId={})", id);
                         } else {
-                            System.out.println("DELETE DB FINAL: Final deletion attempt successful");
+                            log.debug("Final deletion attempt successful (registrationId={})", id);
                         }
                     } catch (Exception e) {
-                        System.err.println("DELETE ERROR: Final deletion attempt exception: " + e.getMessage());
+                        log.warn("Final deletion attempt exception (registrationId={})", id, e);
                     }
                 } else {
-                    System.out.println("DELETE DB VERIFY: Verified registration record is deleted from database");
+                    log.debug("Verified registration record deleted from database (registrationId={})", id);
                 }
             } catch (Exception e) {
-                System.err.println("DELETE ERROR: Failed to delete registration from database: " + e.getMessage());
-                e.printStackTrace();
+                log.warn("Failed to delete registration from database (registrationId={})", id, e);
                 
                 Map<String, Object> errorResponse = new HashMap<>();
                 errorResponse.put("success", false);
-                errorResponse.put("message", "Error deleting registration from database: " + e.getMessage());
+                errorResponse.put("message", "Error deleting registration from database");
                 return ResponseEntity.status(500).body(errorResponse);
             }
-            
-            System.out.println("DELETE COMPLETE: Successfully completed deletion process for registration " + id);
+
+            log.debug("Successfully completed deletion process (registrationId={})", id);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -401,12 +427,11 @@ public class RegistrationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.err.println("DELETE FATAL ERROR: Unhandled exception in deletion process: " + e.getMessage());
-            e.printStackTrace();
+            log.warn("Unhandled exception in deletion process (registrationId={})", id, e);
             
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error deleting registration: " + e.getMessage());
+            errorResponse.put("message", "Error deleting registration");
             
             return ResponseEntity.status(500).body(errorResponse);
         }
@@ -419,11 +444,24 @@ public class RegistrationController {
     @GetMapping("/migrate-urls")
     public ResponseEntity<?> migrateImageUrls() {
         try {
+            // Hard safety: never allow a state-mutating migration endpoint in production
+            if (isProdProfile()) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Not found");
+                return ResponseEntity.status(404).body(errorResponse);
+            }
+
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+
             // Get all registrations
             List<Registration> registrations = registrationRepository.findAll();
             int migratedCount = 0;
-            
-            System.out.println("Starting migration of " + registrations.size() + " registrations...");
+
+            log.info("Starting registration image URL migration (total={})", registrations.size());
             
             for (Registration registration : registrations) {
                 // Check if vehicleImageUrls is not empty but vehicleImageUrlsJson is empty
@@ -436,9 +474,8 @@ public class RegistrationController {
                     registration.setVehicleImageUrls(urls);
                     registrationRepository.save(registration);
                     migratedCount++;
-                    
-                    System.out.println("Migrated registration ID " + registration.getId() + 
-                                      " with " + urls.size() + " URLs");
+
+                    log.debug("Migrated registration image URLs (registrationId={}, urlCount={})", registration.getId(), urls.size());
                 }
             }
             
@@ -450,10 +487,10 @@ public class RegistrationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Error during registration image URL migration", e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error during migration: " + e.getMessage());
+            errorResponse.put("message", "Error during migration");
             
             return ResponseEntity.status(500).body(errorResponse);
         }
@@ -479,6 +516,15 @@ public class RegistrationController {
             
             // Get the registration
             Registration registration = registrationRepository.findById(id).get();
+
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+            User currentUser = userRepository.findByContactNumber(currentContact);
+            if (currentUser == null || registration.getUserId() == null || !registration.getUserId().equals(currentUser.getId())) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
             
             // Check if there's an existing RC document that needs to be deleted
             if (registration.getRc() != null && !registration.getRc().isEmpty()) {
@@ -486,7 +532,7 @@ public class RegistrationController {
                     // Delete the existing document
                     supabaseService.deleteDocument(registration.getRc());
                 } catch (Exception e) {
-                    System.err.println("Failed to delete existing RC document: " + e.getMessage());
+                    log.warn("Failed to delete existing RC document from storage (registrationId={})", id, e);
                     // Continue with upload even if deletion fails
                 }
             }
@@ -506,10 +552,10 @@ public class RegistrationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Error uploading RC document (registrationId={})", id, e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error uploading RC document: " + e.getMessage());
+            errorResponse.put("message", "Error uploading RC document");
             
             return ResponseEntity.status(500).body(errorResponse);
         }
@@ -535,6 +581,15 @@ public class RegistrationController {
             
             // Get the registration
             Registration registration = registrationRepository.findById(id).get();
+
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+            User currentUser = userRepository.findByContactNumber(currentContact);
+            if (currentUser == null || registration.getUserId() == null || !registration.getUserId().equals(currentUser.getId())) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
             
             // Check if there's an existing DL document that needs to be deleted
             if (registration.getD_l() != null && !registration.getD_l().isEmpty()) {
@@ -542,7 +597,7 @@ public class RegistrationController {
                     // Delete the existing document
                     supabaseService.deleteDocument(registration.getD_l());
                 } catch (Exception e) {
-                    System.err.println("Failed to delete existing driving license document: " + e.getMessage());
+                    log.warn("Failed to delete existing DL document from storage (registrationId={})", id, e);
                     // Continue with upload even if deletion fails
                 }
             }
@@ -562,10 +617,10 @@ public class RegistrationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Error uploading driving license document (registrationId={})", id, e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error uploading driving license document: " + e.getMessage());
+            errorResponse.put("message", "Error uploading driving license document");
             
             return ResponseEntity.status(500).body(errorResponse);
         }
@@ -590,6 +645,15 @@ public class RegistrationController {
             
             // Get the registration
             Registration registration = registrationRepository.findById(id).get();
+
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+            User currentUser = userRepository.findByContactNumber(currentContact);
+            if (currentUser == null || registration.getUserId() == null || !registration.getUserId().equals(currentUser.getId())) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
             
             // Create response with document URLs and status
             Map<String, Object> response = new HashMap<>();
@@ -613,10 +677,10 @@ public class RegistrationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Error getting document status (registrationId={})", id, e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error getting document status: " + e.getMessage());
+            errorResponse.put("message", "Error getting document status");
             
             return ResponseEntity.status(500).body(errorResponse);
         }
@@ -641,6 +705,15 @@ public class RegistrationController {
             
             // Get the registration
             Registration registration = registrationRepository.findById(id).get();
+
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+            User currentUser = userRepository.findByContactNumber(currentContact);
+            if (currentUser == null || registration.getUserId() == null || !registration.getUserId().equals(currentUser.getId())) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
             
             // Check if there's an RC document to delete
             if (registration.getRc() == null || registration.getRc().isEmpty()) {
@@ -654,7 +727,7 @@ public class RegistrationController {
             try {
                 supabaseService.deleteDocument(registration.getRc());
             } catch (Exception e) {
-                System.err.println("Failed to delete RC document from storage: " + e.getMessage());
+                log.warn("Failed to delete RC document from storage (registrationId={})", id, e);
                 // Continue with database update even if storage deletion fails
             }
             
@@ -669,10 +742,10 @@ public class RegistrationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Error deleting RC document (registrationId={})", id, e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error deleting RC document: " + e.getMessage());
+            errorResponse.put("message", "Error deleting RC document");
             
             return ResponseEntity.status(500).body(errorResponse);
         }
@@ -698,6 +771,15 @@ public class RegistrationController {
             
             // Get the registration
             Registration registration = registrationRepository.findById(id).get();
+
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+            User currentUser = userRepository.findByContactNumber(currentContact);
+            if (currentUser == null || registration.getUserId() == null || !registration.getUserId().equals(currentUser.getId())) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
             
             // Update membership status
             String membership = membershipData.get("membership");
@@ -719,10 +801,10 @@ public class RegistrationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Error updating membership status (registrationId={})", id, e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error updating membership status: " + e.getMessage());
+            errorResponse.put("message", "Error updating membership status");
             
             return ResponseEntity.status(500).body(errorResponse);
         }
@@ -737,23 +819,42 @@ public class RegistrationController {
     @GetMapping("/search")
     public ResponseEntity<?> searchRegistrations(@RequestParam String term) {
         try {
-            List<Registration> results = new ArrayList<>();
-            
-            // Try to parse term as Long for ID search
-            if (term.matches("\\d+")) {
-                // Term is a number, search by ID
-                registrationRepository.findById(Long.valueOf(term)).ifPresent(results::add);
-            } else {
-                // Term is not a number, search by name
-                results.addAll(registrationRepository.findByFullNameContainingIgnoreCase(term));
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null) {
+                return SecurityUtils.forbidden("Forbidden");
             }
-            
+            User currentUser = userRepository.findByContactNumber(currentContact);
+            if (currentUser == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+
+            List<Registration> results = new ArrayList<>();
+            List<Registration> myRegs = registrationRepository.findByUserId(currentUser.getId());
+
+            if (term != null && term.matches("\\d+")) {
+                Long id = Long.valueOf(term);
+                for (Registration r : myRegs) {
+                    if (r.getId() != null && r.getId().equals(id)) {
+                        results.add(r);
+                        break;
+                    }
+                }
+            } else {
+                String t = term == null ? "" : term.toLowerCase();
+                for (Registration r : myRegs) {
+                    String name = r.getFullName() == null ? "" : r.getFullName();
+                    if (name.toLowerCase().contains(t)) {
+                        results.add(r);
+                    }
+                }
+            }
+
             return ResponseEntity.ok(results);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Error searching registrations", e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error searching registrations: " + e.getMessage());
+            errorResponse.put("message", "Error searching registrations");
             
             return ResponseEntity.status(500).body(errorResponse);
         }
@@ -778,6 +879,15 @@ public class RegistrationController {
             
             // Get the registration
             Registration registration = registrationRepository.findById(id).get();
+
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+            User currentUser = userRepository.findByContactNumber(currentContact);
+            if (currentUser == null || registration.getUserId() == null || !registration.getUserId().equals(currentUser.getId())) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
             
             // Check if there's a DL document to delete
             if (registration.getD_l() == null || registration.getD_l().isEmpty()) {
@@ -791,7 +901,7 @@ public class RegistrationController {
             try {
                 supabaseService.deleteDocument(registration.getD_l());
             } catch (Exception e) {
-                System.err.println("Failed to delete driving license document from storage: " + e.getMessage());
+                log.warn("Failed to delete DL document from storage (registrationId={})", id, e);
                 // Continue with database update even if storage deletion fails
             }
             
@@ -806,10 +916,10 @@ public class RegistrationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Error deleting driving license document (registrationId={})", id, e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "Error deleting driving license document: " + e.getMessage());
+            errorResponse.put("message", "Error deleting driving license document");
             
             return ResponseEntity.status(500).body(errorResponse);
         }
@@ -824,12 +934,29 @@ public class RegistrationController {
             @RequestParam(value = "userId", required = false) Long userId,
             @RequestParam(value = "contactNumber", required = false) String contactNumber) {
         try {
+            String currentContact = SecurityUtils.currentContactOrNull();
+            if (currentContact == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+            User currentUser = userRepository.findByContactNumber(currentContact);
+            if (currentUser == null) {
+                return SecurityUtils.forbidden("Forbidden");
+            }
+
             // Resolve userId from contactNumber if needed
             if (userId == null && contactNumber != null && !contactNumber.isEmpty()) {
                 User user = userRepository.findByContactNumber(contactNumber);
                 if (user != null) {
                     userId = user.getId();
                 }
+            }
+
+            // Only allow syncing the authenticated user's registrations
+            if (userId == null) {
+                userId = currentUser.getId();
+            }
+            if (!userId.equals(currentUser.getId())) {
+                return SecurityUtils.forbidden("Forbidden");
             }
 
             int updatedCount = 0;
@@ -870,10 +997,10 @@ public class RegistrationController {
             response.put("updated", updatedCount);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Failed to sync registration membership", e);
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
-            error.put("message", "Failed to sync membership: " + e.getMessage());
+            error.put("message", "Failed to sync membership");
             return ResponseEntity.status(500).body(error);
         }
     }
