@@ -18,6 +18,36 @@
 [build.processing.images]
   compress = true
 
+# Cache headers
+# Goal: ensure HTML/CSS/JS refresh immediately after deploy (especially on mobile).
+# - We keep HTML as no-cache so navigations always fetch the latest document.
+# - We set JS/CSS to must-revalidate so clients check for updates.
+# - We allow long-lived caching for attached assets (mostly images).
+[[headers]]
+  for = "/**"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/**/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/**/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/site.webmanifest"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/attached_assets/**"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
 # Prefer static pages for these exact paths (place BEFORE any SSR rewrites)
 
 # Canonical vehicles slug: /find-vehicles (keep old /vehicles working via 301)

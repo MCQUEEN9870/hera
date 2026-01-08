@@ -1509,7 +1509,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         // Update the WhatsApp section in the modal (if already rendered), otherwise retry shortly
                         const updateWhatsAppSection = () => {
-                            const whatsappSection = document.querySelector('.modal-info-list li:nth-child(3) .info-content');
+                            const whatsappSection = (typeof modalInfo !== 'undefined' && modalInfo && modalInfo.querySelector)
+                                ? modalInfo.querySelector('[data-field="owner-whatsapp"]')
+                                : document.querySelector('[data-field="owner-whatsapp"]');
                             if (whatsappSection) {
                                 whatsappSection.innerHTML = `
                                     <div class="info-label">WhatsApp</div>
@@ -1543,7 +1545,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         // Update the alternate contact section in the modal (if already rendered), otherwise retry shortly
                         const updateAlternateSection = () => {
-                            const alternateSection = document.querySelector('.modal-info-list li:nth-child(4) .info-content');
+                            const alternateSection = (typeof modalInfo !== 'undefined' && modalInfo && modalInfo.querySelector)
+                                ? modalInfo.querySelector('[data-field="owner-alternate"]')
+                                : document.querySelector('[data-field="owner-alternate"]');
                             if (alternateSection) {
                                 alternateSection.innerHTML = `
                                     <div class="info-label">Alternate Number</div>
@@ -2085,14 +2089,14 @@ document.addEventListener('DOMContentLoaded', function() {
                             </li>
                             <li class="modal-info-item">
                                 <div class="info-icon"><i class="fab fa-whatsapp"></i></div>
-                                <div class="info-content">
+                                <div class="info-content" data-field="owner-whatsapp">
                                     <div class="info-label">WhatsApp</div>
                                     ${whatsappNumber ? createContactInfoWithCopy(whatsappNumber) : '<div class="info-value">WhatsApp number not provided by vehicle owner</div>'}
                                 </div>
                             </li>
                             <li class="modal-info-item">
                                 <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
-                                <div class="info-content">
+                                <div class="info-content" data-field="owner-alternate">
                                     <div class="info-label">Alternate Number</div>
                                     ${createContactInfoWithCopy(alternateNumber)}
                                 </div>
