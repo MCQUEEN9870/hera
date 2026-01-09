@@ -267,6 +267,7 @@
             padding: 20px;
             margin-top: 20px;
         }
+        
 
         .vehicle-details-header {
             display: flex;
@@ -685,8 +686,15 @@
                 flex-basis: 50%;
             }
 
+            .dashboard-content {
+                padding: 10px;
+            }
+
             .vehicle-details-content {
                 grid-template-columns: 1fr;
+            }
+            .vehicle-details-section {
+                padding: 0;
             }
 
             .vehicle-selector-header {
@@ -1650,7 +1658,7 @@
                 <div class="vehicle-selector">
                     <div class="vehicle-selector-header">
                         <div class="vehicle-selector-title">
-                            <i class="fas fa-truck"></i> Your Registered Vehicles
+                            <i class="fas fa-truck"></i>Registered Vehicles
                         </div>
                         <button class="add-vehicle-btn" id="addVehicleBtn">
                             <i class="fas fa-plus"></i> Add Vehicle
