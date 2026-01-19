@@ -63,6 +63,62 @@ document.addEventListener('DOMContentLoaded', function(){
     <meta name="description" content="Contact Herapherigoods for support, feedback, or questions. Quick responses and helpful FAQs to guide you." />
     <meta property="og:description" content="Contact Herapherigoods for support, feedback, or questions. Quick responses and helpful FAQs to guide you." />
     <meta name="twitter:description" content="Contact Herapherigoods for support, feedback, or questions. Quick responses and helpful FAQs to guide you." />
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "What transport services do you provide?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Herapherigoods is a platform where you can find goods transport (trucks, tempos, pickups, refrigerated vehicles), passenger vehicles (taxi/cab, tourist bus), and rental & events options (wedding/VIP cars). Availability depends on vehicle owners in your area."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Do you offer interstate transport services?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes, many vehicle owners listed on Herapherigoods provide interstate and long-distance services. Pricing and availability are decided by the vehicle owner based on route, timing, and vehicle type."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I book a taxi/cab, truck, tempo, bus, or wedding car near my pincode?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Select the right category (Goods / Passenger / Rental & Events), choose the vehicle type, enter your pincode, and search. Then contact the owner directly to confirm availability, timing, and price."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How is pricing decided for goods transport and rentals?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Pricing typically depends on distance, vehicle type (pickup/tempo/truck/bus/wedding car), load details, time duration, and any tolls/permits. You connect directly with owners to finalize the quote and terms."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I book a tourist bus or tempo traveller for group travel?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Use the Passenger category to search for tourist buses and other passenger vehicles available near your pincode and contact the owner for seat count, route, timing, and pricing."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Do you provide packers and movers services?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes, some service providers offer packing, loading, transportation, and unloading. You can contact them through the platform to confirm the scope, materials, and pricing."
+                    }
+                }
+            ]
+        }
+    </script>
     <!-- Social Media Meta Tags -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://herapherigoods.in/contact-us" />
@@ -720,7 +776,7 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 
     <!-- FAQ Section -->
-    <div class="faq-section">
+    <div class="faq-section" id="faqs">
         <h2>Frequently asked questions</h2>
         
         <div class="faq-tabs">
@@ -731,27 +787,27 @@ document.addEventListener('DOMContentLoaded', function(){
         
         <div class="faq-container">
             <!-- General Tab Questions -->
-            <div class="faq-item active">
+            <div class="faq-item active" data-faq-category="General">
                 <div class="faq-question">
                     How does Herapherigoods work?
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="faq-answer">
-                    <p>Herapherigoods is a platform that connects transport vehicle owners directly with customers. You can search for available vehicles in your area based on your requirements, view vehicle details and contact information, and connect directly with the vehicle owner without any middlemen or extra charges.</p>
+                    <p>Herapherigoods is a platform that connects vehicle owners directly with customers. You can search for available vehicles in your area based on your requirements, view vehicle details and contact information, and connect directly with the vehicle owner without any middlemen or extra charges.</p>
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="General">
                 <div class="faq-question">
                     What types of vehicles are available on your platform?
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="faq-answer">
-                    <p>We offer a wide range of transport vehicles including small commercial vehicles (like Tata Ace, Auto Loaders, E-Rickshaws), medium commercial vehicles (like Eicher Canter, Bolero Pickup), heavy commercial vehicles (Container Trucks, Flatbed Trucks), special utility vehicles (JCB, Cranes, Dumpers), refrigerated vehicles, and emergency vehicles like ambulances and tow trucks.</p>
+                    <p>We offer a wide range of transport vehicles categories including goods transport (trucks, tempos, pickups, refrigerated, etc.), passenger (taxis/cabs, tourist buses, etc.), and rental & events (wedding/VIP cars, etc.).</p>
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="General">
                 <div class="faq-question">
                     Is there any registration fee to use your services?
                     <i class="fas fa-chevron-down"></i>
@@ -761,17 +817,17 @@ document.addEventListener('DOMContentLoaded', function(){
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="General">
                 <div class="faq-question">
                     How do I find a vehicle for my transport needs?
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="faq-answer">
-                    <p>Simply visit our "Find Vehicles" page, enter your location and select the type of vehicle you need. Our system will show you available vehicles in your area. You can then view details and directly contact the vehicle owner to discuss your requirements and pricing.</p>
+                    <p>Simply visit our "Find Vehicles" page, Select category of vehicle then vehicle type you need and after this just enter or select your pincode, In last click on Search vehicle button. Our system will show you available vehicles in your area. You can then view details and directly contact the vehicle owner to discuss your requirements and pricing.</p>
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="General">
                 <div class="faq-question">
                     Is my personal information safe with Herapherigoods?
                     <i class="fas fa-chevron-down"></i>
@@ -781,7 +837,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="General">
                 <div class="faq-question">
                     Do you verify the vehicle owners on your platform?
                     <i class="fas fa-chevron-down"></i>
@@ -791,7 +847,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="General">
                 <div class="faq-question">
                     Are you responsible for any fraud or misconduct by vehicle owners?
                     <i class="fas fa-chevron-down"></i>
@@ -802,17 +858,17 @@ document.addEventListener('DOMContentLoaded', function(){
             </div>
             
             <!-- Services Tab Questions -->
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="Services">
                 <div class="faq-question">
                     What transport services do you provide?
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="faq-answer">
-                    <p>We provide a platform for various transport services including goods transportation, vehicle rental, packers and movers services, construction equipment rental (JCB, cranes), refrigerated transport for perishable goods, emergency vehicle services (ambulance, tow trucks), and specialized transport solutions for various industries.</p>
+                    <p>We provide a platform for various transport services including goods transportation, vehicle rental, packers and movers services, construction equipment rental (JCB, cranes), refrigerated transport for perishable goods, emergency vehicle services (ambulance, tow trucks), Cabs/Luxury Buses, Rental VIP cars for Wedding &amp; Events, and specialized transport solutions for various industries.</p>
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="Services">
                 <div class="faq-question">
                     Do you offer interstate transport services?
                     <i class="fas fa-chevron-down"></i>
@@ -822,7 +878,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="Services">
                 <div class="faq-question">
                     Can I book specialized vehicles like refrigerated trucks or construction equipment?
                     <i class="fas fa-chevron-down"></i>
@@ -832,7 +888,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="Services">
                 <div class="faq-question">
                     Do you provide packers and movers services?
                     <i class="fas fa-chevron-down"></i>
@@ -842,7 +898,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="Services">
                 <div class="faq-question">
                     Can I hire vehicles for regular/daily transport needs?
                     <i class="fas fa-chevron-down"></i>
@@ -852,7 +908,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="Services">
                 <div class="faq-question">
                     Do you provide emergency transport services?
                     <i class="fas fa-chevron-down"></i>
@@ -861,9 +917,89 @@ document.addEventListener('DOMContentLoaded', function(){
                     <p>Yes, we have ambulances and emergency response vehicles listed on our platform. These can be contacted directly in case of emergencies. We recommend saving relevant contact information beforehand for quicker access during emergencies.</p>
                 </div>
             </div>
+
+            <div class="faq-item" data-faq-category="Services">
+                <div class="faq-question">
+                    Can I book a taxi/cab, truck, tempo, bus, or wedding car near my pincode?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes. Select the right category (Goods / Passenger / Rental &amp; Events), choose the vehicle type (pickup/tempo/truck, taxi/cab, tourist bus, wedding/VIP car), enter your pincode, and search. Then contact the owner directly to confirm availability, timing, and price.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-faq-category="Services">
+                <div class="faq-question">
+                    Which vehicle should I choose for goods transport (pickup, tempo, mini truck, 14 ft/17 ft, trailer, refrigerated)?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>It depends on your load weight/volume, pickup/drop distance, and whether you need special handling (cold-chain/refrigerated, fragile, or bulky items). Share load details (approx. weight, number of boxes, dimensions) to get the right vehicle quickly.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-faq-category="Services">
+                <div class="faq-question">
+                    Do you provide passenger vehicles for outstation trips, local rides, and airport pickup?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes. Many owners list passenger vehicles like taxi/cab (sedan/SUV) for local, outstation, and airport services. Use the Passenger category and contact the owner for route, timing, and fare.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-faq-category="Services">
+                <div class="faq-question">
+                    Can I book a tourist bus or group vehicle for trips and events?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes. You can find tourist buses and other group travel options in the Passenger category. Confirm seat count, AC/non-AC, route, and timings directly with the owner.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-faq-category="Services">
+                <div class="faq-question">
+                    Do you have wedding cars, luxury/VIP rentals, and event vehicles?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes. In Rental &amp; Events you can find wedding cars, luxury/VIP cars, and other event vehicles (subject to availability in your area). Discuss decoration, hours, pickup time, and pricing directly with the owner.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-faq-category="Services">
+                <div class="faq-question">
+                    How is pricing decided for goods transport and rentals?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Pricing usually depends on distance, vehicle type (pickup/tempo/truck/bus/wedding car), load details, duration, and tolls/permits if applicable. Since you connect directly with owners, you can confirm the final quote and terms before booking.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-faq-category="Services">
+                <div class="faq-question">
+                    Can I get vehicles on monthly/contract basis for business deliveries?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes. Many owners support daily, weekly, or monthly requirements for businesses. Share your schedule, routes, and preferred vehicle type to finalize a contract basis arrangement with the owner.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-faq-category="Services">
+                <div class="faq-question">
+                    What details should I share to get the fastest quote?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Share pickup location, drop location, date/time, category &amp; vehicle type, load/passenger details (weight/boxes or number of people), and whether you need return trip, helpers, refrigeration, or special equipment (JCB/crane).</p>
+                </div>
+            </div>
             
             <!-- Driver Dashboard Tab Questions -->
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="Driver Dashboard">
                 <div class="faq-question">
                     What is the Driver Dashboard?
                     <i class="fas fa-chevron-down"></i>
@@ -873,7 +1009,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="Driver Dashboard">
                 <div class="faq-question">
                     How do I access my Driver Dashboard?
                     <i class="fas fa-chevron-down"></i>
@@ -883,7 +1019,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="Driver Dashboard">
                 <div class="faq-question">
                     How can I update my vehicle information or availability?
                     <i class="fas fa-chevron-down"></i>
@@ -893,7 +1029,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="Driver Dashboard">
                 <div class="faq-question">
                     Can I list multiple vehicles under one account?
                     <i class="fas fa-chevron-down"></i>
@@ -903,7 +1039,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="Driver Dashboard">
                 <div class="faq-question">
                     How do I respond to customer inquiries?
                     <i class="fas fa-chevron-down"></i>
@@ -913,7 +1049,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 </div>
             </div>
             
-            <div class="faq-item">
+            <div class="faq-item" data-faq-category="Driver Dashboard">
                 <div class="faq-question">
                     How can I improve my visibility on the platform?
                     <i class="fas fa-chevron-down"></i>
@@ -991,20 +1127,21 @@ document.addEventListener('DOMContentLoaded', function(){
     <script>
         // Smart URL conversion - automatically adds .html for local development
         if (typeof window.buildUrl === 'function') {
-            // Convert all internal links to use smart URLs
+            // Convert all internal links to use smart URLs (preserve ?query and #hash)
             const links = document.querySelectorAll('a[href^="index"], a[href^="register"], a[href^="find-vehicles"], a[href^="vehicles"], a[href^="contact-us"], a[href^="terms-and-condition"], a[href^="privacy-policy"], a[href^="refer-and-refund-policy"]');
             links.forEach(link => {
                 const href = link.getAttribute('href');
-                if (href && !href.includes('?')) {
-                    // For links without query parameters, just convert the base path
-                    const path = href.split('?')[0];
-                    link.href = window.buildUrl(path) + (href.includes('?') ? href.substring(href.indexOf('?')) : '');
-                } else if (href && href.includes('?')) {
-                    // For links with query parameters, convert the base path and keep the query
-                    const path = href.split('?')[0];
-                    const query = href.substring(href.indexOf('?'));
-                    link.href = window.buildUrl(path) + query;
-                }
+                if (!href) return;
+
+                const hashIndex = href.indexOf('#');
+                const hash = hashIndex >= 0 ? href.substring(hashIndex) : '';
+                const hrefWithoutHash = hashIndex >= 0 ? href.substring(0, hashIndex) : href;
+
+                const queryIndex = hrefWithoutHash.indexOf('?');
+                const path = queryIndex >= 0 ? hrefWithoutHash.substring(0, queryIndex) : hrefWithoutHash;
+                const query = queryIndex >= 0 ? hrefWithoutHash.substring(queryIndex) : '';
+
+                link.href = window.buildUrl(path) + query + hash;
             });
         }
         
@@ -1109,14 +1246,40 @@ document.addEventListener('DOMContentLoaded', function(){
         
         // Initialize FAQ tabs - show only General tab questions on page load
         document.addEventListener('DOMContentLoaded', function() {
+            const faqSection = document.getElementById('faqs');
+            if (!faqSection) return;
+
+            const faqTabs = document.querySelectorAll('.faq-tab');
             const faqItems = document.querySelectorAll('.faq-item');
-            
-            // Hide all items except those in the General tab
-            faqItems.forEach((item, index) => {
-                if (index > 6) { // Items after index 6 are not in the General tab
-                    item.style.display = 'none';
-                }
-            });
+
+            function setFaqCategory(tabName) {
+                faqTabs.forEach(t => t.classList.toggle('active', t.textContent.trim() === tabName));
+
+                const visibleItems = [];
+                faqItems.forEach(item => {
+                    const category = (item.getAttribute('data-faq-category') || 'General').trim();
+                    const shouldShow = category === tabName;
+                    item.style.display = shouldShow ? 'block' : 'none';
+                    item.classList.remove('active');
+                    if (shouldShow) visibleItems.push(item);
+                });
+
+                if (visibleItems[0]) visibleItems[0].classList.add('active');
+            }
+
+            const hash = (window.location.hash || '').toLowerCase();
+            let initialTab = 'General';
+            if (hash === '#faqs-services') initialTab = 'Services';
+            if (hash === '#faqs-driver-dashboard') initialTab = 'Driver Dashboard';
+
+            setFaqCategory(initialTab);
+
+            // If user arrived via #faqs*, ensure section is visible and in view
+            if (hash.startsWith('#faqs')) {
+                setTimeout(() => {
+                    faqSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 50);
+            }
         });
         
         // Form validation
@@ -1357,42 +1520,26 @@ document.addEventListener('DOMContentLoaded', function(){
         // FAQ Tabs
         const faqTabs = document.querySelectorAll('.faq-tab');
         const faqItems = document.querySelectorAll('.faq-item');
-        
-        // Define tab categories
-        const tabCategories = {
-            'General': [0, 1, 2, 3, 4, 5, 6],
-            'Services': [7, 8, 9, 10, 11, 12],
-            'Driver Dashboard': [13, 14, 15, 16, 17, 18]
-        };
-        
-        faqTabs.forEach((tab, tabIndex) => {
+
+        function showFaqCategory(tabName) {
+            faqTabs.forEach(t => t.classList.toggle('active', t.textContent.trim() === tabName));
+
+            const visibleItems = [];
+            faqItems.forEach(item => {
+                const category = (item.getAttribute('data-faq-category') || 'General').trim();
+                const shouldShow = category === tabName;
+                item.style.display = shouldShow ? 'block' : 'none';
+                item.classList.remove('active');
+                if (shouldShow) visibleItems.push(item);
+            });
+
+            if (visibleItems[0]) visibleItems[0].classList.add('active');
+        }
+
+        faqTabs.forEach((tab) => {
             tab.addEventListener('click', () => {
-                // Update active tab
-                faqTabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                // Get the tab name
                 const tabName = tab.textContent.trim();
-                
-                // Hide all FAQ items first
-                faqItems.forEach(item => {
-                    item.style.display = 'none';
-                    item.classList.remove('active');
-                });
-                
-                // Show only the items for the selected tab
-                if (tabCategories[tabName]) {
-                    tabCategories[tabName].forEach(itemIndex => {
-                        if (faqItems[itemIndex]) {
-                            faqItems[itemIndex].style.display = 'block';
-                            
-                            // Make the first item active for the selected tab
-                            if (itemIndex === tabCategories[tabName][0]) {
-                                faqItems[itemIndex].classList.add('active');
-                            }
-                        }
-                    });
-                }
+                showFaqCategory(tabName);
             });
         });
 

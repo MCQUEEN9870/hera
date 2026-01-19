@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // DOM Elements
     const vehicleSearchForm = document.getElementById('vehicleSearchForm');
+    const vehicleCategorySelect = document.getElementById('vehicleCategory');
     const vehicleTypeSelect = document.getElementById('vehicleType');
     const stateSelect = document.getElementById('state');
     // City input no longer exists; use district select if present
@@ -97,14 +98,142 @@ document.addEventListener('DOMContentLoaded', function() {
     window.locationVerified = false;
     // Prevent duplicate auto-verifications
     let isVerifyingPincode = false;
+    // Promise for any in-flight verification (allows Search to await silently)
+    let currentPincodeVerificationPromise = null;
     // Track the last verified pincode to avoid clearing verification on programmatic or identical input
     let lastVerifiedPin = null;
+
+    // Puducherry UT enclaves: keep these pins local-only (no India Post API)
+    const PUDUCHERRY_LOCAL_PIN_TO_DISTRICT = {
+        '605001': 'Puducherry',
+        '605007': 'Puducherry',
+        '605110': 'Puducherry',
+        '605008': 'Puducherry',
+        '605014': 'Puducherry',
+        '609602': 'Karaikal',
+        '673310': 'Mahe',
+        '533464': 'Yanam'
+    };
+
+    function verifyPuducherryPinLocal(pin) {
+        const p = String(pin || '').trim();
+        const district = PUDUCHERRY_LOCAL_PIN_TO_DISTRICT[p];
+        if (!district) return false;
+        try {
+            if (stateSelect) {
+                stateSelect.value = 'Puducherry';
+                // Trigger wizard state change so districts populate
+                try { stateSelect.dispatchEvent(new Event('change')); } catch(_) {}
+            }
+            // Mark verified immediately so other handlers don't override
+            locationVerified = true;
+            window.locationVerified = true;
+            lastVerifiedPin = p;
+
+            // Ensure pincode input preserves user's value
+            try { if (pincodeInput && (!pincodeInput.value || pincodeInput.value !== p)) { pincodeInput.value = p; } } catch(_) {}
+
+            // Set district after state change
+            if (districtSelect) {
+                setTimeout(() => {
+                    try {
+                        districtSelect.disabled = false;
+                        const has = Array.from(districtSelect.options).some(o => (o.value || '').toLowerCase() === district.toLowerCase());
+                        if (!has) {
+                            const opt = document.createElement('option');
+                            opt.value = district;
+                            opt.textContent = district;
+                            districtSelect.appendChild(opt);
+                        }
+                        districtSelect.value = district;
+                        suppressMetaClear = true;
+                        districtSelect.dispatchEvent(new Event('change'));
+                    } catch(_) {}
+                }, 250);
+            }
+
+            // Hide any open suggestions and chevron after verification
+            try {
+                const pinSug = document.getElementById('pincodeSuggestions');
+                if (pinSug) { pinSug.style.display = 'none'; pinSug.innerHTML = ''; }
+                const chevron = document.getElementById('pincodeChevron');
+                if (chevron) chevron.style.display = 'none';
+                if (pincodeInput) pincodeInput.placeholder = 'Enter pincode';
+            } catch(_) {}
+
+            // Visual verified styling
+            try {
+                if (pincodeInput) {
+                    pincodeInput.classList.add('pin-verified');
+                    pincodeInput.style.borderColor = '#10b981';
+                    pincodeInput.style.boxShadow = '0 0 0 4px rgba(16,185,129,0.15)';
+                }
+            } catch(_) {}
+
+            showToast('Pincode verified successfully!', 'success');
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
     
     // Parse URL parameters to pre-fill the form
     const urlParams = new URLSearchParams(window.location.search);
+
+    function inferCategoryFromType(typeValue) {
+        const t = String(typeValue || '').trim();
+        if (!t) return '';
+        // Goods
+        const goodsTypes = new Set([
+            'Manual Cart (Thel / Rickshaw)','Auto Loader (CNG loader)','Tata Ace (Chhota Hathi)','E-Rickshaw Loader (Tuk-Tuk)',
+            'Mini Truck (Eicher Canter)','Vikram Tempo','Bolero Pickup (MaXX)','Tata 407','6 wheeler',
+            'Container Truck','Open Body Truck (6 wheeler)','Closed Body Truck','Flatbed Truck','8 wheeler','12 wheeler and onwards',
+            'JCB','Crane','Trailer Truck','Tipper Truck (Dumper Truck)','Tanker Truck','Garbage Truck',
+            'Ambulance','Tow-Truck',
+            'Refrigerated Vans','Refrigerated Trucks',
+            'Packer&Movers','Parcel Delivery',
+            'Food trucks','Beverage trucks'
+        ]);
+        if (goodsTypes.has(t)) return 'goods';
+        // Passenger
+        const passengerTypes = new Set([
+            'Innova Crysta','Ertiga','Dzire','Sedan (Verna, Ciaz, etc.)','Hatchback (WagonR, i10, etc.)','Other Taxi Cars',
+            '26-seater Mini Bus','35-seater AC Bus','45+ Seater Tourist Coach','Volvo Type Bus','Other Bus Types'
+        ]);
+        if (passengerTypes.has(t)) return 'passenger';
+        // Rental
+        const rentalTypes = new Set([
+            'Fortuner','Audi/BMW/Mercedes','Luxury Vintage Cars','Open Jeep (Decorated)','SUV/MUV for Baraat','Other Rental Vehicles'
+        ]);
+        if (rentalTypes.has(t)) return 'rental';
+        return '';
+    }
+
+    // Prefer explicit category param if present
+    if (urlParams.has('category') && vehicleCategorySelect) {
+        const category = String(urlParams.get('category') || '').trim().toLowerCase();
+        if (category === 'goods' || category === 'passenger' || category === 'rental') {
+            vehicleCategorySelect.value = category;
+            try {
+                vehicleCategorySelect.dispatchEvent(new Event('change', { bubbles: true }));
+            } catch (_) {}
+        }
+    }
+
     if (urlParams.has('type')) {
         const vehicleType = urlParams.get('type');
         console.log('Setting vehicle type from URL:', vehicleType);
+
+        // If category wasn't provided, infer it from the type (back-compat for old links)
+        if (vehicleCategorySelect && !vehicleCategorySelect.value) {
+            const inferred = inferCategoryFromType(vehicleType);
+            if (inferred) {
+                vehicleCategorySelect.value = inferred;
+                try {
+                    vehicleCategorySelect.dispatchEvent(new Event('change', { bubbles: true }));
+                } catch (_) {}
+            }
+        }
         
         // Add a small delay to ensure dropdown is fully loaded
         setTimeout(() => {
@@ -166,6 +295,11 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 console.log('Vehicle type set successfully:', vehicleTypeSelect.value);
             }
+
+            // Trigger downstream enablement in vehicles.html wizard
+            try {
+                vehicleTypeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            } catch (_) {}
         }, 100);
     }
     if (urlParams.has('state') && stateSelect) {
@@ -186,48 +320,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
     
-    // Handle pincode input validation + auto-verify
-    if (pincodeInput && pincodeInput.tagName === 'INPUT') pincodeInput.addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9]/g, '');
-        if (this.value.length > 6) {
-            this.value = this.value.slice(0, 6);
-        }
-        // Auto-verify when 6 digits entered
-        const val = this.value.trim();
-        const six = /^\d{6}$/.test(val);
-        if (six && !window.locationVerified && !isVerifyingPincode) {
-            verifyPincode(val);
-        }
-    });
-
-    // Clear meta info when user edits pincode
-    if (pincodeInput) {
-        const clearMetaOnEdit = () => {
-            const currentVal = (pincodeInput.value || '').trim();
-            // If user selected from list, window.locationVerified may be true but lastVerifiedPin unset
-            if (window.locationVerified === true && (lastVerifiedPin === null || lastVerifiedPin === undefined)) {
-                lastVerifiedPin = currentVal;
-                return; // keep verified state
-            }
-            if (lastVerifiedPin && currentVal === lastVerifiedPin) {
-                // Value unchanged; keep verified state
-                return;
-            }
-            // Value changed by user; invalidate verification
-            locationVerified = false;
-            window.locationVerified = false;
-            try {
-                if (pincodeInput) {
-                    pincodeInput.classList.remove('pin-verified');
-                    // Also clear any inline verified styles to be extra safe
-                    pincodeInput.style.borderColor = '';
-                    pincodeInput.style.boxShadow = '';
-                }
-            } catch(_) {}
-        };
-        pincodeInput.addEventListener('input', clearMetaOnEdit);
-        pincodeInput.addEventListener('change', clearMetaOnEdit);
-    }
+    // NOTE: Pincode input sanitization + auto-verify + progress-bar updates are handled in vehicles.html.
+    // Keep vehicles.js focused on Search + API integration to avoid overlapping verifiers.
     // Also clear meta when district changes (location context changed)
     if (districtSelect) {
         districtSelect.addEventListener('change', function(){
@@ -241,30 +335,41 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Direct verification function (replaces removed Verify button)
-    function verifyPincode(pincodeValue) {
-        console.log('Verifying pincode:', pincodeValue);
+    // Verification that returns a promise so Search can await it without a second click.
+    async function verifyPincodeAsync(pincodeValue) {
+        const pin = String(pincodeValue || '').trim();
+        console.log('Verifying pincode:', pin);
+
+        // Puducherry UT enclave pins are handled locally (no API)
+        if (verifyPuducherryPinLocal(pin)) {
+            return true;
+        }
+
         // If already verified for the same pin, skip
-        if (window.locationVerified && lastVerifiedPin && pincodeValue === lastVerifiedPin) {
+        if (window.locationVerified && lastVerifiedPin && pin === lastVerifiedPin) {
             console.log('Pincode already verified, skipping re-verification');
-            return;
+            return true;
         }
-        if (!pincodeValue || !/^\d{6}$/.test(pincodeValue)) {
+
+        if (!pin || !/^\d{6}$/.test(pin)) {
             showToast('Please enter a valid 6-digit pincode', 'error');
-            return;
+            return false;
         }
+
+        // If a verification is already in-flight, await it.
+        if (currentPincodeVerificationPromise) {
+            try { return await currentPincodeVerificationPromise; } catch(_) { return false; }
+        }
+
         isVerifyingPincode = true;
-        fetch(`https://api.postalpincode.in/pincode/${pincodeValue}`)
-            .then(response => {
+        currentPincodeVerificationPromise = (async () => {
+            try {
+                const response = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
                 console.log('Pincode API response status:', response.status);
-                return response.json();
-            })
-            .then(data => {
+                const data = await response.json();
                 console.log('Pincode API response:', data);
-                handlePincodeResponse(data, pincodeValue);
-                isVerifyingPincode = false;
-            })
-            .catch(error => {
+                return !!handlePincodeResponse(data, pin);
+            } catch (error) {
                 console.error('Error verifying pincode:', error);
                 // Only show error if verification isn't already complete
                 if (!window.locationVerified && !locationVerified) {
@@ -272,8 +377,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     console.log('Verification already completed, ignoring late error');
                 }
+                return false;
+            } finally {
                 isVerifyingPincode = false;
-            });
+                currentPincodeVerificationPromise = null;
+            }
+        })();
+
+        return await currentPincodeVerificationPromise;
+    }
+
+    // Back-compat: keep old entry point name for any other callers
+    function verifyPincode(pincodeValue) {
+        void verifyPincodeAsync(pincodeValue);
     }
     
     // Function to handle pincode API response
@@ -355,12 +471,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Don't automatically trigger search after verification anymore
             // Let the user click the search button themselves
+            return true;
         } else {
             console.log('API response indicates failure or no data:', data);
             // Do not auto-approximate; require correct verification or selection
             if (!window.locationVerified && !locationVerified) {
                 showToast('Could not verify pincode. Please recheck or select from dropdown.', 'error');
             }
+            return false;
         }
     }
     
@@ -374,7 +492,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const toast = document.createElement('div');
         toast.id = 'globalToast';
         toast.className = `toast ${type}`;
-        toast.textContent = message;
+        // Safely render line breaks for messages joined with "<br>" without using innerHTML
+        const raw = String(message ?? '');
+        toast.textContent = '';
+        const parts = raw.split(/<br\s*\/?>/i);
+        parts.forEach((part, idx) => {
+            toast.appendChild(document.createTextNode(part));
+            if (idx < parts.length - 1) toast.appendChild(document.createElement('br'));
+        });
         toast.style.cssText = 'position:fixed;bottom:30px;right:30px;background:#333;color:#fff;padding:14px 20px;border-radius:10px;z-index:10000;';
         document.body.appendChild(toast);
         const duration = type === 'error' ? 6000 : 3000;
@@ -382,7 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Search form submission
-    vehicleSearchForm.addEventListener('submit', function(e) {
+    vehicleSearchForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         // Get form values
@@ -398,15 +523,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const hasStateDistrict = state && city && state !== '' && city !== '';
         const validPin = /^\d{6}$/.test(pincode);
         const globalVerified = !!(window.locationVerified || locationVerified);
-        // If user entered a pincode and it's not verified yet, try once and ask to press Search again
-        if (validPin && !globalVerified && !isVerifyingPincode) {
-            verifyPincode(pincode);
-            showToast('Verifying pincode... please wait','info');
-            return;
-        }
-        // If a verified pincode is present, inform the user we're searching with it
-        if (validPin && globalVerified) {
-            showToast('Finding verified vehicles for you... please wait a few seconds','success');
+        // If a pincode is present but not verified, silently verify and continue (no double-click)
+        if (validPin && !globalVerified) {
+            // Prefer verifier from vehicles.html (it also auto-fills state/district and updates progress)
+            try {
+                if (window.__pincodeVerifyPromise && typeof window.__pincodeVerifyPromise.then === 'function') {
+                    await window.__pincodeVerifyPromise;
+                }
+            } catch(_) { /* ignore */ }
+
+            if (!window.locationVerified && typeof window.__verifyPinAndAutofill === 'function') {
+                // No toast here; vehicles.html shows toast when user enters 6 digits
+                try { await window.__verifyPinAndAutofill(pincode); } catch(_) {}
+            }
+
+            const nowVerified = !!(window.locationVerified || locationVerified);
+            if (!nowVerified) {
+                // Keep user on pincode step; vehicles.html will show any needed guidance
+                return;
+            }
         }
         // Require pincode selection when state & district chosen but no pincode
         if (!validPin && hasStateDistrict) {
@@ -418,6 +553,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!vehicleType) { showToast('Select a vehicle type','error'); vehicleTypeSelect.focus(); return; }
         
         console.log('Form validation passed, proceeding with search...');
+
+        // Progress bar: move to Search step once all validations are satisfied
+        try { if (typeof window.updateProgressBar === 'function') window.updateProgressBar(6); } catch(_) {}
         
     // Show loading overlay
         loadingOverlay.style.display = 'flex';

@@ -75,11 +75,6 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     @Value("${app.ratelimit.payments.verify.ip.window-seconds:60}")
     private int verifyPaymentIpWindowSeconds;
 
-    @Value("${app.ratelimit.ai.conversation.ip.limit:30}")
-    private int aiConversationIpLimit;
-    @Value("${app.ratelimit.ai.conversation.ip.window-seconds:60}")
-    private int aiConversationIpWindowSeconds;
-
     @Value("${app.ratelimit.trust.ip.limit:30}")
     private int trustIpLimit;
     @Value("${app.ratelimit.trust.ip.window-seconds:60}")
@@ -146,11 +141,6 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             // Payments: signature verification endpoint (cheap but can be abused)
             if (PATH_MATCHER.match("/api/payments/verify", path)) {
                 return enforceIpOnly(request, "payments:verify", verifyPaymentIpLimit, verifyPaymentIpWindowSeconds);
-            }
-
-            // AI assistant: conversation storage (DB write)
-            if (PATH_MATCHER.match("/api/ai/conversation", path)) {
-                return enforceIpOnly(request, "ai:conversation", aiConversationIpLimit, aiConversationIpWindowSeconds);
             }
 
             // Trust counter: prevent spam / manipulation

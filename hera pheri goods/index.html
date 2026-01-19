@@ -21,18 +21,20 @@
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://api.herapherigoods.in" crossorigin>
   <link rel="dns-prefetch" href="//fundingchoicesmessages.google.com">
-  <title>Herapherigoods - List & Find Transport Vehicles in India</title>
-  <meta name="title" content="Herapherigoods - List & Find Transport Vehicles in India" />
-  <meta property="og:title" content="Herapherigoods - List & Find Transport Vehicles in India" />
-  <meta name="twitter:title" content="Herapherigoods - List & Find Transport Vehicles in India" />
-  <meta name="description" content="Herapherigoods - List & Find Transport vehicles(trucks, tempos/autos, JCBs, maxx, packers&movers) and more just by pincode." />
-  <meta property="og:description" content="Herapherigoods - List & Find Transport vehicles(trucks, tempos/autos, JCBs, maxx, packers&movers) and more just by pincode. Contact To Vehicle owner Directly." />
-  <meta name="twitter:description" content="Herapherigoods - List & Find Transport vehicles(trucks, tempos/autos, JCBs, maxx, packers&movers) and more just by pincode. Contact To Vehicle owner Directly." />
+  <title>HerapheriGoods - Find & List Goods, Passenger & Rental Vehicles in India</title>
+  <meta name="title" content="HerapheriGoods - Find & List Goods, Passenger & Rental Vehicles in India" />
+  <meta property="og:title" content="HerapheriGoods - Find & List Goods, Passenger & Rental Vehicles in India" />
+  <meta name="twitter:title" content="HerapheriGoods - Find & List Goods, Passenger & Rental Vehicles in India" />
+  <meta name="description" content="Find trucks, tempos, pickups, JCB, packers & movers, taxis/cabs, buses, wedding & VIP rental cars near you by pincode. Direct contact with owners. Free listing." />
+  <meta property="og:description" content="HerapheriGoods helps you find & list all types of vehicles: goods transport (trucks, tempos, pickups, refrigerated), passenger (taxis/cabs, tourist buses), and rental & events (wedding/VIP cars). Search by pincode and contact owners directly." />
+  <meta name="twitter:description" content="HerapheriGoods helps you find & list all types of vehicles: goods transport (trucks, tempos, pickups, refrigerated), passenger (taxis/cabs, tourist buses), and rental & events (wedding/VIP cars). Search by pincode and contact owners directly." />
+  <meta name="keywords" content="transport vehicles, goods transport, truck, tempo, mini truck, tata ace, pickup, bolero maxx, container truck, open body truck, closed body truck, trailer truck, tanker, tipper dumper, refrigerated truck, jcb, crane, packers and movers, courier parcel delivery, taxi, cab, ola uber cab, sedan taxi, suv taxi, innova crysta, ertiga, bus, tourist bus, ac bus, volvo bus, wedding car, vip car, vintage car, fortuner, thar, luxury car rental, local pincode vehicle" />
   
   <!-- Social Media Meta Tags -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://herapherigoods.in/" />
   <meta property="og:site_name" content="Herapherigoods" />
+  <meta property="og:locale" content="en_IN" />
   <meta property="og:image" content="attached_assets/images/1200x630.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -53,11 +55,11 @@
       "hera pheri goods in",
       "herapheri goods"
     ],
-    "description": "Herapherigoods - List & Find Transport vehicles.",
+    "description": "Find & list goods transport, passenger and rental/event vehicles across India. Search by pincode and contact owners directly.",
     "url": "https://herapherigoods.in/",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://herapherigoods.in/find-vehicles?type={search_term_string}",
+      "target": "https://herapherigoods.in/vehicles?search={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   }
@@ -101,8 +103,8 @@
       @media (prefers-reduced-motion: reduce){#snowfallCanvas{display:none;}}
     </style>
     <!-- Preload + standard stylesheet to avoid FOUC but keep fetch early -->
-    <link rel="preload" href="style.css?v=20260108-1" as="style">
-    <link rel="stylesheet" href="style.css?v=20260108-1">
+    <link rel="preload" href="style.css?v=20260108-2" as="style">
+    <link rel="stylesheet" href="style.css?v=20260108-2">
     
   <!-- Font Awesome will be lazy-loaded on interaction/viewport; inline SVGs used for above-the-fold icons -->
  
@@ -421,19 +423,19 @@
       </div>
       <!-- Navigation Links -->
       <ul class="nav-links">
-        <!-- Truck Type Dropdown Menu -->
-        <li class="dropdown">
-          <a href="#" class="nav-item truck-type-btn" title="Find the right vehicle for your transport needs."><span>Find Vehicles</span></a>
+        <!-- Vehicle dropdowns (split) -->
+        <li class="dropdown" data-vehicle-category="goods">
+          <a href="#" class="nav-item vehicle-nav-toggle" data-vehicle-category="goods" title="Find goods/transport vehicles."><span>Goods &amp; Special Utility Vehicles</span></a>
+
           <div class="dropdown-content">
             <!-- Small Commercial Vehicles Category -->
             <div class="category">
               <h3 title="Perfect for small loads and city deliveries."><i class="fas fa-boxes"></i> Small Transport Vehicles (SCV)</h3>
               <ul>
-                <!-- SCV Vehicle List Items -->
-                <li><a href="find-vehicles?type=Manual Cart (Thel / Rickshaw)" title="Ideal for very short distances and narrow lanes."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/manual cart (thela).webp" alt="Manual Cart (Thel)" title="Manual Cart (Thel / Rickshaw)" class="vehicle-icon"> Manual Cart (Thel / Rickshaw)</a></li>
-                <li><a href="find-vehicles?type=Auto Loader (CNG loader)" title="Good for medium-sized goods within the city."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/Auto Loader(CNG loader).webp" alt="Auto Loader" title="Auto Loader (CNG loader)" class="vehicle-icon"> Auto Loader (CNG loader)</a></li>
-                <li><a href="find-vehicles?type=Tata Ace (Chhota Hathi)" title="Popular choice for small business deliveries."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/Auto Loader(CNG loader).webp" alt="Tata Ace" title="Tata Ace (Chhota Hathi)" class="vehicle-icon"> Tata Ace (Chhota Hathi)</a></li>
-                <li><a href="find-vehicles?type=E-Rickshaw Loader (Tuk-Tuk)" title="Eco-friendly option for local cargo."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/e-ricksahw (tuk-tuk).webp" alt="E-Rickshaw" title="E-Rickshaw Loader (Tuk-Tuk)" class="vehicle-icon"> E-Rickshaw Loader (Tuk-Tuk)</a></li>
+                <li><a href="find-vehicles?category=goods&type=Manual Cart (Thel / Rickshaw)" title="Ideal for very short distances and narrow lanes."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/manual cart (thela).webp" alt="Manual Cart (Thel)" title="Manual Cart (Thel / Rickshaw)" class="vehicle-icon"> Manual Cart (Thel / Rickshaw)</a></li>
+                <li><a href="find-vehicles?category=goods&type=Auto Loader (CNG loader)" title="Good for medium-sized goods within the city."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/Auto Loader(CNG loader).webp" alt="Auto Loader" title="Auto Loader (CNG loader)" class="vehicle-icon"> Auto Loader (CNG loader)</a></li>
+                <li><a href="find-vehicles?category=goods&type=Tata Ace (Chhota Hathi)" title="Popular choice for small business deliveries."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/Auto Loader(CNG loader).webp" alt="Tata Ace" title="Tata Ace (Chhota Hathi)" class="vehicle-icon"> Tata Ace (Chhota Hathi)</a></li>
+                <li><a href="find-vehicles?category=goods&type=E-Rickshaw Loader (Tuk-Tuk)" title="Eco-friendly option for local cargo."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/e-ricksahw (tuk-tuk).webp" alt="E-Rickshaw" title="E-Rickshaw Loader (Tuk-Tuk)" class="vehicle-icon"> E-Rickshaw Loader (Tuk-Tuk)</a></li>
               </ul>
             </div>
             
@@ -441,12 +443,11 @@
             <div class="category">
               <h3 title="Good for medium loads and trips between nearby cities."><i class="fas fa-shuttle-van"></i> Light Transport Vehicles (LCV)</h3>
               <ul>
-                <!-- LCV Vehicle List Items -->
-                <li><a href="find-vehicles?type=Mini Truck (Eicher Canter)" title="perfect for city-to-city."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/mini truck (Eicher Canter).webp" alt="Mini Truck" title="Mini Truck (Eicher Canter)" class="vehicle-icon"> Mini Truck (Eicher Canter)</a></li>
-                <li><a href="find-vehicles?type=Vikram Tempo" title="For local goods movement."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/vikram tempo.webp" alt="Vikram Tempo" title="Vikram Tempo" class="vehicle-icon"> Vikram Tempo</a></li>
-                <li><a href="find-vehicles?type=Bolero Pickup (MaXX)" title="Strong and suitable for various terrains."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/bolero pickup-truck.webp" alt="Bolero Pickup" title="Bolero Pickup (MaXX)" class="vehicle-icon"> Bolero Pickup (MaXX)</a></li>
-                <li><a href="find-vehicles?type=Tata 407" title="Popular for medium-size commercial transport."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/tata 407.webp" alt="Tata 407" title="Tata 407" class="vehicle-icon"> Tata 407</a></li>
-                <li><a href="find-vehicles?type=6 wheeler" title="Carries more load than smaller LCVs."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/6 wheeler.webp" alt="6 Wheeler" title="6 wheeler" class="vehicle-icon"> 6 wheeler</a></li>
+                <li><a href="find-vehicles?category=goods&type=Mini Truck (Eicher Canter)" title="perfect for city-to-city."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/mini truck (Eicher Canter).webp" alt="Mini Truck" title="Mini Truck (Eicher Canter)" class="vehicle-icon"> Mini Truck (Eicher Canter)</a></li>
+                <li><a href="find-vehicles?category=goods&type=Vikram Tempo" title="For local goods movement."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/vikram tempo.webp" alt="Vikram Tempo" title="Vikram Tempo" class="vehicle-icon"> Vikram Tempo</a></li>
+                <li><a href="find-vehicles?category=goods&type=Bolero Pickup (MaXX)" title="Strong and suitable for various terrains."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/bolero pickup-truck.webp" alt="Bolero Pickup" title="Bolero Pickup (MaXX)" class="vehicle-icon"> Bolero Pickup (MaXX)</a></li>
+                <li><a href="find-vehicles?category=goods&type=Tata 407" title="Popular for medium-size commercial transport."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/tata 407.webp" alt="Tata 407" title="Tata 407" class="vehicle-icon"> Tata 407</a></li>
+                <li><a href="find-vehicles?category=goods&type=6 wheeler" title="Carries more load than smaller LCVs."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/6 wheeler.webp" alt="6 Wheeler" title="6 wheeler" class="vehicle-icon"> 6 wheeler</a></li>
               </ul>
             </div>
             
@@ -454,13 +455,12 @@
             <div class="category">
               <h3 title="Used for big goods and long-distance transport."><i class="fas fa-truck-loading"></i> Medium & Heavy Transport Vehicles (MHCV & HCV)</h3>
               <ul>
-                <!-- MHCV & HCV Vehicle List Items -->
-                <li><a href="find-vehicles?type=Container Truck" title="Safe choice for important and secured goods."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/container truck.webp" alt="Container Truck" title="Container Truck" class="vehicle-icon"> Container Truck</a></li>
-                <li><a href="find-vehicles?type=Open Body Truck (6 wheeler)" title="Suitable for bulky and odd-sized items."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/open body truck.webp" alt="Open Body Truck" title="Open Body Truck (6 wheeler)" class="vehicle-icon"> Open Body Truck (6 wheeler)</a></li>
-                <li><a href="find-vehicles?type=Closed Body Truck" title="Protection from weather and theft."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/closed body truck.webp" alt="Closed Body Truck" title="Closed Body Truck" class="vehicle-icon"> Closed Body Truck</a></li>
-                <li><a href="find-vehicles?type=Flatbed Truck" title="Ideal for oversized cargo and machinery."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/flat-bed-truck.webp" alt="Flatbed Truck" title="Flatbed Truck" class="vehicle-icon"> Flatbed Truck</a></li>
-                <li><a href="find-vehicles?type=8 wheeler" title="Increased capacity for heavier loads."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/8 wheeler.webp" alt="8 Wheeler" title="8 wheeler" class="vehicle-icon"> 8 wheeler</a></li>
-                <li><a href="find-vehicles?type=12 wheeler and onwards" title="Used for very large and heavy shipping like in industries."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/12 wheeler and onwards.webp" alt="12 Wheeler" title="12 wheeler and onwards" class="vehicle-icon"> 12 wheeler and onwards</a></li>
+                <li><a href="find-vehicles?category=goods&type=Container Truck" title="Safe choice for important and secured goods."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/container truck.webp" alt="Container Truck" title="Container Truck" class="vehicle-icon"> Container Truck</a></li>
+                <li><a href="find-vehicles?category=goods&type=Open Body Truck (6 wheeler)" title="Suitable for bulky and odd-sized items."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/open body truck.webp" alt="Open Body Truck" title="Open Body Truck (6 wheeler)" class="vehicle-icon"> Open Body Truck (6 wheeler)</a></li>
+                <li><a href="find-vehicles?category=goods&type=Closed Body Truck" title="Protection from weather and theft."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/closed body truck.webp" alt="Closed Body Truck" title="Closed Body Truck" class="vehicle-icon"> Closed Body Truck</a></li>
+                <li><a href="find-vehicles?category=goods&type=Flatbed Truck" title="Ideal for oversized cargo and machinery."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/flat-bed-truck.webp" alt="Flatbed Truck" title="Flatbed Truck" class="vehicle-icon"> Flatbed Truck</a></li>
+                <li><a href="find-vehicles?category=goods&type=8 wheeler" title="Increased capacity for heavier loads."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/8 wheeler.webp" alt="8 Wheeler" title="8 wheeler" class="vehicle-icon"> 8 wheeler</a></li>
+                <li><a href="find-vehicles?category=goods&type=12 wheeler and onwards" title="Used for very large and heavy shipping like in industries."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/12 wheeler and onwards.webp" alt="12 Wheeler" title="12 wheeler and onwards" class="vehicle-icon"> 12 wheeler and onwards</a></li>
               </ul>
             </div>
             
@@ -469,60 +469,112 @@
               <h3 title="Vehicles for special work like lifting, dumping, or carrying liquids."><i class="fas fa-tools"></i> Special Utility Vehicles (SUV)</h3>
               <ul>
                 <!-- SUV Vehicle List Items -->
-                <li><a href="find-vehicles?type=JCB" title="For excavation and construction tasks."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/jcb.svg" alt="JCB" title="JCB" class="vehicle-icon"> JCB</a></li>
-                <li><a href="find-vehicles?type=Crane" title="Lifting and moving heavy objects or machinery."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/crane.svg" alt="Crane" title="Crane" class="vehicle-icon"> Crane</a></li>
-                <li><a href="find-vehicles?type=Trailer Truck" title="Transporting oversized and heavy loads."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/truck-trailer.svg" alt="Trailer Truck" title="Trailer Truck" class="trailer-icon"> Trailer Truck</a></li>
-                <li><a href="find-vehicles?type=Tipper Truck (Dumper Truck)" title="Used for carrying loose materials like sand, gravel."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/tipper truck.webp" alt="Tipper Truck" title="Tipper Truck (Dumper Truck)" class="vehicle-icon"> Tipper Truck (Dumper Truck)</a></li>
-                <li><a href="find-vehicles?type=Tanker Truck" title="For transporting liquids or gases."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/tanker-truck.webp" alt="Tanker Truck" title="Tanker Truck" class="vehicle-icon"> Tanker Truck</a></li>
-                <li><a href="find-vehicles?type=Garbage Truck" title="For waste collection and disposal."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/garbage-truck.webp" alt="Garbage Truck" title="Garbage Truck" class="vehicle-icon"> Garbage Truck</a></li>
+                <li><a href="find-vehicles?category=goods&type=JCB" title="For excavation and construction tasks."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/jcb.svg" alt="JCB" title="JCB" class="vehicle-icon"> JCB</a></li>
+                <li><a href="find-vehicles?category=goods&type=Crane" title="Lifting and moving heavy objects or machinery."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/crane.svg" alt="Crane" title="Crane" class="vehicle-icon"> Crane</a></li>
+                <li><a href="find-vehicles?category=goods&type=Trailer Truck" title="Transporting oversized and heavy loads."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/truck-trailer.svg" alt="Trailer Truck" title="Trailer Truck" class="trailer-icon"> Trailer Truck</a></li>
+                <li><a href="find-vehicles?category=goods&type=Tipper Truck (Dumper Truck)" title="Used for carrying loose materials like sand, gravel."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/tipper truck.webp" alt="Tipper Truck" title="Tipper Truck (Dumper Truck)" class="vehicle-icon"> Tipper Truck (Dumper Truck)</a></li>
+                <li><a href="find-vehicles?category=goods&type=Tanker Truck" title="For transporting liquids or gases."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/tanker-truck.webp" alt="Tanker Truck" title="Tanker Truck" class="vehicle-icon"> Tanker Truck</a></li>
+                <li><a href="find-vehicles?category=goods&type=Garbage Truck" title="For waste collection and disposal."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/garbage-truck.webp" alt="Garbage Truck" title="Garbage Truck" class="vehicle-icon"> Garbage Truck</a></li>
             </ul>
             </div>
+            
+            <!-- Emergency Vehicles  -->
             <div class="category">
               <h3 title="Vehicles for urgent medical and emergency situations."><i class="fas fa-ambulance"></i> Emergency Vehicles</h3>
               <ul>
-                <!-- Emergency Vehicle List Items -->
-                <li><a href="find-vehicles?type=Ambulance" title="For patient transport and medical emergencies."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\ambulace.webp" alt="Ambulance" title="Ambulance" class="vehicle-icon"> Ambulance</a></li>
+                <li><a href="find-vehicles?category=goods&type=Ambulance" title="For patient transport and medical emergencies."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\ambulace.webp" alt="Ambulance" title="Ambulance" class="vehicle-icon"> Ambulance</a></li>
               </ul>
               <ul>
-                <li><a href="find-vehicles?type=Tow-Truck" title="For towing and recovery of vehicles."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\Tow-truck.webp" alt="Tow-Truck" title="Tow-Truck" class="vehicle-icon"> Tow-Truck</a></li>
+                <li><a href="find-vehicles?category=goods&type=Tow-Truck" title="For towing and recovery of vehicles."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\Tow-truck.webp" alt="Tow-Truck" title="Tow-Truck" class="vehicle-icon"> Tow-Truck</a></li>
               </ul>
             </div>
             
-               
+            <!-- Refrigerated & AC vehicles -->
             <div class="category">
               <h3 title="Keeps items cold for dairy, ice cream, and other frozen goods."><i class="fas fa-snowflake"></i> Refrigerated & AC vehciles</h3>
               <ul>
-                <!-- Refrigerated & AC Vehicle List Items -->
-                <li><a href="find-vehicles?type=Refrigerated Vans" title="Keeps dairy, ice cream, and food cool in short trips."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\refrigerator vans.webp" alt="Refrigerated Vans" title="Refrigerated Vans" class="vehicle-icon"> Refrigerated Vans</a></li>
-                <li><a href="find-vehicles?type=Refrigerated Trucks" title="Larger trucks for transporting frozen or chilled goods over long distances."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\refrigerated trucks.webp" alt="Refrigerated Trucks" title="Refrigerated Trucks" class="vehicle-icon"> Refrigerated Trucks</a></li>
+                <li><a href="find-vehicles?category=goods&type=Refrigerated Vans" title="Keeps dairy, ice cream, and food cool in short trips."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\refrigerator vans.webp" alt="Refrigerated Vans" title="Refrigerated Vans" class="vehicle-icon"> Refrigerated Vans</a></li>
+                <li><a href="find-vehicles?category=goods&type=Refrigerated Trucks" title="Larger trucks for transporting frozen or chilled goods over long distances."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\refrigerated trucks.webp" alt="Refrigerated Trucks" title="Refrigerated Trucks" class="vehicle-icon"> Refrigerated Trucks</a></li>
               </ul>
             </div>
+            
+            <!-- Packer&Movers Vehicles -->
             <div class="category">
               <h3 title="Used for shifting homes, delivering parcels, and other transport services in cities."><i class="fas fa-boxes-packing"></i>Service-Based Vehicles</h3>
               <ul>
-                <!-- Packer&Movers Vehicle List Items -->
-                <li><a href="find-vehicles?type=Packer&Movers" title="For house shifting, office relocation, or furniture transport. Select this if you provide loading/unloading services too."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\Packers.webp" alt="Packer" title="Packers & Movers" class="vehicle-icon">Packer&Movers<img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\movers.webp" alt="Movers" title="Packers & Movers" class="vehicle-icon"></a></li>
-                <li><a href="find-vehicles?type=Parcel Delivery" title="For local & city-to-city parcel deliveries. If you deliver packages, documents, small cargo, select this. "><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\delivery-man.webp" alt="Parcel Delivery" title="Parcel Delivery" class="vehicle-icon"> Parcel Delivery</a></li>
-              </ul>
-            </div>
-            <div class="category">
-              <h3 title="For serving food and beverages."><i class="fas fa-utensils"></i>Food & Beverage Vehicles</h3>
-              <ul>
-                <li><a href="find-vehicles?type=Food trucks" title="For serving meals like Chinese, North-Indian, South-Indian Continental, etc."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\food-truck.webp" alt="Food Delivery" title="Food-based vehicles" class="vehicle-icon"> Food-Based vehicles</a></li>
-                <li><a href="find-vehicles?type=Beverage trucks" title="For serving Juice & Shakes, coffee, tea, etc."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\drink-truck.webp" alt="Beverage Delivery" title="Drink-based vehicles" class="vehicle-icon">Drink-Based vehicles</a></li>
+                <li><a href="find-vehicles?category=goods&type=Packer&Movers" title="For house shifting, office relocation, or furniture transport. Select this if you provide loading/unloading services too."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\Packers.webp" alt="Packer" title="Packers & Movers" class="vehicle-icon">Packer&Movers<img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\movers.webp" alt="Movers" title="Packers & Movers" class="vehicle-icon"></a></li>
+                <li><a href="find-vehicles?category=goods&type=Parcel Delivery" title="For local & city-to-city parcel deliveries. If you deliver packages, documents, small cargo, select this. "><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\delivery-man.webp" alt="Parcel Delivery" title="Parcel Delivery" class="vehicle-icon"> Parcel Delivery</a></li>
               </ul>
             </div>
            
+            <!-- Food & Beverage Vehicles -->
+            <div class="category">
+              <h3 title="For serving food and beverages."><i class="fas fa-utensils"></i>Food & Beverage Vehicles</h3>
+              <ul>
+                <li><a href="find-vehicles?category=goods&type=Food trucks" title="For serving meals like Chinese, North-Indian, South-Indian Continental, etc."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\food-truck.webp" alt="Food Delivery" title="Food-based vehicles" class="vehicle-icon"> Food-Based vehicles</a></li>
+                <li><a href="find-vehicles?category=goods&type=Beverage trucks" title="For serving Juice & Shakes, coffee, tea, etc."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets\images\drink-truck.webp" alt="Beverage Delivery" title="Drink-based vehicles" class="vehicle-icon">Drink-Based vehicles</a></li>
+              </ul>
+            </div>
+
+          </div>
+        </li>
+
+        <li class="dropdown" data-vehicle-category="passenger">
+          <a href="#" class="nav-item vehicle-nav-toggle" data-vehicle-category="passenger" title="Find passenger vehicles like cabs and buses."><span>Passenger Vehicles</span></a>
+
+          <div class="dropdown-content">
+            <!-- 🚖 Commercial & Rental Cars -->
+            <div class="category">
+              <h3 title="uses for Ola/Uber type ride, city-to-city cab services, private bookings"><i class="fas fa-taxi"></i>Local & Long-Distance Cabs</h3>
+              <ul>
+                <li><a href="find-vehicles?category=passenger&type=Innova Crysta" title="Spacious SUV, perfect for family trips & long journeys. 7-seater"><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/crysta.webp" alt="Innova Crysta" title="Innova Crysta" class="vehicle-icon"> Innova Crysta</a></li>
+                <li><a href="find-vehicles?category=passenger&type=Ertiga" title="Budget friendly, ideal for small groups & city rides. 7-seater"><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/ertiga.webp" alt="Ertiga" title="Ertiga" class="vehicle-icon"> Ertiga</a></li>
+                <li><a href="find-vehicles?category=passenger&type=Dzire" title="suitable for small families & daily travel. 4-seater"><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/dzire.webp" alt="Dzire" title="D-zire" class="vehicle-icon"> Dzire</a></li>
+                <li><a href="find-vehicles?category=passenger&type=Sedan (Verna, Ciaz, etc.)" title="Stylish sedans, great for business travel & comfort rides."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/sedan.webp" alt="Sedan" title="Sedan (Verna, Ciaz, etc.)" class="vehicle-icon"> Sedan (Verna, Ciaz, etc.)</a></li>
+                <li><a href="find-vehicles?category=passenger&type=Hatchback (WagonR, i10, etc.)" title="Economical cars, best for travelling in city"><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/hatch-back.webp" alt="Hatchback" title="Hatchback (WagonR, i10, etc.)" class="vehicle-icon"> Hatchback (WagonR, i10, etc.)</a></li>
+                <li><a href="find-vehicles?category=passenger&type=Other Taxi Cars" title="Remaining categories. Wide range of cabs to match your travel needs."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/other-taxis.webp" alt="Other Taxi Cars" title="Other Taxi Cars" class="vehicle-icon"> Other Taxi Cars</a></li>
+              </ul>
+            </div>
+            
+            <!-- 🚌 Tourist & Contract Buses -->
+            <div class="category">
+              <h3 title="Tourists, staff duty, long route private bus bookings"><i class="fas fa-bus"></i>Tourist & Contract Buses</h3>
+              <ul>
+                <!-- Bus Vehicle List Items -->
+                <li><a href="find-vehicles?category=passenger&type=26-seater Mini Bus" title="Compact bus, perfect for school trips & small tourist groups."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/mini-bus.webp" alt="26-seater Mini Bus" title="26-seater Mini Bus" class="vehicle-icon"> 26-seater Mini Bus</a></li>
+                <li><a href="find-vehicles?category=passenger&type=35-seater AC Bus" title="Comfortable mid-size bus, ideal for corporate tours & pilgrimages."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/A.C-bus.webp" alt="35-seater AC Bus" title="35-seater AC Bus" class="vehicle-icon"> 35-seater AC Bus</a></li>
+                <li><a href="find-vehicles?category=passenger&type=45+ Seater Tourist Coach" title="Large coach, best for weddings, events & big gatherings."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/45+seaterbuses.webp" alt="45+ Seater Tourist Coach" title="45+ Seater Tourist Coach" class="vehicle-icon"> 45+ Seater Tourist Coach</a></li>
+                <li><a href="find-vehicles?category=passenger&type=Volvo Type Bus" title="Luxury & Premium travel experience for long-distance tours."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/volvo-bus.webp" alt="Volvo Type Bus" title="Volvo Type Bus" class="vehicle-icon"> Volvo Type Bus</a></li>
+                <li><a href="find-vehicles?category=passenger&type=Other Bus Types" title="Custom bus options available for every occasion."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/other-bus-types.webp" alt="Other Bus Types" title="Other Bus Types" class="vehicle-icon"> Other Bus Types</a></li>
+              </ul>
+            </div>
+
+          </div>
+        </li>
+
+        <li class="dropdown" data-vehicle-category="rental">
+          <a href="#" class="nav-item vehicle-nav-toggle" data-vehicle-category="rental" title="Find wedding, VIP and event rentals."><span>Rental &amp; Events</span></a>
+
+          <div class="dropdown-content">
+            <!-- 💒 Wedding & VIP Rentals -->
+            <div class="category">
+              <h3 title="Shadi, corporate event, VIP airport pickup, film shoots"><i class="fas fa-gem"></i>For Wedding & VIP Rentals</h3>
+              <ul>
+                <!-- Wedding & VIP Vehicle List Items -->
+                <li><a href="find-vehicles?category=rental&type=Fortuner" title="Premium SUV, perfect for film shoots, VIP entry & family wedding rides."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/fortuner.webp" alt="Fortuner" title="Fortuner" class="vehicle-icon"> Fortuner/Thar/Scorpio <img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/thar.webp" alt="Thar" title="Packers & Movers" class="vehicle-icon"></a></li>
+                <li><a href="find-vehicles?category=rental&type=Audi/BMW/Mercedes" title="Premium/Luxury cars for VVIP guests & grand weddings."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/audi-bmw-mercedes.webp" alt="Audi/BMW/Mercedes" title="Audi/BMW/Mercedes" class="vehicle-icon"> Audi/BMW/Mercedes</a></li>
+                <li><a href="find-vehicles?category=rental&type=Luxury Vintage Cars" title="Ideal for royal wedding themes and events."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/vintage-car.webp" alt="Luxury Vintage Cars" title="Luxury Vintage Cars" class="vehicle-icon"> Luxury Vintage Cars</a></li>
+                <li><a href="find-vehicles?category=rental&type=Open Jeep (Decorated)" title="Traditional wedding vehicle, decorated for celebrations."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/open-jeep.webp" alt="Open Jeep (Decorated)" title="Open Jeep (Decorated)" class="vehicle-icon"> Open Jeep (Decorated)</a></li>
+                <li><a href="find-vehicles?category=rental&type=SUV/MUV for Baraat" title="Spacious vehicles for group wedding rides."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/For-baraat.webp" alt="SUV/MUV for Baraat" title="SUV/MUV for Baraat" class="vehicle-icon"> SUV/MUV for Weddings</li>
+                <li><a href="find-vehicles?category=rental&type=Other Rental Vehicles" title="Tailored luxury & event vehicles on request."><img loading="lazy" decoding="async" fetchpriority="low" src="attached_assets/images/other-rental-vehicles.webp" alt="Other Rental Vehicles" title="Other Rental Vehicles" class="vehicle-icon"> Other Rental Vehicles</a></li>
+              </ul>
+            </div>
 
           </div>
         </li>
         <!-- Other Navigation Items -->
        <li>
           <a href="posts" title="Post your vehicle need for free" class="nav-item"><span>Posts</span></a>
-        </li>
-
-        <li>
-          <a href="contact-us" title= "send your query/issues to us" class="nav-item"><span>Contact Us</span></a>
         </li>
         
         <!-- Authentication Section - Only shown when user is logged in -->
@@ -562,8 +614,9 @@
         <button class="mobile-close" aria-label="Close menu">&times;</button>
       </div>
       <ul class="mobile-nav-links">
-  <li><a href="find-vehicles" class="mobile-nav-item">Find Vehicles</a></li>
-        <li><a href="contact-us" class="mobile-nav-item">Contact Us</a></li>
+        <li><a href="find-vehicles?category=goods" class="mobile-nav-item">Goods Vehicles</a></li>
+        <li><a href="find-vehicles?category=passenger" class="mobile-nav-item">Passenger Vehicles</a></li>
+        <li><a href="find-vehicles?category=rental" class="mobile-nav-item">Rental &amp; Events</a></li>
         <li><a href="posts" class="mobile-nav-item">Posts</a></li>
         <li><a href="driver-dashboard" id="profileLink" class="mobile-nav-item">My Profile</a></li>
       </ul>
@@ -584,8 +637,8 @@
         <div class="hero-container">
           <!-- Hero Content -->
           <div class="hero-content">
-            <h1>Register Transport Vehicle</h1>
-            <p>Join our network of trusted transporters, Add your vehicle to our platform and connect with people who need transport vehicles.</p>
+            <h1>Find &amp; List Vehicles Nearby</h1>
+            <p>Herapherigoods helps you quickly find trucks/tempos/pickups for goods transport, taxis/cabs &amp; buses for passenger travel, and wedding/VIP rental cars for events. Search by pincode and connect with verified vehicle owners directly.</p>
             
             <!-- Hero Features -->
             <div class="hero-features">
@@ -615,8 +668,8 @@
         <div class="find-vehicle-container">
           <!-- Find Vehicle Content -->
           <div class="find-vehicle-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-            <h2>Find Nearby Transport Vehicle</h2>
-            <p>Search for available transport vehicles according to your need in your area and get information of transport vehicle owner directly - Free, No commission.</p>
+            <h2>Find Nearby Vehicles by Pincode</h2>
+            <p>Search goods vehicles (truck, tempo, Tata Ace, Bolero pickup, 6/10/12 wheeler, container), passenger vehicles (cab/taxi, sedan/SUV, tourist bus), or rental &amp; events vehicles (wedding car, vintage, luxury/VIP) in your area — direct owner contact, free and no commission.</p>
             <!-- Find Vehicle Button with Click-It animation (small, right side) -->
             <div class="btn-with-click-anim">
               <button class="find-vehicle-btn" onclick="window.location.href = (window.buildUrl ? window.buildUrl('vehicles') : (location.protocol === 'file:' ? 'vehicles.html' : 'vehicles'))">
@@ -637,16 +690,16 @@
     <div class="platform-description">
       <div class="description-container">
         <div class="platform-heading" data-aos="fade-down" data-aos-duration="800">
-          <video loading="lazy" decoding="async" data-src="attached_assets\animation\register-transport-vehicle.webm" alt="register-transport-vehicle" title="Aapka Apna Transport Network animation" class="heading-animation lazy-video" autoplay loop muted playsinline preload="metadata"></video>
-          <h2>Herapherigoods – Aapka Apna Transport Network!</h2>
+          <video loading="lazy" decoding="async" data-src="attached_assets\animation\register-transport-vehicle.webm" alt="register-vehicle" title="Aapka Apna Vehicle Network animation" class="heading-animation lazy-video" autoplay loop muted playsinline preload="metadata"></video>
+          <h2>HerapheriGoods – Aapka Apna Vehicle Network!</h2>
         </div>
-        <p class="main-description" data-aos="fade-up" data-aos-duration="800">Do you need transportation for your goods, want to send items, or require any kind of delivery service? Herapherigoods is a free listing platform that directly connects transport vehicle owners with customers—without any third-party commissions!</p>
+        <p class="main-description" data-aos="fade-up" data-aos-duration="800">Need a vehicle for goods shifting, passenger travel, or a wedding/event booking? HerapheriGoods is a free listing platform where you can find and contact vehicle owners directly—goods transport (trucks, tempos, pickups, packers &amp; movers), passenger (taxis/cabs, tourist buses) and rental &amp; events (wedding/VIP cars) — with no third‑party commission.</p>
         
         <!-- CTA section removed as requested -->
 
         <!-- Vehicle Categories Section with Flip Cards -->
         <div class="vehicle-categories-section">
-          <h2 class="section-title">Our Vehicle Categories</h2>
+          <h2 class="section-title">Explore Vehicles by Category</h2>
           <!-- Inline city selector to deepen category links without adding a new section -->
           <div class="inline-city-selector" style="margin:10px 0 18px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <label for="homeCitySelect" style="font-weight:600; color:#333;">Choose city</label>
@@ -918,7 +971,7 @@
       <div class="how-it-works-container">
         <div class="how-it-works-header" data-aos="fade-down" data-aos-duration="1000" data-aos-offset="200">
           <h2>How Herapherigoods Works ?</h2>
-          <p>Simple steps to connect and transport your goods hassle-free</p>
+          <p>Simple steps to find, contact, and book vehicles (goods, passenger, rental &amp; events) hassle-free</p>
         </div>
 
         <div class="how-it-works-grid">
@@ -929,9 +982,9 @@
             </div>
             <div class="how-step-overlay">
               <h3>Register Your Vehicle</h3>
-              <p>Own a transport vehicle?
-              List it on HerapheriGoods.in in just a few minutes — no charges, no hidden commissions.
-              Whether it’s a truck, tempo, auto, JCB, Crane services, Packers & Movers or refrigerated van, registration is completely free and open to all verified owners.</p>
+              <p>Own a vehicle?
+              List it on HerapheriGoods.in — no charges, no hidden commissions.
+              Whether it’s a goods vehicle (truck, tempo, pickup, JCB/Crane, packers &amp; movers, refrigerated), a passenger vehicle (taxi/cab, bus), or a rental &amp; events vehicle (wedding/VIP cars), registration is completely free.</p>
             </div>
           </div>
 
@@ -942,7 +995,7 @@
             </div>
             <div class="how-step-overlay">
               <h3>Direct Contact</h3>
-              <p>Contact any transport vehicle owner directly and discuss your requirements—no middleman involved!</p>
+              <p>Contact any vehicle owner directly (truck/cab/bus/rental) and discuss your requirement — no middleman involved!</p>
             </div>
           </div>
 
@@ -979,7 +1032,7 @@
           <img src="attached_assets/images/why-choose-herapheri-goods.webp" alt="Why Choose Herapherigoods" title="Why Choose Herapherigoods" class="why-hero-image" loading="lazy">
           <div class="why-hero-overlay">
             <h2 data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="300" data-aos-offset="300">Why Choose Herapherigoods ?</h2>
-            <p data-aos="fade-up" data-aos-duration="800" data-aos-delay="600" data-aos-offset="300">Because we make it <strong>free</strong> and <strong>easy</strong> — customers <strong>find</strong> trusted transport vehicles, and vehicle owners <strong>list</strong> their vehicles to reach the right demand.</p>
+            <p data-aos="fade-up" data-aos-duration="800" data-aos-delay="600" data-aos-offset="300">Because we make it <strong>free</strong> and <strong>easy</strong> — customers <strong>find</strong> trusted vehicles (goods, passenger, rental), and vehicle owners <strong>list</strong> their vehicles to reach the right demand.</p>
           </div>
         </div>
 
@@ -989,7 +1042,7 @@
           <!-- Feature 1: Direct Connection (Image Left) -->
           <div class="why-feature-card left-image">
             <div class="why-feature-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="300">
-              <img src="attached_assets/images/direct-connection.webp" alt="Direct Connection" title="Direct Connection with Transport Owners" loading="lazy">
+              <img src="attached_assets/images/direct-connection.webp" alt="Direct Connection" title="Direct Connection with Vehicle Owners" loading="lazy">
             </div>
             <div class="why-feature-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="300" data-aos-offset="300">
               <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500" data-aos-offset="300">
@@ -997,8 +1050,8 @@
               </div>
               <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="600" data-aos-offset="300">Direct Connection</h3>
               <p>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="300">Direct Connection with Transport Owners – No brokers or middlemen!</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="550" data-aos-offset="300">Customers can directly contact <strong>Verified</strong> trucks, mini trucks, autos, e-rickshaws, JCBs, crane, and other transport vehicle owners in your area.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="300">Direct Connection with Vehicle Owners – No brokers or middlemen!</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="550" data-aos-offset="300">Customers can directly contact <strong>Verified</strong> owners of trucks, tempos, pickups, JCB/crane, packers &amp; movers, taxis/cabs, buses, and rental/wedding cars in your area.</span>
                 <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="600" data-aos-offset="300"><strong>List your vehicle</strong> at the right locations so customers can find you exactly when they need you — helping you get more trust and more bookings.</span>
                 <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="650" data-aos-offset="300">Simple. Transparent. No extra charges.</span>
               </p>
@@ -1013,13 +1066,13 @@
               </div>
               <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="400" data-aos-offset="300">Various Categories</h3>
               <p>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="300"><strong>Various Types of Transport Vehicles Available</strong> – From small local deliveries to long-distance shifting, <strong>Herapheri</strong> Goods connects you with every type of transport vehicles - From mini trucks and tempos to heavy-duty trailers, JCBs, cranes, even Packers&Movers, food or emergency vehicles, and more!</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="550" data-aos-offset="300">Whatever your goods, wherever your location, find the right vehicle instantly – all in one platform.</span>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="600" data-aos-offset="300">One website, all transport solutions!</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="300"><strong>All Types of Vehicles Available</strong> – One platform for goods transport (mini trucks, tempos, 6/10/12 wheeler, container, trailers, JCB/crane, packers &amp; movers), passenger travel (taxis/cabs, tourist buses) and rental &amp; events (wedding/VIP cars, vintage &amp; luxury).</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="550" data-aos-offset="300">Whatever your requirement, wherever your location, find the right vehicle instantly — all in one platform.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="600" data-aos-offset="300">One website, all vehicle solutions!</span>
               </p>
             </div>
             <div class="why-feature-image" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200" data-aos-offset="300">
-              <img src="attached_assets/images/all-types.webp" alt="All Types of Vehicles" title="All Types of Transport Vehicles" loading="lazy">
+              <img src="attached_assets/images/all-types.webp" alt="All Types of Vehicles" title="All Types of Vehicles (Goods, Passenger, Rental)" loading="lazy">
             </div>
           </div>
 
@@ -1063,7 +1116,7 @@
           <!-- Feature 5: Free Listing (Image Left) -->
           <div class="why-feature-card left-image">
             <div class="why-feature-image" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100" data-aos-offset="300">
-              <img src="attached_assets/images/free-listing.webp" alt="Free Listing" title="Free Listing for Transport Owners" loading="lazy">
+              <img src="attached_assets/images/free-listing.webp" alt="Free Listing" title="Free Listing for Vehicle Owners" loading="lazy">
             </div>
             <div class="why-feature-content" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="300" data-aos-offset="300">
               <div class="why-icon" data-aos="zoom-in" data-aos-duration="800" data-aos-delay="500" data-aos-offset="300">
@@ -1071,7 +1124,7 @@
               </div>
               <h3 data-aos="fade-up" data-aos-duration="800" data-aos-delay="600" data-aos-offset="300">Free For Vehicle Owners</h3>
               <p>
-                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="300">Free Listing for Transport Owners – If you own a truck, mini truck, crane, or other transport vehicles, List it completely free on Herapherigoods and let nearby customers find you instantly.</span>
+                <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="500" data-aos-offset="300">Free Listing for Vehicle Owners – If you own a truck, cab, bus, wedding/rental car, crane/JCB, or any other vehicle/service, list it completely free on Herapherigoods and let nearby customers find you instantly.</span>
                 <span data-aos="fade-up" data-aos-duration="600" data-aos-delay="550" data-aos-offset="300">No subscription. No hidden charges. Just genuine connections that help you grow your Service faster — without spending a single rupee.</span>
               </p>
             </div>
@@ -1293,10 +1346,7 @@
     <!-- Vehicle Owner Carousel JavaScript - Load this after feedback-carousel.js -->
   <script defer src="vehicle-owner-carousel.js?v=20260108-1"></script>
     <!-- No Supabase Configuration needed -->
-    <!-- AI Assistant CSS loaded asynchronously to avoid blocking -->
-    <link rel="preload" as="style" href="ai-assistant.css?v=20260108-1" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="ai-assistant.css?v=20260108-1"></noscript>
-  <script defer src="ai-assistant.js?v=20260108-1"></script>
+
   
   <!-- Lazy-load Font Awesome CSS only when needed (dropdown/share/footer in view) -->
   <script>
@@ -1444,8 +1494,8 @@
         <div class="footer-column">
             <h3>About Us</h3>
             <div class="about-content">
-                <p class="about-text">Welcome to Herapherigoods, your one-stop platform for finding reliable transport vehicle owners across various locations. Whether you need a truck, mini truck, auto, e-rickshaw, JCB, or crane, we connect you directly with the right vehicle owners—no middlemen, no extra charges!</p>
-                <p class="about-text-more">Our mission is to make transportation hassle-free by providing authentic listings of vehicle owners, so you can contact them directly for your shifting, construction, or logistics needs. As we grow, we aim to expand our reach to more cities and offer additional services to make the process even smoother. Join us in building a trusted network of transport solutions!</p>
+                <p class="about-text">Welcome to Herapherigoods, your one-stop platform for finding reliable vehicle owners across various locations. Whether you need a goods vehicle (truck, tempo, pickup, JCB/crane), a passenger vehicle (taxi/cab, bus), or a rental &amp; events vehicle (wedding/VIP cars), we connect you directly with the right owners—no middlemen, no extra charges!</p>
+                <p class="about-text-more">Our mission is to make bookings hassle-free by providing authentic listings of vehicle owners, so you can contact them directly for goods shifting (trucks/tempos/pickups), passenger travel (taxi/cab/bus), and rental &amp; events (wedding/VIP cars). As we grow, we aim to expand our reach to more cities and offer more categories to make the process even smoother. Join us in building a trusted vehicle network!</p>
             </div>
             <button class="show-more-btn">Show More</button>
             <!-- <div class="social-links">
@@ -1461,11 +1511,13 @@
             <h3>Quick Links</h3>
             <ul>
                 <li><a href="#" class="scroll-to-top"><i class="fas fa-chevron-right"></i> Home</a></li>
-                <li><a href="#hero-section" class="scroll-link"><i class="fas fa-chevron-right"></i> Register your Transport Vehicle</a></li>
+                <li><a href="#hero-section" class="scroll-link"><i class="fas fa-chevron-right"></i> Register your Vehicle</a></li>
                 <li><a href="#find-vehicle-section" class="scroll-link"><i class="fas fa-chevron-right"></i> Find Vehicles</a></li>
+            <li><a href="contact-us"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
+            <li><a href="contact-us#faqs"><i class="fas fa-chevron-right"></i> FAQs</a></li>
                 <li><a href="privacy-policy"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
                 <li><a href="terms-and-condition"><i class="fas fa-chevron-right"></i> Terms & Conditions</a></li>
-                <li><a href="refer-and-refund-policy"><i class="fas fa-chevron-right"></i> Refer & Earn and Refund Policy</a></li>
+             <!--   <li><a href="refer-and-refund-policy"><i class="fas fa-chevron-right"></i> Refer & Earn and Refund Policy</a></li> -->
             </ul>
         </div>
 
@@ -1475,7 +1527,7 @@
             <ul class="contact-info">
                 <li>
                     <i class="fas fa-map-marker-alt"></i>
-                    <span>Fatehabad(Agra), Uttar Pradesh, India</span>
+                    <span>Fatehabad, Agra, Uttar Pradesh, India</span>
                 </li>
                 <li>
                     <i class="fas fa-phone"></i>
@@ -1639,17 +1691,18 @@ Best regards,
             // Convert all internal links to use smart URLs
             const links = document.querySelectorAll('a[href^="find-vehicles"], a[href^="vehicles"], a[href^="login"], a[href^="register"], a[href^="driver-dashboard"], a[href^="contact-us"], a[href^="privacy-policy"], a[href^="terms-and-condition"], a[href^="refer-and-refund-policy"], a[href^="posts"]');
             links.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href && !href.includes('?')) {
-                    // For links without query parameters, just convert the base path
-                    const path = href.split('?')[0];
-                    link.href = window.buildUrl(path) + (href.includes('?') ? href.substring(href.indexOf('?')) : '');
-                } else if (href && href.includes('?')) {
-                    // For links with query parameters, convert the base path and keep the query
-                    const path = href.split('?')[0];
-                    const query = href.substring(href.indexOf('?'));
-                    link.href = window.buildUrl(path) + query;
-                }
+              const href = link.getAttribute('href');
+              if (!href) return;
+
+              const hashIndex = href.indexOf('#');
+              const hash = hashIndex >= 0 ? href.substring(hashIndex) : '';
+              const hrefWithoutHash = hashIndex >= 0 ? href.substring(0, hashIndex) : href;
+
+              const queryIndex = hrefWithoutHash.indexOf('?');
+              const path = queryIndex >= 0 ? hrefWithoutHash.substring(0, queryIndex) : hrefWithoutHash;
+              const query = queryIndex >= 0 ? hrefWithoutHash.substring(queryIndex) : '';
+
+              link.href = window.buildUrl(path) + query + hash;
             });
             
             // Convert JavaScript redirects

@@ -8,19 +8,70 @@ document.addEventListener('DOMContentLoaded', function() {
     const photoCounter = document.querySelector('.photo-counter');
     const photoError = document.querySelector('.photo-error');
     const pincode = document.getElementById('pincode');
-    const verifyPincodeBtn = document.getElementById('verifyPincodeBtn');
     const useLocationBtn = document.getElementById('useLocationBtn');
     const vehicleSelectBtn = document.getElementById('vehicleSelectBtn');
     const vehicleDropdown = document.querySelector('.vehicle-dropdown');
     const celebrationOverlay = document.getElementById('celebrationOverlay');
     const stateInput = document.getElementById('state');
-    const cityInput = document.getElementById('city');
-    const stateClickCapture = document.getElementById('stateClickCapture');
+    const districtSelect = document.getElementById('district');
+    const pincodeSuggestions = document.getElementById('pincodeSuggestions');
+    const pincodeChevron = document.getElementById('pincodeChevron');
     const vehicleNumberField = document.getElementById('vehicleNumber');
     const vehicleNumberContainer = vehicleNumberField.parentNode;
+
+    // Vehicle Category gating (register page)
+    const vehicleCategoryRegInput = document.getElementById('vehicleCategoryReg');
+    const vehicleCategoryGroup = document.getElementById('vehicleCategoryGroup');
+    const vehicleCategoryCards = Array.from(document.querySelectorAll('#vehicleCategoryGroup .vehicle-category-card'));
     
-    // Add variable to track pincode verification status
+    // Track pincode verification status
     let isPincodeVerified = false;
+    let lastVerifiedPin = null;
+
+    function normalizeStateKey(s) {
+        return String(s || '')
+            .toLowerCase()
+            .replace(/&/g, ' and ')
+            .replace(/[^a-z0-9]+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function setStateFromValue(rawState) {
+        if (!stateInput) return;
+        const stateValue = String(rawState || '').trim();
+        if (!stateValue) { stateInput.selectedIndex = 0; return; }
+
+        // 1) Exact match (fast path)
+        for (let i = 0; i < stateInput.options.length; i++) {
+            if (stateInput.options[i].value === stateValue) {
+                stateInput.selectedIndex = i;
+                return;
+            }
+        }
+
+        // 2) Tolerant match: '&' vs 'and', punctuation, NCT of Delhi, merged UT naming
+        const wanted = normalizeStateKey(stateValue);
+        const aliases = new Set([wanted]);
+        if (wanted === 'jammu and kashmir') {
+            aliases.add('jammu kashmir');
+        }
+        if (wanted === 'delhi') {
+            aliases.add('nct of delhi');
+        }
+        if (wanted === 'dadra and nagar haveli and daman and diu') {
+            aliases.add('daman and diu');
+            aliases.add('dadra and nagar haveli');
+        }
+
+        for (let i = 0; i < stateInput.options.length; i++) {
+            const optKey = normalizeStateKey(stateInput.options[i].value);
+            if (aliases.has(optKey)) {
+                stateInput.selectedIndex = i;
+                return;
+            }
+        }
+    }
 
     function escapeHtml(value) {
         const s = (value === null || value === undefined) ? '' : String(value);
@@ -32,11 +83,178 @@ document.addEventListener('DOMContentLoaded', function() {
             .replace(/'/g, '&#39;');
     }
 
+    // ===== Pincode Suggestions CSS (scoped) =====
+    (function injectPinStyles(){
+        if (document.getElementById('reg-pin-suggestions-style')) return;
+        const styleEl = document.createElement('style');
+        styleEl.id = 'reg-pin-suggestions-style';
+        styleEl.textContent = `
+            .pin-suggestions {
+                position: absolute;
+                width: 100%;
+                max-height: 320px;
+                overflow-y: auto;
+                background: #ffffff;
+                color: #111827;
+                border: 1px solid #e5e7eb;
+                border-radius: 12px;
+                box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+                z-index: 2000;
+                margin-top: 8px;
+                padding: 6px 0;
+            }
+            .pin-suggestion-item {
+                padding: 12px 16px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 12px;
+                cursor: pointer;
+                transition: background 0.15s ease, border-color 0.15s ease;
+                border-left: 3px solid transparent;
+            }
+            .pin-suggestion-item:hover, .pin-suggestion-item.active {
+                background: #f3f4f6;
+                border-left-color: #3b82f6;
+            }
+            .pin-suggestion-code { font-weight: 700; letter-spacing: 0.3px; color:#111827; }
+            .pin-suggestion-name { color:#6b7280; font-size: 14px; }
+            .pin-chevron { position:absolute; right:12px; top:50%; transform: translateY(-50%); width:34px; height:34px; border:none; background:transparent; color:#6b7280; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+            .pin-chevron:hover { color:#374151; }
+            #pincode.pin-verified { border-color:#10b981 !important; box-shadow: 0 0 0 4px rgba(16,185,129,0.15) !important; background:#ffffff; }
+        `;
+        document.head.appendChild(styleEl);
+    })();
+
+    // ===== State → District mapping (used for dropdown) =====
+    // Minimal: districts are used for pincode suggestions; keep list consistent with Vehicles page.
+    const stateToDistricts = {
+        "Uttar Pradesh": ["Agra", "Aligarh", "Ambedkar Nagar", "Amethi", "Amroha", "Auraiya", "Ayodhya", "Azamgarh", "Baghpat", "Bahraich", "Ballia", "Balrampur", "Banda", "Barabanki", "Bareilly", "Basti", "Bhadohi", "Bijnor", "Budaun", "Bulandshahr", "Chandauli", "Chitrakoot", "Deoria", "Etah", "Etawah", "Farrukhabad", "Fatehpur", "Firozabad", "Gautam Buddha Nagar", "Ghaziabad", "Ghazipur", "Gonda", "Gorakhpur", "Hamirpur", "Hapur", "Hardoi", "Hathras", "Jalaun", "Jaunpur", "Jhansi", "Kannauj", "Kanpur Dehat", "Kanpur Nagar", "Kasganj", "Kaushambi", "Kushinagar", "Lakhimpur Kheri", "Lalitpur", "Lucknow", "Maharajganj", "Mahoba", "Mainpuri", "Mathura", "Mau", "Meerut", "Mirzapur", "Moradabad", "Muzaffarnagar", "Pilibhit", "Pratapgarh", "Prayagraj", "Raebareli", "Rampur", "Saharanpur", "Sambhal", "Sant Kabir Nagar", "Shahjahanpur", "Shamli", "Shravasti", "Siddharthnagar", "Sitapur", "Sonbhadra", "Sultanpur", "Unnao", "Varanasi"],
+        "Maharashtra": ["Ahmednagar", "Akola", "Amravati", "Aurangabad", "Beed", "Bhandara", "Buldhana", "Chandrapur", "Dhule", "Gadchiroli", "Gondia", "Hingoli", "Jalgaon", "Jalna", "Kolhapur", "Latur", "Mumbai City", "Mumbai Suburban", "Nagpur", "Nanded", "Nandurbar", "Nashik", "Osmanabad", "Palghar", "Parbhani", "Pune", "Raigad", "Ratnagiri", "Sangli", "Satara", "Sindhudurg", "Solapur", "Thane", "Wardha", "Washim", "Yavatmal"],
+        "Delhi": ["Central Delhi", "East Delhi", "New Delhi", "North Delhi", "North East Delhi", "North West Delhi", "Shahdara", "South Delhi", "South East Delhi", "South West Delhi", "West Delhi"],
+        "Gujarat": ["Ahmedabad", "Amreli", "Anand", "Aravalli", "Banaskantha", "Bharuch", "Bhavnagar", "Botad", "Chhota Udaipur", "Dahod", "Dang", "Devbhoomi Dwarka", "Gandhinagar", "Gir Somnath", "Jamnagar", "Junagadh", "Kheda", "Kutch", "Mahisagar", "Mehsana", "Morbi", "Narmada", "Navsari", "Panchmahal", "Patan", "Porbandar", "Rajkot", "Sabarkantha", "Surat", "Surendranagar", "Tapi", "Vadodara", "Valsad"],
+        "Rajasthan": ["Ajmer", "Alwar", "Banswara", "Baran", "Barmer", "Bharatpur", "Bhilwara", "Bikaner", "Bundi", "Chittorgarh", "Churu", "Dausa", "Dholpur", "Dungarpur", "Hanumangarh", "Jaipur", "Jaisalmer", "Jalore", "Jhalawar", "Jhunjhunu", "Jodhpur", "Karauli", "Kota", "Nagaur", "Pali", "Pratapgarh", "Rajsamand", "Sawai Madhopur", "Sikar", "Sirohi", "Sri Ganganagar", "Tonk", "Udaipur"],
+        "Haryana": ["Ambala", "Bhiwani", "Charkhi Dadri", "Faridabad", "Fatehabad", "Gurugram", "Hisar", "Jhajjar", "Jind", "Kaithal", "Karnal", "Kurukshetra", "Mahendragarh", "Nuh", "Palwal", "Panchkula", "Panipat", "Rewari", "Rohtak", "Sirsa", "Sonipat", "Yamunanagar"],
+        "Punjab": ["Amritsar", "Barnala", "Bathinda", "Faridkot", "Fatehgarh Sahib", "Fazilka", "Ferozepur", "Gurdaspur", "Hoshiarpur", "Jalandhar", "Kapurthala", "Ludhiana", "Mansa", "Moga", "Mohali", "Muktsar", "Pathankot", "Patiala", "Rupnagar", "Sangrur", "Shahid Bhagat Singh Nagar", "Tarn Taran"],
+        "Andhra Pradesh": ["Anantapur", "Chittoor", "East Godavari", "Guntur", "Krishna", "Kurnool", "Nellore", "Prakasam", "Srikakulam", "Visakhapatnam", "Vizianagaram", "West Godavari", "YSR Kadapa"],
+        "Karnataka": ["Bagalkot", "Ballari", "Belagavi", "Bengaluru Rural", "Bengaluru Urban", "Bidar", "Chamarajanagar", "Chikballapur", "Chikkamagaluru", "Chitradurga", "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Hassan", "Haveri", "Kalaburagi", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru", "Raichur", "Ramanagara", "Shivamogga", "Tumakuru", "Udupi", "Uttara Kannada", "Vijayapura", "Yadgir"],
+        "Tamil Nadu": ["Ariyalur", "Chengalpattu", "Chennai", "Coimbatore", "Cuddalore", "Dharmapuri", "Dindigul", "Erode", "Kallakurichi", "Kanchipuram", "Kanyakumari", "Karur", "Krishnagiri", "Madurai", "Mayiladuthurai", "Nagapattinam", "Namakkal", "Nilgiris", "Perambalur", "Pudukkottai", "Ramanathapuram", "Ranipet", "Salem", "Sivaganga", "Tenkasi", "Thanjavur", "Theni", "Thoothukudi", "Tiruchirappalli", "Tirunelveli", "Tirupathur", "Tiruppur", "Tiruvallur", "Tiruvannamalai", "Tiruvarur", "Vellore", "Viluppuram", "Virudhunagar"],
+        "West Bengal": ["Alipurduar", "Bankura", "Birbhum", "Cooch Behar", "Dakshin Dinajpur", "Darjeeling", "Hooghly", "Howrah", "Jalpaiguri", "Jhargram", "Kalimpong", "Kolkata", "Malda", "Murshidabad", "Nadia", "North 24 Parganas", "Paschim Bardhaman", "Paschim Medinipur", "Purba Bardhaman", "Purba Medinipur", "Purulia", "South 24 Parganas", "Uttar Dinajpur"],
+        "Kerala": ["Alappuzha", "Ernakulam", "Idukki", "Kannur", "Kasaragod", "Kollam", "Kottayam", "Kozhikode", "Malappuram", "Palakkad", "Pathanamthitta", "Thiruvananthapuram", "Thrissur", "Wayanad"],
+        "Telangana": ["Adilabad", "Bhadradri Kothagudem", "Hyderabad", "Jagtial", "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy", "Karimnagar", "Khammam", "Komaram Bheem", "Mahabubabad", "Mahabubnagar", "Mancherial", "Medak", "Medchal-Malkajgiri", "Mulugu", "Nagarkurnool", "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad", "Peddapalli", "Rajanna Sircilla", "Rangareddy", "Sangareddy", "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy", "Warangal Rural", "Warangal Urban", "Yadadri Bhuvanagiri"],
+        "Madhya Pradesh": ["Agar Malwa", "Alirajpur", "Anuppur", "Ashoknagar", "Balaghat", "Barwani", "Betul", "Bhind", "Bhopal", "Burhanpur", "Chhatarpur", "Chhindwara", "Damoh", "Datia", "Dewas", "Dhar", "Dindori", "Guna", "Gwalior", "Harda", "Hoshangabad", "Indore", "Jabalpur", "Jhabua", "Katni", "Khandwa", "Khargone", "Mandla", "Mandsaur", "Morena", "Narsinghpur", "Neemuch", "Niwari", "Panna", "Raisen", "Rajgarh", "Ratlam", "Rewa", "Sagar", "Satna", "Sehore", "Seoni", "Shahdol", "Shajapur", "Sheopur", "Shivpuri", "Sidhi", "Singrauli", "Tikamgarh", "Ujjain", "Umaria", "Vidisha"],
+        "Bihar": ["Araria", "Arwal", "Aurangabad", "Banka", "Begusarai", "Bhagalpur", "Bhojpur", "Buxar", "Darbhanga", "East Champaran", "Gaya", "Gopalganj", "Jamui", "Jehanabad", "Kaimur", "Katihar", "Khagaria", "Kishanganj", "Lakhisarai", "Madhepura", "Madhubani", "Munger", "Muzaffarpur", "Nalanda", "Nawada", "Patna", "Purnia", "Rohtas", "Saharsa", "Samastipur", "Saran", "Sheikhpura", "Sheohar", "Sitamarhi", "Siwan", "Supaul", "Vaishali", "West Champaran"],
+        "Odisha": ["Angul", "Balangir", "Balasore", "Bargarh", "Bhadrak", "Boudh", "Cuttack", "Deogarh", "Dhenkanal", "Gajapati", "Ganjam", "Jagatsinghpur", "Jajpur", "Jharsuguda", "Kalahandi", "Kandhamal", "Kendrapara", "Kendujhar", "Khordha", "Koraput", "Malkangiri", "Mayurbhanj", "Nabarangpur", "Nayagarh", "Nuapada", "Puri", "Rayagada", "Sambalpur", "Subarnapur", "Sundergarh"],
+        "Jharkhand": ["Bokaro", "Chatra", "Deoghar", "Dhanbad", "Dumka", "East Singhbhum", "Garhwa", "Giridih", "Godda", "Gumla", "Hazaribagh", "Jamtara", "Khunti", "Koderma", "Latehar", "Lohardaga", "Pakur", "Palamu", "Ramgarh", "Ranchi", "Sahebganj", "Seraikela Kharsawan", "Simdega", "West Singhbhum"],
+        "Assam": ["Baksa", "Barpeta", "Biswanath", "Bongaigaon", "Cachar", "Charaideo", "Chirang", "Darrang", "Dhemaji", "Dhubri", "Dibrugarh", "Dima Hasao", "Goalpara", "Golaghat", "Hailakandi", "Hojai", "Jorhat", "Kamrup", "Kamrup Metropolitan", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Majuli", "Morigaon", "Nagaon", "Nalbari", "Sivasagar", "Sonitpur", "South Salmara-Mankachar", "Tinsukia", "Udalguri", "West Karbi Anglong"],
+        "Chhattisgarh": ["Balod", "Baloda Bazar", "Balrampur", "Bastar", "Bemetara", "Bijapur", "Bilaspur", "Dantewada", "Dhamtari", "Durg", "Gariaband", "Gaurela Pendra Marwahi", "Janjgir Champa", "Jashpur", "Kabirdham", "Kanker", "Kondagaon", "Korba", "Koriya", "Mahasamund", "Mungeli", "Narayanpur", "Raigarh", "Raipur", "Rajnandgaon", "Sukma", "Surajpur", "Surguja"],
+        "Uttarakhand": ["Almora", "Bageshwar", "Chamoli", "Champawat", "Dehradun", "Haridwar", "Nainital", "Pauri Garhwal", "Pithoragarh", "Rudraprayag", "Tehri Garhwal", "Udham Singh Nagar", "Uttarkashi"],
+        "Himachal Pradesh": ["Bilaspur", "Chamba", "Hamirpur", "Kangra", "Kinnaur", "Kullu", "Lahaul and Spiti", "Mandi", "Shimla", "Sirmaur", "Solan", "Una"],
+        "Goa": ["North Goa", "South Goa"],
+        "Arunachal Pradesh": ["Anjaw", "Changlang", "Dibang Valley", "East Kameng", "East Siang", "Kamle", "Kra Daadi", "Kurung Kumey", "Lepa Rada", "Lohit", "Longding", "Lower Dibang Valley", "Lower Siang", "Lower Subansiri", "Namsai", "Pakke Kessang", "Papum Pare", "Shi Yomi", "Siang", "Tawang", "Tirap", "Upper Siang", "Upper Subansiri", "West Kameng", "West Siang"],
+        "Manipur": ["Bishnupur", "Chandel", "Churachandpur", "Imphal East", "Imphal West", "Jiribam", "Kakching", "Kamjong", "Kangpokpi", "Noney", "Pherzawl", "Senapati", "Tamenglong", "Tengnoupal", "Thoubal", "Ukhrul"],
+        "Meghalaya": ["East Garo Hills", "East Jaintia Hills", "East Khasi Hills", "North Garo Hills", "Ri Bhoi", "South Garo Hills", "South West Garo Hills", "South West Khasi Hills", "West Garo Hills", "West Jaintia Hills", "West Khasi Hills"],
+        "Mizoram": ["Aizawl", "Champhai", "Hnahthial", "Khawzawl", "Kolasib", "Lawngtlai", "Lunglei", "Mamit", "Saiha", "Saitual", "Serchhip"],
+        "Nagaland": ["Dimapur", "Kiphire", "Kohima", "Longleng", "Mokokchung", "Mon", "Noklak", "Peren", "Phek", "Tuensang", "Wokha", "Zunheboto"],
+        "Sikkim": ["East Sikkim", "North Sikkim", "South Sikkim", "West Sikkim"],
+        "Tripura": ["Dhalai", "Gomati", "Khowai", "North Tripura", "Sepahijala", "South Tripura", "Unakoti", "West Tripura"],
+
+        // Union Territories
+        "Andaman and Nicobar Islands": ["Nicobar", "North and Middle Andaman", "South Andaman", "South Nicobar"],
+        "Chandigarh": ["Chandigarh"],
+        "Dadra and Nagar Haveli and Daman and Diu": ["Dadra and Nagar Haveli", "Daman", "Diu"],
+        "Lakshadweep": ["Lakshadweep"],
+        "Puducherry": ["Puducherry", "Karaikal", "Mahe", "Yanam"],
+        "Jammu and Kashmir": ["Jammu", "Samba", "Kathua", "Udhampur", "Reasi", "Rajouri", "Poonch", "Doda", "Kishtwar", "Ramban", "Anantnag", "Bandipora", "Baramulla", "Budgam", "Ganderbal", "Kulgam", "Kupwara", "Pulwama", "Shopian", "Srinagar"],
+        "Ladakh": ["Leh", "Kargil"]
+    };
+
+    // Puducherry UT: local-only pincode list and pin mapping (no API)
+    const PUDUCHERRY_LOCAL = {
+        districts: {
+            'Puducherry': [
+                { pincode: '605001', postOfficeName: 'Puducherry HO' },
+                { pincode: '605007', postOfficeName: 'Ariyankuppam' },
+                { pincode: '605110', postOfficeName: 'Villianur' },
+                { pincode: '605008', postOfficeName: 'Lawspet' },
+                { pincode: '605014', postOfficeName: 'Pondicherry University' }
+            ],
+            'Karaikal': [
+                { pincode: '609602', postOfficeName: 'Karaikal HO' }
+            ],
+            'Mahe': [
+                { pincode: '673310', postOfficeName: 'Mahe HO' }
+            ],
+            'Yanam': [
+                { pincode: '533464', postOfficeName: 'Yanam HO' }
+            ]
+        },
+        pinToDistrict: {
+            '605001': 'Puducherry',
+            '605007': 'Puducherry',
+            '605110': 'Puducherry',
+            '605008': 'Puducherry',
+            '605014': 'Puducherry',
+            '609602': 'Karaikal',
+            '673310': 'Mahe',
+            '533464': 'Yanam'
+        }
+    };
+
     // Toggle bilingual hint on every click
     let pincodeHintToggle = 0;
     
     // Add variable to track if selected vehicle is a manual cart
     let isManualCartSelected = false;
+
+    function shakeVehicleCategory() {
+        const el = vehicleCategoryGroup || document.getElementById('vehicleCategoryGroup');
+        if (!el) return;
+        el.classList.remove('shake-attention');
+        void el.offsetWidth;
+        el.classList.add('shake-attention');
+        window.setTimeout(() => el.classList.remove('shake-attention'), 600);
+    }
+
+    function setActiveVehicleCategory(value) {
+        const val = String(value || '').toLowerCase();
+
+        // Update hidden input (submitted)
+        if (vehicleCategoryRegInput) vehicleCategoryRegInput.value = val;
+
+        // Visual state
+        vehicleCategoryCards.forEach(card => {
+            const match = (String(card.getAttribute('data-category-value') || '').toLowerCase() === val);
+            card.classList.toggle('active', match);
+            card.setAttribute('aria-pressed', match ? 'true' : 'false');
+        });
+
+        // Filter vehicle types by selected category
+        if (vehicleDropdown) {
+            if (val) vehicleDropdown.setAttribute('data-active-category', val);
+            else vehicleDropdown.removeAttribute('data-active-category');
+        }
+
+        // Enable/disable vehicle type dropdown button
+        if (vehicleSelectBtn) {
+            const enabled = !!val;
+            vehicleSelectBtn.classList.toggle('is-disabled', !enabled);
+            vehicleSelectBtn.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+        }
+
+        // Reset chosen vehicle type when category changes
+        try {
+            const typeInputs = document.querySelectorAll('input[name="vehicleType"]');
+            typeInputs.forEach(i => { i.checked = false; });
+            if (vehicleSelectBtn) vehicleSelectBtn.querySelector('span').textContent = 'Select Vehicle Type';
+            if (vehicleDropdown) vehicleDropdown.classList.remove('show');
+            isManualCartSelected = false;
+            if (vehicleNumberContainer) {
+                vehicleNumberContainer.style.display = 'block';
+                if (vehicleNumberField) vehicleNumberField.setAttribute('required', 'required');
+            }
+        } catch(_) {}
+    }
     
     // Add helper text for vehicle number format
     const vehicleNumberHelper = document.createElement('div');
@@ -47,13 +265,11 @@ document.addEventListener('DOMContentLoaded', function() {
     vehicleNumberHelper.style.marginTop = '5px';
     vehicleNumberContainer.appendChild(vehicleNumberHelper);
     
-    // Set city and state fields as readonly
-    cityInput.setAttribute('readonly', 'readonly');
-    stateInput.setAttribute('disabled', 'disabled');
-    
-    // Add visual indication that these fields can't be edited directly
-    cityInput.style.backgroundColor = '#f8f8f8';
-    stateInput.style.backgroundColor = '#f8f8f8';
+    // Enable state/district selection (vehicles.html-like behavior)
+    try {
+        if (stateInput) { stateInput.removeAttribute('disabled'); stateInput.style.backgroundColor = ''; }
+        if (districtSelect) { districtSelect.disabled = true; }
+    } catch(_) {}
 
     function shakeUseLocationButton() {
         if (!useLocationBtn) return;
@@ -77,20 +293,11 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
-    // When user clicks City/State while pincode is not filled, show bilingual toast
-    if (cityInput) {
-        cityInput.addEventListener('click', function() {
-            // If pincode is already verified, don't distract
+    // If user tries to interact without pincode (optional helper)
+    if (districtSelect) {
+        districtSelect.addEventListener('focus', function() {
             if (isPincodeVerified) return;
-            maybeShowPincodeHintToast();
-        });
-    }
-
-    // State select is disabled, so clicks won't fire on it; we capture clicks via an overlay button
-    if (stateClickCapture) {
-        stateClickCapture.addEventListener('click', function() {
-            if (isPincodeVerified) return;
-            maybeShowPincodeHintToast();
+            // no-op: keep UX clean
         });
     }
     
@@ -107,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add a note to inform users
     const locationNote = document.createElement('div');
     locationNote.className = 'location-note';
-    locationNote.innerHTML = ' City and State will be auto-filled after pincode verification';
+    locationNote.innerHTML = 'Select State/District or enter your pincode';
     locationNote.style.color = '#666';
     locationNote.style.fontSize = '12px';
     locationNote.style.marginTop = '5px';
@@ -154,8 +361,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // Current active view for upload
     let currentUploadView = null;
 
-    // Vehicle dropdown toggle
+    // Vehicle Category cards: click/keyboard to select
+    if (vehicleCategoryCards.length) {
+        vehicleCategoryCards.forEach(card => {
+            card.addEventListener('click', () => setActiveVehicleCategory(card.getAttribute('data-category-value') || ''));
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActiveVehicleCategory(card.getAttribute('data-category-value') || '');
+                }
+            });
+        });
+    }
+    // Initialize default state
+    setActiveVehicleCategory(vehicleCategoryRegInput ? vehicleCategoryRegInput.value : '');
+
+    // Vehicle dropdown toggle (gated by category)
     vehicleSelectBtn.addEventListener('click', function() {
+        const hasCategory = !!(vehicleCategoryRegInput && vehicleCategoryRegInput.value);
+        if (!hasCategory) {
+            showToast('Please select vehicle category first', 'error');
+            shakeVehicleCategory();
+            return;
+        }
         vehicleDropdown.classList.toggle('show');
     });
 
@@ -288,97 +516,412 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Handle pincode input validation
-    pincode.addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9]/g, '');
-        if (this.value.length > 6) {
-            this.value = this.value.slice(0, 6);
-        }
-        
-        // Reset verification status when pincode is changed
+    function clearPincodeVerified() {
         isPincodeVerified = false;
-        
-        // Add visual indicator for pincode length
-        if (this.value.length === 6) {
-            this.style.borderColor = '#ff9800';  // Orange to indicate needs verification
-            this.style.boxShadow = '0 0 5px rgba(255, 152, 0, 0.5)';
-            
-            // Update location note
-            locationNote.innerHTML = 'Please click "Verify" button to verify pincode';
-            locationNote.style.color = '#ff9800';
-        } else {
-            this.style.borderColor = '#ff5252';
-            this.style.boxShadow = '0 0 5px rgba(255, 82, 82, 0.5)';
-            
-            // Update location note
-            locationNote.innerHTML = 'Please enter a valid 6-digit pincode';
-            locationNote.style.color = '#ff5252';
-            
-            // Reset city and state
-            cityInput.value = '';
-            stateInput.selectedIndex = 0;
-        }
-    });
-
-    // Extracted verification logic so it can be reused by Use Location flow
-    async function performPincodeVerification(pin) {
-        const pincodeValue = (pin || pincode.value || '').trim();
-        if (!/^\d{6}$/.test(pincodeValue)) {
-            showToast('Please enter a valid 6-digit pincode', 'error');
-            return false;
-        }
-        const originalBtnText = verifyPincodeBtn ? verifyPincodeBtn.innerHTML : '';
-        if (verifyPincodeBtn) { verifyPincodeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...'; verifyPincodeBtn.disabled = true; }
+        lastVerifiedPin = null;
         try {
-            const resp = await fetch(`https://api.postalpincode.in/pincode/${pincodeValue}`);
-            const data = await resp.json();
-            if (data && data[0].Status === 'Success') {
-                const postOffice = data[0].PostOffice[0];
-                const stateValue = postOffice.State || postOffice.Circle;
-                for (let i = 0; i < stateInput.options.length; i++) {
-                    if (stateInput.options[i].value === stateValue) { stateInput.selectedIndex = i; break; }
-                }
-                cityInput.value = postOffice.District || postOffice.Division || postOffice.Region || postOffice.Block;
-                // Visual confirmation
-                cityInput.style.borderColor = '#4CAF50';
-                cityInput.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
-                stateInput.style.borderColor = '#4CAF50';
-                stateInput.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
-                pincode.style.borderColor = '#4CAF50';
-                pincode.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.5)';
-                locationNote.innerHTML = 'Location verified';
-                locationNote.style.color = '#4CAF50';
-                isPincodeVerified = true;
-                showToast('Pincode verified successfully!', 'success');
-                return true;
-            } else {
-                cityInput.value = '';
-                stateInput.selectedIndex = 0;
-                isPincodeVerified = false;
-                pincode.style.borderColor = '#ff5252';
-                pincode.style.boxShadow = '0 0 5px rgba(255, 82, 82, 0.5)';
-                locationNote.innerHTML = 'Invalid pincode. Please enter a valid pincode';
-                locationNote.style.color = '#ff5252';
-                showToast('Invalid pincode. Please enter a valid pincode.', 'error');
-                return false;
+            if (pincode) {
+                pincode.classList.remove('pin-verified');
+                pincode.style.borderColor = '';
+                pincode.style.boxShadow = '';
             }
-        } catch (e) {
-            console.error('Error verifying pincode:', e);
-            isPincodeVerified = false;
-            locationNote.innerHTML = 'Error verifying pincode. Please try again';
-            locationNote.style.color = '#ff5252';
-            showToast('Error verifying pincode. Please try again.', 'error');
-            return false;
-        } finally {
-            if (verifyPincodeBtn) { verifyPincodeBtn.innerHTML = originalBtnText; verifyPincodeBtn.disabled = false; }
+        } catch(_) {}
+
+        // Also reset the helper text so "Location verified" doesn't stick after edits
+        try {
+            if (typeof locationNote !== 'undefined' && locationNote) {
+                locationNote.innerHTML = 'Select State/District or enter your pincode';
+                locationNote.style.color = '#777';
+            }
+        } catch(_) {}
+    }
+
+    function setChevronOpen(isOpen) {
+        if (!pincodeChevron) return;
+        const icon = pincodeChevron.querySelector('i');
+        if (icon) {
+            icon.classList.toggle('fa-chevron-up', !!isOpen);
+            icon.classList.toggle('fa-chevron-down', !isOpen);
+        }
+        pincodeChevron.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+
+    function updateChevronVisibility() {
+        if (!pincodeChevron) return;
+        const hasList = !!(pincodeSuggestions && pincodeSuggestions.children && pincodeSuggestions.children.length);
+        const canShow = hasList && !isPincodeVerified && !!(stateInput && stateInput.value) && !!(districtSelect && districtSelect.value);
+        pincodeChevron.style.display = canShow ? 'inline-flex' : 'none';
+        if (!canShow) setChevronOpen(false);
+    }
+
+    function setDistrictOptionsForState(stateValue) {
+        if (!districtSelect) return;
+        const st = String(stateValue || '').trim();
+        districtSelect.innerHTML = '<option value="">Select District</option>';
+        districtSelect.disabled = true;
+        if (st && stateToDistricts[st]) {
+            stateToDistricts[st].forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d;
+                districtSelect.appendChild(opt);
+            });
+            districtSelect.disabled = false;
         }
     }
 
-    // Hook up original Verify button to the shared function
-    if (verifyPincodeBtn) verifyPincodeBtn.addEventListener('click', () => { performPincodeVerification(); });
+    // Initialize district list (in case state is pre-filled)
+    if (stateInput && districtSelect) {
+        setDistrictOptionsForState(stateInput.value);
+    }
+
+    function showPincodeList(list) {
+        if (!pincodeSuggestions) return;
+        pincodeSuggestions.innerHTML = '';
+        list.forEach(o => {
+            const item = document.createElement('div');
+            item.className = 'pin-suggestion-item';
+            item.innerHTML = `<div class="pin-suggestion-code">${escapeHtml(o.pincode || o.Pincode || '')}</div><div class="pin-suggestion-name">${escapeHtml(o.postOfficeName || o.Name || '')}</div>`;
+            item.addEventListener('click', () => {
+                const pin = String(o.pincode || o.Pincode || '').trim();
+                if (!pin) return;
+                pincode.value = pin;
+                isPincodeVerified = true;
+                lastVerifiedPin = pin;
+                if (pincodeChevron) {
+                    setChevronOpen(false);
+                    pincodeChevron.style.display = 'none';
+                }
+                if (pincode) {
+                    pincode.classList.add('pin-verified');
+                    pincode.style.borderColor = '#10b981';
+                    pincode.style.boxShadow = '0 0 0 4px rgba(16,185,129,0.15)';
+                    pincode.placeholder = 'Enter pincode';
+                }
+                pincodeSuggestions.style.display = 'none';
+                locationNote.innerHTML = 'Location selected';
+                locationNote.style.color = '#4CAF50';
+            });
+            pincodeSuggestions.appendChild(item);
+        });
+        pincodeSuggestions.style.display = 'none';
+        setChevronOpen(false);
+        updateChevronVisibility();
+    }
+
+    async function fetchPincodesForSelection(stateValue, districtValue) {
+        const selectedState = String(stateValue || '').trim();
+        const selectedDistrict = String(districtValue || '').trim();
+        if (!selectedDistrict) return [];
+
+        const selectedStateKey = normalizeStateKey(selectedState);
+        const selectedDistrictKey = normalizeStateKey(selectedDistrict);
+
+        // Puducherry local-only (no API)
+        if (selectedStateKey === 'puducherry') {
+            return (PUDUCHERRY_LOCAL.districts[selectedDistrict] || []).slice();
+        }
+
+        const matchesSelectedState = (officeState) => {
+            const key = normalizeStateKey(officeState);
+            if (!selectedStateKey) return true;
+            if (key === selectedStateKey) return true;
+            if (selectedStateKey === 'delhi' && key === 'nct of delhi') return true;
+            if (selectedStateKey === 'ladakh' && key === 'jammu and kashmir') return true;
+            if (selectedStateKey === 'andaman and nicobar islands' && (key === 'andaman and nicobar' || key === 'andaman nicobar' || key === 'andaman nicobar islands')) return true;
+            if (selectedStateKey === 'puducherry' && key === 'pondicherry') return true;
+            // Puducherry enclaves can appear under neighbouring states in India Post
+            if (selectedStateKey === 'puducherry') {
+                if (selectedDistrictKey === 'mahe' && key === 'kerala') return true;
+                if (selectedDistrictKey === 'yanam' && key === 'andhra pradesh') return true;
+                if (selectedDistrictKey === 'karaikal' && key === 'tamil nadu') return true;
+            }
+            // India Post may still report old UT names for merged UT
+            if (selectedStateKey === 'dadra and nagar haveli and daman and diu' && (key === 'dadra and nagar haveli' || key === 'daman and diu')) return true;
+            return false;
+        };
+
+        const isUnionTerritory = (s) => {
+            const k = normalizeStateKey(s);
+            return [
+                'andaman and nicobar islands',
+                'chandigarh',
+                'dadra and nagar haveli and daman and diu',
+                'delhi',
+                'jammu and kashmir',
+                'ladakh',
+                'lakshadweep',
+                'puducherry'
+            ].includes(k);
+        };
+
+        const getIndiaPostOffices = async (q) => {
+            try {
+                const resp = await fetch(`https://api.postalpincode.in/postoffice/${encodeURIComponent(q)}`);
+                const json = await resp.json();
+                return (json && json[0] && json[0].Status === 'Success') ? (json[0].PostOffice || []) : [];
+            } catch (_) {
+                return [];
+            }
+        };
+
+        const stateSearchAlias = (s, district) => {
+            const k = normalizeStateKey(s);
+            const d = normalizeStateKey(district);
+            if (k === 'andaman and nicobar islands') return 'Andaman';
+            if (k === 'puducherry') {
+                if (d === 'puducherry') return 'Pondicherry';
+                return district || 'Pondicherry';
+            }
+            if (k === 'lakshadweep') return 'Kavaratti';
+            if (k === 'dadra and nagar haveli and daman and diu') {
+                if (d.includes('daman')) return 'Daman';
+                if (d.includes('diu')) return 'Diu';
+                return 'Silvassa';
+            }
+            if (k === 'ladakh') return 'Leh';
+            if (k === 'delhi') return 'Delhi';
+            if (k === 'jammu and kashmir') return 'Kashmir';
+            return s;
+        };
+
+        const buildPincodeListFromOffices = (offices, district) => {
+            const dKey = normalizeStateKey(district);
+            const stateKey = normalizeStateKey(selectedState);
+            const districtAliases = new Set([dKey]);
+            if (stateKey === 'puducherry' && dKey === 'puducherry') districtAliases.add('pondicherry');
+            if (stateKey === 'andaman and nicobar islands' && dKey === 'north and middle andaman') districtAliases.add('north middle andaman');
+            if (stateKey === 'andaman and nicobar islands' && dKey === 'south nicobar') districtAliases.add('nicobar');
+            if (stateKey === 'dadra and nagar haveli and daman and diu' && dKey === 'dadra and nagar haveli') {
+                districtAliases.add('dadra nagar haveli');
+                districtAliases.add('dadra & nagar haveli');
+            }
+
+            const filtered = offices
+                .filter(o => !selectedState || matchesSelectedState(o.State))
+                .filter(o => {
+                    if (!district) return true;
+                    const od = normalizeStateKey(o.District || o.Division || o.Region || '');
+                    return districtAliases.has(od);
+                });
+
+            const unique = new Map();
+            filtered.forEach(o => { if (o && o.Pincode) unique.set(o.Pincode, o); });
+            return Array.from(unique.values());
+        };
+
+        // 1) Try backend first (cleanest)
+        const apiBase = (window.API_BASE_URL || '').replace(/\/$/, '');
+        if (apiBase) {
+            try {
+                const resp = await fetch(`${apiBase}/api/geo/pincodes?district=${encodeURIComponent(selectedDistrict)}&state=${encodeURIComponent(selectedState)}`);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (data && Array.isArray(data.pincodes) && data.pincodes.length) {
+                        return data.pincodes.map(p => ({ pincode: String(p.pincode || ''), postOfficeName: p.postOfficeName || '' }));
+                    }
+                }
+            } catch (_) {
+                // fall through
+            }
+        }
+
+        // 2) India Post fallback with filtering (prevents mixed state/district pincodes)
+        // 2.1) Try searching by district name
+        let offices = await getIndiaPostOffices(selectedDistrict);
+        let list = buildPincodeListFromOffices(offices, selectedDistrict);
+
+        // 2.2) If empty (common for UT districts), try searching by state alias and filter by district
+        if (!list.length && isUnionTerritory(selectedState)) {
+            if (normalizeStateKey(selectedState) === 'lakshadweep') {
+                const queries = ['Kavaratti', 'Agatti', 'Amini', 'Minicoy', 'Andrott', 'Kalpeni', 'Kadmat', 'Kiltan', 'Chetlat', 'Bitra'];
+                const all = [];
+                for (const q of queries) {
+                    const part = await getIndiaPostOffices(q);
+                    if (part && part.length) all.push(...part);
+                }
+                list = buildPincodeListFromOffices(all, selectedDistrict);
+            } else {
+                offices = await getIndiaPostOffices(stateSearchAlias(selectedState, selectedDistrict));
+                list = buildPincodeListFromOffices(offices, selectedDistrict);
+            }
+        }
+
+        return list;
+    }
+
+    async function verifyPinAndAutofill(pin) {
+        const p = String(pin || '').trim();
+        if (!/^\d{6}$/.test(p)) return false;
+
+        // Puducherry local-only pins
+        const localDistrict = PUDUCHERRY_LOCAL.pinToDistrict[p];
+        if (localDistrict) {
+            setStateFromValue('Puducherry');
+            setDistrictOptionsForState('Puducherry');
+            if (districtSelect) {
+                districtSelect.value = localDistrict;
+            }
+            isPincodeVerified = true;
+            lastVerifiedPin = p;
+            if (pincode) {
+                pincode.classList.add('pin-verified');
+                pincode.style.borderColor = '#10b981';
+                pincode.style.boxShadow = '0 0 0 4px rgba(16,185,129,0.15)';
+            }
+            locationNote.innerHTML = 'Location verified';
+            locationNote.style.color = '#4CAF50';
+            return true;
+        }
+
+        // If user selected Puducherry, do not use any external API for manual verification
+        if (stateInput && normalizeStateKey(stateInput.value) === 'puducherry') {
+            return false;
+        }
+
+        try {
+            const resp = await fetch(`https://api.postalpincode.in/pincode/${encodeURIComponent(p)}`);
+            const data = await resp.json();
+            if (!(data && data[0] && data[0].Status === 'Success' && data[0].PostOffice && data[0].PostOffice.length)) return false;
+            const postOffice = data[0].PostOffice[0];
+            let st = postOffice.State || postOffice.Circle || '';
+            const dist = postOffice.District || postOffice.Division || postOffice.Region || postOffice.Block || '';
+
+            // Ladakh: India Post sometimes reports J&K for Leh/Kargil
+            if (normalizeStateKey(st) === 'jammu and kashmir') {
+                const dKey = normalizeStateKey(dist);
+                if (dKey === 'leh' || dKey === 'kargil') st = 'Ladakh';
+            }
+
+            setStateFromValue(st);
+            setDistrictOptionsForState(stateInput.value);
+            if (districtSelect && dist) {
+                // add option if not in list
+                const has = Array.from(districtSelect.options).some(o => (o.value || '').toLowerCase() === String(dist).toLowerCase());
+                if (!has) {
+                    const opt = document.createElement('option');
+                    opt.value = dist;
+                    opt.textContent = dist;
+                    districtSelect.appendChild(opt);
+                }
+                districtSelect.value = dist;
+            }
+
+            isPincodeVerified = true;
+            lastVerifiedPin = p;
+            if (pincode) {
+                pincode.classList.add('pin-verified');
+                pincode.style.borderColor = '#10b981';
+                pincode.style.boxShadow = '0 0 0 4px rgba(16,185,129,0.15)';
+            }
+            locationNote.innerHTML = 'Location verified';
+            locationNote.style.color = '#4CAF50';
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // State → District
+    if (stateInput && districtSelect) {
+        stateInput.addEventListener('change', function() {
+            clearPincodeVerified();
+            if (pincodeSuggestions) { pincodeSuggestions.innerHTML = ''; pincodeSuggestions.style.display = 'none'; }
+            if (pincodeChevron) pincodeChevron.style.display = 'none';
+            if (pincode) {
+                pincode.value = '';
+                pincode.placeholder = 'Pincode';
+            }
+            setDistrictOptionsForState(this.value);
+        });
+    }
+
+    // District → Pincode suggestions
+    if (districtSelect && pincode) {
+        districtSelect.addEventListener('change', async function() {
+            clearPincodeVerified();
+            const st = stateInput ? stateInput.value : '';
+            const dist = this.value;
+            if (pincodeSuggestions) { pincodeSuggestions.innerHTML = ''; pincodeSuggestions.style.display = 'none'; }
+            if (pincodeChevron) { setChevronOpen(false); pincodeChevron.style.display = 'none'; }
+            if (pincode) {
+                pincode.value = '';
+                pincode.placeholder = (st && dist) ? 'Loading pincodes...' : 'Pincode';
+            }
+            if (!st || !dist) return;
+            const list = await fetchPincodesForSelection(st, dist);
+            showPincodeList(list);
+            if (pincode) {
+                pincode.placeholder = list && list.length ? 'Select Pincode' : 'Enter pincode manually';
+            }
+        });
+    }
+
+    // Pincode input: digits only + auto-verify at 6 digits
+    if (pincode) {
+        pincode.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 6) this.value = this.value.slice(0, 6);
+            const val = (this.value || '').trim();
+            // If user edits even 1 digit, remove verified state immediately
+            if (lastVerifiedPin && val === lastVerifiedPin) {
+                // still verified; keep chevron hidden
+                updateChevronVisibility();
+                return;
+            }
+            clearPincodeVerified();
+            updateChevronVisibility();
+            if (/^\d{6}$/.test(val)) {
+                // Auto-verify
+                verifyPinAndAutofill(val).then(ok => {
+                    if (ok) showToast('Pincode verified successfully!', 'success');
+                    else {
+                        locationNote.innerHTML = 'Could not verify pincode. Please recheck or select from list.';
+                        locationNote.style.color = '#ff5252';
+                    }
+                });
+            }
+        });
+
+        // Toggle suggestions via chevron (only when state+district selected)
+        const toggleSuggestions = () => {
+            if (isPincodeVerified) return;
+            if (!stateInput || !districtSelect) return;
+            if (!stateInput.value || !districtSelect.value) return;
+            updateChevronVisibility();
+            if (pincodeChevron && pincodeChevron.style.display === 'none') return;
+            if (pincodeSuggestions && pincodeSuggestions.children.length) {
+                const nextOpen = (pincodeSuggestions.style.display === 'none' || !pincodeSuggestions.style.display);
+                pincodeSuggestions.style.display = nextOpen ? 'block' : 'none';
+                setChevronOpen(nextOpen);
+            }
+        };
+        if (pincodeChevron) pincodeChevron.addEventListener('click', toggleSuggestions);
+
+        // Close suggestions when clicking outside
+        document.addEventListener('mousedown', (e) => {
+            try {
+                if (!pincodeSuggestions) return;
+                if (pincodeSuggestions.style.display !== 'block') return;
+                const wrap = pincode.closest('.pincode-select-wrapper') || pincode.parentElement;
+                if (wrap && wrap.contains(e.target)) return;
+                pincodeSuggestions.style.display = 'none';
+                setChevronOpen(false);
+            } catch(_) {}
+        }, true);
+
+        // Keyboard navigation
+        pincode.addEventListener('keydown', (e) => {
+            if (!pincodeSuggestions || !pincodeSuggestions.children.length) return;
+            const items = Array.from(pincodeSuggestions.children);
+            let idx = items.findIndex(x => x.classList.contains('active'));
+            if (e.key === 'ArrowDown') { e.preventDefault(); idx = (idx < items.length-1) ? idx+1 : 0; items.forEach(i=>i.classList.remove('active')); items[idx].classList.add('active'); items[idx].scrollIntoView({block:'nearest'}); }
+            if (e.key === 'ArrowUp') { e.preventDefault(); idx = (idx > 0) ? idx-1 : items.length-1; items.forEach(i=>i.classList.remove('active')); items[idx].classList.add('active'); items[idx].scrollIntoView({block:'nearest'}); }
+            if (e.key === 'Enter' && idx >= 0) { e.preventDefault(); items[idx].click(); }
+        });
+    }
 
     // Use Location flow: detect GPS -> reverse geocode -> autofill -> auto-verify
-    let lastVerifiedPin = null;
     if (useLocationBtn) {
         useLocationBtn.addEventListener('click', function() {
             if (!('geolocation' in navigator)) { showToast('Geolocation not supported by your browser', 'error'); return; }
@@ -391,20 +934,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (!r.ok) throw new Error('Reverse geocoding failed');
                     const data = await r.json();
                     if (data && data.pincode) {
-                        // Fill state/city if available
-                        if (data.state) {
-                            for (let i = 0; i < stateInput.options.length; i++) {
-                                if (stateInput.options[i].value === data.state) { stateInput.selectedIndex = i; break; }
+                        // Fill state/district if available
+                        if (data.state) { setStateFromValue(data.state); setDistrictOptionsForState(stateInput.value); }
+                        if (data.district && districtSelect) {
+                            const has = Array.from(districtSelect.options).some(o => (o.value || '').toLowerCase() === String(data.district).toLowerCase());
+                            if (!has) {
+                                const opt = document.createElement('option');
+                                opt.value = data.district;
+                                opt.textContent = data.district;
+                                districtSelect.appendChild(opt);
                             }
+                            districtSelect.value = data.district;
                         }
-                        if (data.district) { cityInput.value = data.district; }
                         // Fill pincode and auto-verify
                         pincode.value = String(data.pincode).slice(0,6);
-                        const ok = await performPincodeVerification(pincode.value);
+                        const ok = await verifyPinAndAutofill(pincode.value);
                         if (ok) {
-                            lastVerifiedPin = pincode.value;
-                            // Hide Verify button until user edits pincode
-                            if (verifyPincodeBtn) verifyPincodeBtn.style.display = 'none';
                             locationNote.innerHTML = 'Location detected and verified';
                             locationNote.style.color = '#4CAF50';
                         }
@@ -425,28 +970,20 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-
-    // If user edits/clears pincode after auto verification, show Verify button back
-    pincode.addEventListener('input', function(){
-        const val = (this.value || '').trim();
-        if (!/^\d{6}$/.test(val) || (lastVerifiedPin && val !== lastVerifiedPin)) {
-            isPincodeVerified = false;
-            if (verifyPincodeBtn) verifyPincodeBtn.style.display = '';
-            // Reset visuals to pending state
-            this.style.borderColor = val.length === 6 ? '#ff9800' : '#ff5252';
-            this.style.boxShadow = val.length === 6 ? '0 0 5px rgba(255, 152, 0, 0.5)' : '0 0 5px rgba(255, 82, 82, 0.5)';
-            locationNote.innerHTML = val.length === 6 ? 'Please click "Verify" button to verify pincode' : 'Please enter a valid 6-digit pincode';
-            locationNote.style.color = val.length === 6 ? '#ff9800' : '#ff5252';
-            // Clear city/state if user is actively changing
-            if (val.length < 6) { cityInput.value = ''; stateInput.selectedIndex = 0; }
-        }
-    });
     
     // Function to show toast message
     function showToast(message, type = 'success') {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        toast.textContent = String(message ?? '');
+
+        // Safely render line breaks for messages joined with "<br>" without using innerHTML
+        const raw = String(message ?? '');
+        toast.textContent = '';
+        const parts = raw.split(/<br\s*\/?>/i);
+        parts.forEach((part, idx) => {
+            toast.appendChild(document.createTextNode(part));
+            if (idx < parts.length - 1) toast.appendChild(document.createElement('br'));
+        });
         document.body.appendChild(toast);
 
         toast.style.position = 'fixed';
@@ -482,7 +1019,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Use longer duration for error messages, especially for vehicle registration errors
         // If there are multiple lines (contains <br>), use even longer duration
-        const hasMultipleErrors = message.includes('<br>');
+        const hasMultipleErrors = /<br\s*\/?>/i.test(String(message ?? ''));
         const duration = type === 'error' ? (hasMultipleErrors ? 10000 : 6000) : 3000;
         
         setTimeout(() => {
@@ -818,12 +1355,46 @@ document.addEventListener('DOMContentLoaded', function() {
         let isValid = true;
         let errorMessages = [];
 
+        // Scroll helper: bring first invalid field into viewport
+        const scrollToElement = (el) => {
+            if (!el) return;
+            const target = el.closest('.form-group') || el;
+            try {
+                const top = target.getBoundingClientRect().top + window.pageYOffset - 120;
+                window.scrollTo({ top, behavior: 'smooth' });
+            } catch(_) {}
+            // Prefer focusing a real input/select if possible
+            try {
+                if (typeof el.focus === 'function') {
+                    el.focus({ preventScroll: true });
+                    return;
+                }
+            } catch(_) {}
+            try {
+                const focusable = target.querySelector('input,select,textarea,button,[tabindex]');
+                if (focusable && typeof focusable.focus === 'function') {
+                    focusable.focus({ preventScroll: true });
+                }
+            } catch(_) {}
+        };
+
+        let firstInvalidTarget = null;
+        const setFirstInvalid = (el) => {
+            if (!firstInvalidTarget && el) firstInvalidTarget = el;
+        };
+
         // Check required fields
         const requiredFields = form.querySelectorAll('[required]');
         requiredFields.forEach(field => {
             if (!field.value) {
                 isValid = false;
                 field.classList.add('error');
+
+                // Remember first missing required field (skip hidden inputs)
+                try {
+                    const isHidden = field.type === 'hidden' || field.offsetParent === null;
+                    if (!isHidden) setFirstInvalid(field);
+                } catch(_) { setFirstInvalid(field); }
                 
                 // Get field label for error message
                 let fieldLabel = field.previousElementSibling ? field.previousElementSibling.textContent.trim() : field.name;
@@ -839,6 +1410,7 @@ document.addEventListener('DOMContentLoaded', function() {
             isValid = false;
             contactNo.classList.add('error');
             errorMessages.push('Contact number must be 10 digits');
+            setFirstInvalid(contactNo);
         }
         
         // Validate WhatsApp number length only if provided
@@ -846,6 +1418,7 @@ document.addEventListener('DOMContentLoaded', function() {
             isValid = false;
             whatsappNo.classList.add('error');
             errorMessages.push('WhatsApp number must be 10 digits if provided');
+            setFirstInvalid(whatsappNo);
         } else {
             whatsappNo.classList.remove('error');
         }
@@ -855,6 +1428,15 @@ document.addEventListener('DOMContentLoaded', function() {
             isValid = false;
             pincode.classList.add('error');
             errorMessages.push('Please verify your pincode before submitting');
+            setFirstInvalid(pincode);
+        }
+
+        // Validate vehicle category selection
+        if (!(vehicleCategoryRegInput && vehicleCategoryRegInput.value)) {
+            isValid = false;
+            errorMessages.push('Please select a vehicle category');
+            shakeVehicleCategory();
+            setFirstInvalid(vehicleCategoryGroup || document.getElementById('vehicleCategoryGroup'));
         }
         
         // Validate vehicle type selection
@@ -873,6 +1455,7 @@ document.addEventListener('DOMContentLoaded', function() {
             vehicleSelectBtn.style.borderColor = '#d9534f';
             vehicleSelectBtn.style.boxShadow = '0 0 5px rgba(217, 83, 79, 0.5)';
             vehicleSelectBtn.classList.add('error');
+            setFirstInvalid(vehicleSelectBtn);
         } else {
             vehicleSelectBtn.style.borderColor = '';
             vehicleSelectBtn.style.boxShadow = '';
@@ -917,6 +1500,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     uploadBox.style.animation = '';
                 }, 500);
             });
+
+            // Scroll to the first missing upload box
+            try {
+                const firstMissingView = photoViews.find(v => !uploadedPhotos[v]);
+                if (firstMissingView) {
+                    const firstBox = document.querySelector(`.photo-upload-box[data-view="${firstMissingView}"]`);
+                    setFirstInvalid(firstBox);
+                }
+            } catch(_) {}
             
             errorMessages.push(`Please upload all 4 required photos. Missing: ${missingViews.join(', ')}`);
             
@@ -944,6 +1536,7 @@ document.addEventListener('DOMContentLoaded', function() {
             errorMessages.push('Please agree to the Terms & Conditions');
             termsCheckbox.parentNode.style.color = '#d9534f';
             termsCheckbox.parentNode.style.fontWeight = 'bold';
+            setFirstInvalid(termsCheckbox);
         } else {
             termsCheckbox.parentNode.style.color = '';
             termsCheckbox.parentNode.style.fontWeight = '';
@@ -954,6 +1547,7 @@ document.addEventListener('DOMContentLoaded', function() {
             errorMessages.push('Please agree to the Privacy Policy');
             privacyCheckbox.parentNode.style.color = '#d9534f';
             privacyCheckbox.parentNode.style.fontWeight = 'bold';
+            setFirstInvalid(privacyCheckbox);
         } else {
             privacyCheckbox.parentNode.style.color = '';
             privacyCheckbox.parentNode.style.fontWeight = '';
@@ -964,12 +1558,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!validateVehicleNumber(vehicleNumberField, false)) {
                 isValid = false;
                 errorMessages.push('Invalid vehicle number format');
+                setFirstInvalid(vehicleNumberField);
             }
         }
 
         if (!isValid) {
             // Display all error messages in a single toast
             showToast(errorMessages.join('<br>'), 'error');
+
+            // Bring user to the first invalid field
+            if (firstInvalidTarget) {
+                scrollToElement(firstInvalidTarget);
+            }
             return;
         }
 
@@ -1372,7 +1972,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function submitVehicleRegistration() {
         // Check if pincode has been verified
         if (!isPincodeVerified) {
-            showToast('Please verify your pincode first to get city and state details', 'error');
+            showToast('Please enter a valid pincode (auto-verified) before submitting', 'error');
             pincode.focus();
             return;
         }
@@ -1414,7 +2014,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         formData.append('state', document.getElementById('state').value);
-        formData.append('city', document.getElementById('city').value);
+        // District dropdown posts as `city` for backend compatibility
+        const districtEl = document.getElementById('district');
+        formData.append('city', districtEl ? districtEl.value : '');
         formData.append('pincode', pincode.value);
         
         // Add images

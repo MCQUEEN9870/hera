@@ -372,6 +372,70 @@
         .shake-attention{
             animation: shake 0.5s;
         }
+
+        /* Vehicle Category cards (register page) */
+        .vehicle-category-cards {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+        @media (max-width: 700px) {
+            .vehicle-category-cards { grid-template-columns: 1fr; }
+        }
+        .vehicle-category-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            cursor: pointer;
+            user-select: none;
+            transition: transform .15s ease, box-shadow .25s ease, border-color .25s ease;
+        }
+        .vehicle-category-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        }
+        .vehicle-category-card.active {
+            border-color: #667eea;
+            box-shadow: 0 14px 34px rgba(102, 126, 234, 0.22);
+        }
+        .vehicle-category-card img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            border-radius: 12px;
+            background: #f3f4f6;
+            padding: 7px;
+            flex: 0 0 auto;
+        }
+        .vehicle-category-card .text {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            line-height: 1.2;
+            text-align: left;
+        }
+        .vehicle-category-card .title {
+            font-weight: 800;
+            color: #111827;
+            font-size: 14px;
+        }
+        .vehicle-category-card .subtitle {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* Filter vehicle types by selected category */
+        .vehicle-dropdown .vehicle-category-group { display: none; }
+        .vehicle-dropdown[data-active-category="goods"] .vehicle-category-group[data-vehicle-category="goods"] { display: block; }
+        .vehicle-dropdown[data-active-category="passenger"] .vehicle-category-group[data-vehicle-category="passenger"] { display: block; }
+        .vehicle-dropdown[data-active-category="rental"] .vehicle-category-group[data-vehicle-category="rental"] { display: block; }
+
+        .vehicle-select-btn.is-disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -401,6 +465,35 @@
                 <input type="text" id="name" name="fullName" required placeholder="Enter your full name">
                 </div>
 
+                <!-- Vehicle Category Selection -->
+                <div class="form-groupregi" id="vehicleCategoryGroup">
+                    <label>Choose Vehicle Category <span class="required">*</span></label>
+                    <input type="hidden" id="vehicleCategoryReg" name="vehicleCategory" value="">
+                    <div class="vehicle-category-cards" role="group" aria-label="Vehicle Category">
+                        <div class="vehicle-category-card" data-category-value="goods" tabindex="0" role="button" aria-pressed="false">
+                            <img src="attached_assets/images/goods-vehicles.webp" alt="Goods Vehicles" loading="lazy" decoding="async">
+                            <div class="text">
+                                <div class="title">Goods &amp; Special Utility Vehicles</div>
+                                <div class="subtitle">Loaders, Garbage/Tow/Food Trucks, Tempos, JCBs, Crane, Packers &amp; Movers, etc.</div>
+                            </div>
+                        </div>
+                        <div class="vehicle-category-card" data-category-value="passenger" tabindex="0" role="button" aria-pressed="false">
+                            <img src="attached_assets/images/passenger-vehicles.webp" alt="Passenger Vehicles" loading="lazy" decoding="async">
+                            <div class="text">
+                                <div class="title">Passenger Vehicles</div>
+                                <div class="subtitle">Cabs, Buses, A.C/Luxury/Sleeper Buses, etc.</div>
+                            </div>
+                        </div>
+                        <div class="vehicle-category-card" data-category-value="rental" tabindex="0" role="button" aria-pressed="false">
+                            <img src="attached_assets/images/rent-vehicles.webp" alt="Rental & Events" loading="lazy" decoding="async">
+                            <div class="text">
+                                <div class="title">Rental &amp; Events</div>
+                                <div class="subtitle">For Royal Wedding, Vintage cars &amp; VIP rentals, etc.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Vehicle Type Selection -->
                 <div class="form-groupregi">
                     <label for="vehicleType">Choose Vehicle Type <span class="required">*</span></label>
@@ -409,6 +502,8 @@
                             <span>Select Vehicle Type</span>
                         </button>
                         <div class="vehicle-dropdown">
+
+                            <div class="vehicle-category-group" data-vehicle-category="goods">
                             <!-- Small Commercial Vehicles Category -->
                             <div class="vehicle-category">
                                 <h3>Small Commercial Vehicles (SCV)</h3>
@@ -601,6 +696,120 @@
                                     </label>
                                 </div>
                             </div>
+
+                            </div>
+                            
+                            <!-- Local & Long-Distance Cabs -->
+                            <div class="vehicle-category-group" data-vehicle-category="passenger">
+                            <div class="vehicle-category">
+                                <h3>Local & Long-Distance Cabs</h3>
+                                <div class="vehicle-options">
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Innova Crysta">
+                                        <img src="attached_assets/images/crysta.webp" alt="Innova Crysta" title="Innova Crysta" class="vehicle-icon">
+                                        <span>Innova Crysta</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Ertiga">
+                                        <img src="attached_assets/images/ertiga.webp" alt="Ertiga" title="Ertiga" class="vehicle-icon">
+                                        <span>Ertiga</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Dzire">
+                                        <img src="attached_assets/images/dzire.webp" alt="Dzire" title="Dzire" class="vehicle-icon">
+                                        <span>Dzire</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Sedan (Verna, Ciaz, etc.)">
+                                        <img src="attached_assets/images/sedan.webp" alt="Sedan" title="Sedan (Verna, Ciaz, etc.)" class="vehicle-icon">
+                                        <span>Sedan (Verna, Ciaz, etc.)</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Hatchback (WagonR, i10, etc.)">
+                                        <img src="attached_assets/images/hatch-back.webp" alt="Hatchback" title="Hatchback (WagonR, i10, etc.)" class="vehicle-icon">
+                                        <span>Hatchback (WagonR, i10, etc.)</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Other Taxi Cars">
+                                        <img src="attached_assets/images/other-taxis.webp" alt="Other Taxi Cars" title="Other Taxi Cars" class="vehicle-icon">
+                                        <span>Other Taxi Cars</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Tourist & Contract Buses -->
+                            <div class="vehicle-category">
+                                <h3>Tourist & Contract Buses</h3>
+                                <div class="vehicle-options">
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="26-seater Mini Bus">
+                                        <img src="attached_assets/images/mini-bus.webp" alt="26-seater Mini Bus" title="26-seater Mini Bus" class="vehicle-icon">
+                                        <span>26-seater Mini Bus</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="35-seater AC Bus">
+                                        <img src="attached_assets/images/A.C-bus.webp" alt="35-seater AC Bus" title="35-seater AC Bus" class="vehicle-icon">
+                                        <span>35-seater AC Bus</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="45+ Seater Tourist Coach">
+                                        <img src="attached_assets/images/45+seaterbuses.webp" alt="45+ Seater Tourist Coach" title="45+ Seater Tourist Coach" class="vehicle-icon">
+                                        <span>45+ Seater Tourist Coach</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Volvo Type Bus">
+                                        <img src="attached_assets/images/volvo-bus.webp" alt="Volvo Type Bus" title="Volvo Type Bus" class="vehicle-icon">
+                                        <span>Volvo Type Bus</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Other Bus Types">
+                                        <img src="attached_assets/images/other-bus-types.webp" alt="Other Bus Types" title="Other Bus Types" class="vehicle-icon">
+                                        <span>Other Bus Types</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            </div>
+                            
+                            <!-- Wedding & VIP Rentals -->
+                            <div class="vehicle-category-group" data-vehicle-category="rental">
+                            <div class="vehicle-category">
+                                <h3>Wedding & VIP Rentals</h3>
+                                <div class="vehicle-options">
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Fortuner">
+                                        <img src="attached_assets/images/fortuner.webp" alt="Fortuner" title="Fortuner" class="vehicle-icon">
+                                        <span>Fortuner/Thar/Scorpio</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Audi/BMW/Mercedes">
+                                        <img src="attached_assets/images/audi-bmw-mercedes.webp" alt="Audi/BMW/Mercedes" title="Audi/BMW/Mercedes" class="vehicle-icon">
+                                        <span>Audi/BMW/Mercedes</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Luxury Vintage Cars">
+                                        <img src="attached_assets/images/vintage-car.webp" alt="Luxury Vintage Cars" title="Luxury Vintage Cars" class="vehicle-icon">
+                                        <span>Luxury Vintage Cars</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Open Jeep (Decorated)">
+                                        <img src="attached_assets/images/open-jeep.webp" alt="Open Jeep (Decorated)" title="Open Jeep (Decorated)" class="vehicle-icon">
+                                        <span>Open Jeep (Decorated)</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="SUV/MUV for Baraat">
+                                        <img src="attached_assets/images/For-baraat.webp" alt="SUV/MUV for Baraat" title="SUV/MUV for Baraat" class="vehicle-icon">
+                                        <span>SUV/MUV for Weddings</span>
+                                    </label>
+                                    <label class="vehicle-option">
+                                        <input type="radio" name="vehicleType" value="Other Rental Vehicles">
+                                        <img src="attached_assets/images/other-rental-vehicles.webp" alt="Other Rental Vehicles" title="Other Rental Vehicles" class="vehicle-icon">
+                                        <span>Other Rental Vehicles</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -727,45 +936,62 @@
                     <div class="address-row">
                     <div class="state-select-wrapper" id="stateSelectWrapper">
                         <select id="state" name="state" required>
-                            <option value="">Select State</option>
-                            <option value="Andhra Pradesh">Andhra Pradesh</option>
-                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                            <option value="Assam">Assam</option>
-                            <option value="Bihar">Bihar</option>
-                            <option value="Chhattisgarh">Chhattisgarh</option>
-                            <option value="Goa">Goa</option>
-                            <option value="Gujarat">Gujarat</option>
-                            <option value="Haryana">Haryana</option>
-                            <option value="Himachal Pradesh">Himachal Pradesh</option>
-                            <option value="Jharkhand">Jharkhand</option>
-                            <option value="Karnataka">Karnataka</option>
-                            <option value="Kerala">Kerala</option>
-                            <option value="Madhya Pradesh">Madhya Pradesh</option>
-                            <option value="Maharashtra">Maharashtra</option>
-                            <option value="Manipur">Manipur</option>
-                            <option value="Meghalaya">Meghalaya</option>
-                            <option value="Mizoram">Mizoram</option>
-                            <option value="Nagaland">Nagaland</option>
-                            <option value="Odisha">Odisha</option>
-                            <option value="Punjab">Punjab</option>
-                            <option value="Rajasthan">Rajasthan</option>
-                            <option value="Sikkim">Sikkim</option>
-                            <option value="Tamil Nadu">Tamil Nadu</option>
-                            <option value="Telangana">Telangana</option>
-                            <option value="Tripura">Tripura</option>
-                            <option value="Uttar Pradesh">Uttar Pradesh</option>
-                            <option value="Uttarakhand">Uttarakhand</option>
-                            <option value="West Bengal">West Bengal</option>
-                            <option value="Delhi">Delhi</option>
+                            <option value="">Select State / UT</option>
+
+                            <optgroup label="States (28)">
+                                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                <option value="Assam">Assam</option>
+                                <option value="Bihar">Bihar</option>
+                                <option value="Chhattisgarh">Chhattisgarh</option>
+                                <option value="Goa">Goa</option>
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Haryana">Haryana</option>
+                                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                <option value="Jharkhand">Jharkhand</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Kerala">Kerala</option>
+                                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Manipur">Manipur</option>
+                                <option value="Meghalaya">Meghalaya</option>
+                                <option value="Mizoram">Mizoram</option>
+                                <option value="Nagaland">Nagaland</option>
+                                <option value="Odisha">Odisha</option>
+                                <option value="Punjab">Punjab</option>
+                                <option value="Rajasthan">Rajasthan</option>
+                                <option value="Sikkim">Sikkim</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Telangana">Telangana</option>
+                                <option value="Tripura">Tripura</option>
+                                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                <option value="Uttarakhand">Uttarakhand</option>
+                                <option value="West Bengal">West Bengal</option>
+                            </optgroup>
+
+                            <optgroup label="Union Territories (8)">
+                                <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                                <option value="Chandigarh">Chandigarh</option>
+                                <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                <option value="Ladakh">Ladakh</option>
+                                <option value="Lakshadweep">Lakshadweep</option>
+                                <option value="Puducherry">Puducherry</option>
+                            </optgroup>
                         </select>
-                        <button type="button" class="state-click-capture" id="stateClickCapture" aria-label="State (auto-filled)"></button>
                     </div>
-                        <input type="text" id="city" name="city" required placeholder="City">
+                        <select id="district" name="city" required>
+                            <option value="">Select District</option>
+                        </select>
                      </div>
                     <div class="pincode-row">
-                        <input type="text" id="pincode" name="pincode" required maxlength="6" placeholder="Pincode">
+                        <div class="pincode-select-wrapper" style="position:relative; flex: 1;">
+                            <input type="text" id="pincode" name="pincode" required maxlength="6" placeholder="Pincode">
+                            <button type="button" id="pincodeChevron" class="pin-chevron" aria-label="Toggle pincode list" style="display:none;"><i class="fas fa-chevron-down"></i></button>
+                            <div id="pincodeSuggestions" class="pin-suggestions" style="display:none;"></div>
+                        </div>
                         <button type="button" id="useLocationBtn" class="use-location-btn">Use Location</button>
-                        <button type="button" id="verifyPincodeBtn" class="verify-pincode-btn">Verify</button>
                     </div>
                 </div>
                 <div class="form-group terms">
@@ -803,7 +1029,7 @@
 
     <script src="env.js?v=20260108-1"></script>
     <script src="seo.js?v=20260108-1"></script>
-    <script src="register.js?v=20260108-1"></script>
+    <script src="register.js?v=20260117-1"></script>
     
     <script>
         // Smart URL conversion - automatically adds .html for local development

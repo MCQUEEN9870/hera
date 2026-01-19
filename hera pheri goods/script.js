@@ -18,23 +18,27 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 1500);
     }
 
-    // Get dropdown elements
-    const dropdown = document.querySelector(".dropdown");
-    const dropdownContent = document.querySelector(".dropdown-content");
-
-    if (dropdown && dropdownContent) {
-        dropdown.addEventListener("mouseseeker", function () {
-            // Calculate available space on the right side
+    // Get dropdown elements (support multiple dropdowns)
+    const dropdowns = document.querySelectorAll('.glass-nav .dropdown');
+    dropdowns.forEach((dropdown) => {
+        const dropdownContent = dropdown.querySelector('.dropdown-content');
+        if (!dropdownContent) return;
+        const adjust = () => {
             const rect = dropdown.getBoundingClientRect();
             const rightSpace = window.innerWidth - rect.left;
-
-            // Adjust dropdown position if not enough space on the right
             if (rightSpace < 400) {
-                dropdownContent.style.left = "auto";
-                dropdownContent.style.right = "0";
+                dropdownContent.style.left = 'auto';
+                dropdownContent.style.right = '0';
+            } else {
+                dropdownContent.style.left = '';
+                dropdownContent.style.right = '';
             }
-        });
-    }
+        };
+        // Use common events (the previous custom event was unreliable)
+        dropdown.addEventListener('mouseenter', adjust, { passive: true });
+        dropdown.addEventListener('focusin', adjust, { passive: true });
+        dropdown.addEventListener('touchstart', adjust, { passive: true });
+    });
 });
 
 // Glass navbar scroll behavior (home page only)
@@ -42,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const glassNav = document.querySelector('.glass-nav');
     if (!glassNav) return;
     // ensure dropdown stays attached to viewport under fixed nav on resize
-    const dropdownContent = document.querySelector('.glass-nav .dropdown .dropdown-content');
+    const dropdownContents = document.querySelectorAll('.glass-nav .dropdown .dropdown-content');
     const toggleScrolled = () => {
         if (window.scrollY > 40) glassNav.classList.add('scrolled');
         else glassNav.classList.remove('scrolled');
@@ -57,8 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const shouldIgnore = () => {
         // Do not hide when dropdown or mobile menu is open
         const mobileSidebar = document.querySelector('.mobile-sidebar');
-        const dropdownActive = document.querySelector('.dropdown.active');
-        return (dropdownActive && dropdownActive.classList.contains('active')) ||
+        const anyDropdownActive = document.querySelectorAll('.glass-nav .dropdown.active').length > 0;
+        return anyDropdownActive ||
                (mobileSidebar && mobileSidebar.classList.contains('open'));
     };
     const applyNavState = (scrollY) => {
@@ -93,18 +97,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, { passive: true });
     window.addEventListener('resize', () => {
-        if (!dropdownContent) return;
-        if (window.innerWidth <= 768) {
-            dropdownContent.style.position = 'fixed';
-            dropdownContent.style.top = (glassNav.offsetHeight) + 'px';
-            dropdownContent.style.right = '12px';
-            dropdownContent.style.left = 'auto';
-        } else {
-            dropdownContent.style.position = '';
-            dropdownContent.style.top = '';
-            dropdownContent.style.right = '';
-            dropdownContent.style.left = '';
-        }
+        if (!dropdownContents || dropdownContents.length === 0) return;
+        dropdownContents.forEach((dropdownContent) => {
+            if (window.innerWidth <= 768) {
+                dropdownContent.style.position = 'fixed';
+                dropdownContent.style.top = (glassNav.offsetHeight) + 'px';
+                dropdownContent.style.right = '12px';
+                dropdownContent.style.left = 'auto';
+            } else {
+                dropdownContent.style.position = '';
+                dropdownContent.style.top = '';
+                dropdownContent.style.right = '';
+                dropdownContent.style.left = '';
+            }
+        });
     });
 
     // Mobile sidebar toggle
@@ -211,32 +217,38 @@ document.querySelectorAll(".nav-item").forEach((item) => {
 
 // Truck Type Dropdown Toggle
 document.addEventListener('DOMContentLoaded', function() {
-    const truckTypeBtn = document.querySelector('.truck-type-btn');
-    const dropdown = document.querySelector('.dropdown');
+    const dropdowns = document.querySelectorAll('.glass-nav .dropdown');
+    if (!dropdowns || dropdowns.length === 0) return;
 
-    if (!truckTypeBtn || !dropdown) return;
+    const closeAll = () => dropdowns.forEach(d => d.classList.remove('active'));
 
-    // Toggle dropdown on truck type button tap/click (works on mobile + desktop)
-    const onToggle = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dropdown.classList.toggle('active');
-    };
-    truckTypeBtn.addEventListener('click', onToggle, { passive: false });
-    truckTypeBtn.addEventListener('touchstart', onToggle, { passive: false });
+    dropdowns.forEach((dropdown) => {
+        const toggle = dropdown.querySelector('.vehicle-nav-toggle');
+        if (!toggle) return;
 
-    // Prevent clicks inside dropdown from bubbling to document (so it doesn't close immediately)
-    const dropdownContent = dropdown.querySelector('.dropdown-content');
-    if (dropdownContent) {
-        dropdownContent.addEventListener('click', (e) => e.stopPropagation());
-        dropdownContent.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
-    }
+        const onToggle = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const willOpen = !dropdown.classList.contains('active');
+            closeAll();
+            if (willOpen) dropdown.classList.add('active');
+        };
+        toggle.addEventListener('click', onToggle, { passive: false });
+        toggle.addEventListener('touchstart', onToggle, { passive: false });
 
-    // Close dropdown when clicking/tapping outside
-    const closeIfOutside = (e) => {
-        if (!dropdown.contains(e.target)) {
-            dropdown.classList.remove('active');
+        const dropdownContent = dropdown.querySelector('.dropdown-content');
+        if (dropdownContent) {
+            dropdownContent.addEventListener('click', (e) => e.stopPropagation());
+            dropdownContent.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
         }
+    });
+
+    const closeIfOutside = (e) => {
+        // Close if click not inside any dropdown
+        for (const d of dropdowns) {
+            if (d.contains(e.target)) return;
+        }
+        closeAll();
     };
     document.addEventListener('click', closeIfOutside, { passive: true });
     document.addEventListener('touchstart', closeIfOutside, { passive: true });
@@ -374,8 +386,8 @@ document.addEventListener("DOMContentLoaded", function() {
 // Vehicle Category Flip Cards Enhancement
 document.addEventListener('DOMContentLoaded', function() {
     const flipCards = document.querySelectorAll('.flip-card');
-    const truckTypeBtn = document.querySelector('.truck-type-btn');
-    const dropdown = document.querySelector('.dropdown');
+    const truckTypeBtn = document.querySelector('.vehicle-nav-toggle[data-vehicle-category="goods"]') || document.querySelector('.vehicle-nav-toggle');
+    const dropdown = document.querySelector('.glass-nav .dropdown[data-vehicle-category="goods"]') || document.querySelector('.glass-nav .dropdown');
     
     // Add touch support for mobile devices
     flipCards.forEach(card => {
@@ -445,8 +457,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Wait for the scroll to complete before opening dropdown
             setTimeout(() => {
-                // Get the truck type button
-                const truckTypeBtn = document.querySelector('.truck-type-btn');
+                // Goods cards should open the Goods Vehicles dropdown
+                const truckTypeBtn = document.querySelector('.vehicle-nav-toggle[data-vehicle-category="goods"]') || document.querySelector('.vehicle-nav-toggle');
                 
                 // Simulate click on the truck type button to open dropdown
                 if (truckTypeBtn) {
@@ -454,7 +466,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // After dropdown is open, scroll to the appropriate category
                     setTimeout(() => {
-                        const categoryElement = findCategoryElement(category);
+                        const goodsDropdown = document.querySelector('.glass-nav .dropdown[data-vehicle-category="goods"]') || document.querySelector('.glass-nav .dropdown');
+                        const categoryElement = findCategoryElement(category, goodsDropdown);
                         if (categoryElement) {
                             // Smooth scroll to the category
                             categoryElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -468,8 +481,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Function to find the appropriate category in the dropdown
-    function findCategoryElement(category) {
-        const dropdownContent = document.querySelector('.dropdown-content');
+    function findCategoryElement(category, dropdownRoot) {
+        const root = dropdownRoot || document.querySelector('.glass-nav .dropdown');
+        if (!root) return null;
+        const dropdownContent = root.querySelector('.dropdown-content');
+        if (!dropdownContent) return null;
         const categories = dropdownContent.querySelectorAll('.category');
         
             // Map card categories to dropdown categories

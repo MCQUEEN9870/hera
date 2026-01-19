@@ -108,6 +108,17 @@ public class PostalLookupService {
         }
         return sb.toString().trim();
     }
+
+    private static String normalizeStateKey(String s) {
+        if (s == null) return "";
+        String t = s.trim().toLowerCase();
+        if (t.isEmpty()) return "";
+        // Normalize common variations: '&' vs 'and', punctuation, extra spaces
+        t = t.replace("&", " and ");
+        t = t.replaceAll("[^a-z0-9]+", " ");
+        t = t.replaceAll("\\s+", " ").trim();
+        return t;
+    }
     
     /**
      * Fetch all pincodes for a given district and state.
@@ -154,6 +165,7 @@ public class PostalLookupService {
             }
             
             List<PincodeDetails> pincodes = new ArrayList<>();
+            final String requestedStateKey = normalizeStateKey(state);
             for (Object o : offices) {
                 if (!(o instanceof Map)) continue;
                 
@@ -164,10 +176,23 @@ public class PostalLookupService {
                 String officeName = str(office.get("Name"));
                 String officeDistrict = clean(str(office.get("District")));
                 String officeState = clean(str(office.get("State")));
-                
-                // Filter by state if provided
-                if (state != null && !state.trim().isEmpty()) {
-                    if (officeState == null || !officeState.equalsIgnoreCase(state.trim())) {
+
+                // Filter by state if provided (tolerant compare)
+                if (!requestedStateKey.isEmpty()) {
+                    String officeStateKey = normalizeStateKey(officeState);
+                    boolean match = officeStateKey.equals(requestedStateKey);
+
+                    // Common India Post variant: "Nct Of Delhi" for Delhi
+                    if (!match && "delhi".equals(requestedStateKey) && "nct of delhi".equals(officeStateKey)) {
+                        match = true;
+                    }
+
+                    // Sometimes Ladakh post offices may still be tagged under Jammu and Kashmir
+                    if (!match && "ladakh".equals(requestedStateKey) && "jammu and kashmir".equals(officeStateKey)) {
+                        match = true;
+                    }
+
+                    if (!match) {
                         continue;
                     }
                 }

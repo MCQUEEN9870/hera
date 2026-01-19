@@ -2476,12 +2476,9 @@ display: flex;
 
 /* Vehicle Categories Section with Flip Cards */
 .vehicle-categories-section {
-    padding: 60px 20px;
-    background: #fff;
     max-width: 1200px;
     margin: 0px auto;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .section-title {
