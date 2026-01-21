@@ -1,6 +1,40 @@
 // Driver Dashboard JavaScript
 
 document.addEventListener('DOMContentLoaded', function() {
+    let isForcedLogoutInProgress = false;
+
+    function clearAuthStorage() {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userPhone');
+        localStorage.removeItem('userMembership');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('lastSelectedVehicleId');
+    }
+
+    function forceLogout(reason) {
+        if (isForcedLogoutInProgress) return;
+        isForcedLogoutInProgress = true;
+        clearAuthStorage();
+        const next = reason ? `login?reason=${encodeURIComponent(reason)}` : 'login';
+        window.location.href = next;
+    }
+
+    function maybeForceLogoutOnAuthError(response) {
+        if (!response) return false;
+        const status = response.status;
+
+        // 401/403 => token missing/expired/invalid. 404 on /api/users/{phone} => account deleted.
+        if (status === 401 || status === 403) {
+            forceLogout('session_expired');
+            return true;
+        }
+        if (status === 404) {
+            forceLogout('account_deleted');
+            return true;
+        }
+        return false;
+    }
+
     // Escape user-controlled strings before inserting into HTML.
     function escapeHtml(value) {
         return String(value ?? '')
@@ -165,10 +199,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if user is authenticated
     function checkAuth() {
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        const token = localStorage.getItem('authToken');
+        const phone = localStorage.getItem('userPhone');
         if (!isLoggedIn) {
             // If not logged in, redirect to login page
             alert('Please login to access the dashboard');
             window.location.href = 'login';
+            return false;
+        }
+        if (!token || !phone) {
+            forceLogout('session_invalid');
             return false;
         }
         return true;
@@ -223,6 +263,9 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 if (!response.ok) {
+                    if (maybeForceLogoutOnAuthError(response)) {
+                        throw new Error('Auth invalid; redirecting');
+                    }
                     throw new Error('Failed to fetch user data');
                 }
                 return response.json();
@@ -284,6 +327,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     togglePremiumSections();
             })
             .catch(error => {
+                if (isForcedLogoutInProgress) return;
                 console.error('Error fetching user data:', error);
                 
                 // Show error state in user info area
@@ -2530,44 +2574,69 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Check if the vehicle still exists
             fetch(getApiUrl(`vehicles/${vehicleId}`))
-                .then(response => {
-                    if (response.status === 404) {
-                        // 404 means vehicle is deleted - success!
-                        console.log(`Verified: Vehicle ${vehicleId} was successfully deleted`);
-                        return;
+                .then(async response => {
+                    if (maybeForceLogoutOnAuthError(response)) {
+                        throw new Error('Auth invalid; redirecting');
                     }
-                    
+
+                    // Backend should return 404 when not found. Some older versions returned 400.
+                    if (response.status === 404) {
+                        console.log(`Verified: Vehicle ${vehicleId} was successfully deleted`);
+                        return { deleted: true };
+                    }
+
+                    if (response.status === 400) {
+                        try {
+                            const data = await response.json();
+                            const msg = String(data?.message || '').toLowerCase();
+                            if (msg.includes('not found')) {
+                                console.log(`Verified: Vehicle ${vehicleId} was successfully deleted`);
+                                return { deleted: true };
+                            }
+                        } catch (_e) {
+                            // ignore
+                        }
+                    }
+
                     if (response.ok) {
                         // Vehicle still exists - deletion failed
                         console.warn(`Vehicle ${vehicleId} still exists after deletion attempt`);
-                        
-                        // Retry if we haven't reached max retries
-                        if (retryCount < maxRetries) {
-                            retryCount++;
-                            console.log(`Retrying deletion for vehicle ${vehicleId} (attempt ${retryCount + 1})`);
-                            
-                            // Retry the deletion with the force-delete endpoint
-                            fetch(getApiUrl(`vehicles/force-delete/${vehicleId}`), {
-                                method: 'DELETE',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                }
-                            })
-                            .then(deleteResponse => {
-                                console.log(`Retry deletion response: ${deleteResponse.status}`);
-                                // Check again after a delay
-                                setTimeout(checkAndRetry, 1000);
-                            })
-                            .catch(error => {
-                                console.error(`Error during retry deletion: ${error}`);
-                            });
-                        } else {
-                            console.error(`Failed to delete vehicle ${vehicleId} after ${maxRetries + 1} attempts`);
-                            showToast('Vehicle may not have been fully deleted. Please refresh the page.', 'warning');
-                        }
+                        return { deleted: false };
+                    }
+
+                    // Unexpected non-OK
+                    console.warn(`Unexpected response while verifying deletion (status=${response.status})`);
+                    return { deleted: null };
+                })
+                .then(result => {
+                    if (!result || result.deleted !== false) return;
+
+                    // Retry if we haven't reached max retries
+                    if (retryCount < maxRetries) {
+                        retryCount++;
+                        console.log(`Retrying deletion for vehicle ${vehicleId} (attempt ${retryCount + 1})`);
+
+                        // Retry the deletion with the force-delete endpoint
+                        fetch(getApiUrl(`vehicles/force-delete/${vehicleId}`), {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(deleteResponse => {
+                            console.log(`Retry deletion response: ${deleteResponse.status}`);
+                            setTimeout(checkAndRetry, 1000);
+                        })
+                        .catch(error => {
+                            console.error(`Error during retry deletion: ${error}`);
+                        });
+                    } else {
+                        console.error(`Failed to delete vehicle ${vehicleId} after ${maxRetries + 1} attempts`);
+                        showToast('Vehicle may not have been fully deleted. Please refresh the page.', 'warning');
                     }
                 })
                 .catch(error => {
+                    if (isForcedLogoutInProgress) return;
                     console.error(`Error verifying vehicle deletion: ${error}`);
                 });
         }
@@ -2582,7 +2651,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!selectedCard) return;
         
         const vehicleId = selectedCard.getAttribute('data-vehicle');
-        const vehicle = vehicles.find(v => v.id === vehicleId);
+        const vehicle = vehicles.find(v => String(v.id) === String(vehicleId));
         
         if (vehicle) {
             showConfirmModal(
@@ -2595,95 +2664,85 @@ document.addEventListener('DOMContentLoaded', function() {
                     const loadingToast = showToast('Deleting vehicle...', 'info', false);
                     
                     console.log(`Attempting to delete vehicle with ID: ${vehicleId}`);
-                    
-                    // Use XMLHttpRequest for better control over the request
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('DELETE', getApiUrl(`vehicles/delete/${vehicleId}`), true);
-                    xhr.setRequestHeader('Content-Type', 'application/json');
-                    
-                    xhr.onload = function() {
-                        // Remove loading toast
-                        if (loadingToast && loadingToast.remove) {
-                            loadingToast.remove();
+
+                    // Use fetch so env.js can auto-attach Authorization: Bearer <authToken>
+                    fetch(getApiUrl(`vehicles/delete/${vehicleId}`), {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
                         }
-                        
-                        console.log(`Delete vehicle response status: ${xhr.status}`);
-                        
-                        if (xhr.status >= 200 && xhr.status < 300) {
-                            try {
-                                const data = JSON.parse(xhr.responseText);
-                                console.log('Delete vehicle response data:', data);
-                                
-                                if (data.success) {
-                                    // Remove from our array
-                                    const index = vehicles.findIndex(v => v.id === vehicleId);
-                                    if (index > -1) {
-                                        vehicles.splice(index, 1);
-                                    }
-                                    
-                                    // Update UI
-                                    selectedCard.remove();
-                                    
-                                    // Select another vehicle if available
-                                    const remainingCards = document.querySelectorAll('.vehicle-card');
-                                    if (remainingCards.length > 0) {
-                                        const firstVehicleId = remainingCards[0].getAttribute('data-vehicle');
-                                        const firstVehicle = vehicles.find(v => v.id === firstVehicleId);
-                                        selectVehicle(firstVehicle);
-                                        remainingCards[0].classList.add('selected');
-                                    } else {
-                                        // Hide details if no vehicles left
-                                        document.getElementById('vehicleDetails').style.display = 'none';
-                                    }
-                                    
-                                    // Update vehicle limit notice
-                                    updateVehicleLimitNotice();
-                                    
-                                    // Show success message
-                                    showToast('Vehicle deleted successfully');
-                                    
-                                    // Verify deletion was successful
-                                    verifyVehicleDeletion(vehicleId);
-                                } else {
-                                    // Show error message
-                                    console.error('Server returned success:false for vehicle deletion:', data);
-                                    showToast(data.message || 'Failed to delete vehicle', 'error');
-                                }
-                            } catch (error) {
-                                console.error('Error parsing response:', error);
-                                showToast('Error processing server response', 'error');
+                    })
+                    .then(async response => {
+                        console.log(`Delete vehicle response status: ${response.status}`);
+                        if (maybeForceLogoutOnAuthError(response)) {
+                            throw new Error('Auth invalid; redirecting');
+                        }
+
+                        let data = {};
+                        try {
+                            data = await response.json();
+                        } catch (_e) {
+                            data = {};
+                        }
+
+                        if (!response.ok) {
+                            const msg = data?.message || `Failed to delete vehicle (HTTP ${response.status})`;
+                            throw new Error(msg);
+                        }
+                        return data;
+                    })
+                    .then(data => {
+                        console.log('Delete vehicle response data:', data);
+
+                        if (!data || !data.success) {
+                            console.error('Server returned success:false for vehicle deletion:', data);
+                            showToast(data?.message || 'Failed to delete vehicle', 'error');
+                            return;
+                        }
+
+                        // Remove from our array
+                        const index = vehicles.findIndex(v => String(v.id) === String(vehicleId));
+                        if (index > -1) {
+                            vehicles.splice(index, 1);
+                        }
+
+                        // Update UI
+                        selectedCard.remove();
+
+                        // Select another vehicle if available
+                        const remainingCards = document.querySelectorAll('.vehicle-card');
+                        if (remainingCards.length > 0) {
+                            const firstVehicleId = remainingCards[0].getAttribute('data-vehicle');
+                            const firstVehicle = vehicles.find(v => String(v.id) === String(firstVehicleId)) || vehicles[0];
+                            if (firstVehicle) {
+                                selectVehicle(firstVehicle);
+                                remainingCards[0].classList.add('selected');
                             }
                         } else {
-                            console.error(`Server returned error status: ${xhr.status}`);
-                            showToast(`Failed to delete vehicle (${xhr.status})`, 'error');
+                            // Hide details if no vehicles left
+                            const detailsEl = document.getElementById('vehicleDetails');
+                            if (detailsEl) detailsEl.style.display = 'none';
                         }
-                    };
-                    
-                    xhr.onerror = function() {
-                        // Remove loading toast
+
+                        // Update vehicle limit notice
+                        updateVehicleLimitNotice();
+
+                        // Show success message
+                        showToast('Vehicle deleted successfully');
+
+                        // Verify deletion was successful
+                        verifyVehicleDeletion(vehicleId);
+                    })
+                    .catch(error => {
+                        if (isForcedLogoutInProgress) return;
+                        console.error('Error during vehicle deletion:', error);
+                        showToast(error?.message || 'Failed to delete vehicle', 'error');
+                    })
+                    .finally(() => {
                         if (loadingToast && loadingToast.remove) {
                             loadingToast.remove();
                         }
-                        
-                        console.error('Network error during vehicle deletion');
-                        showToast('Network error. Please check your connection.', 'error');
-                    };
-                    
-                    xhr.ontimeout = function() {
-                        // Remove loading toast
-                        if (loadingToast && loadingToast.remove) {
-                            loadingToast.remove();
-                        }
-                        
-                        console.error('Timeout during vehicle deletion');
-                        showToast('Request timed out. Server may be busy.', 'error');
-                    };
-                    
-                    // Set timeout to 30 seconds
-                    xhr.timeout = 30000;
-                    
-                    // Send the request
-                    xhr.send();
+                    });
                 }
             );
         }
@@ -3104,6 +3163,7 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('userPhone');
             // Also remove userMembership to prevent it from affecting new users
             localStorage.removeItem('userMembership');
+            localStorage.removeItem('authToken');
             window.location.href = 'index';
                 }, 1500);
         }
@@ -3185,15 +3245,40 @@ document.addEventListener('DOMContentLoaded', function() {
                                 'Content-Type': 'application/json'
                             }
                         })
-                        .then(response => response.json())
+                        .then(async response => {
+                            // If session is invalid, force logout and stop.
+                            if (response.status === 401 || response.status === 403) {
+                                throw response;
+                            }
+
+                            let data = {};
+                            try {
+                                data = await response.json();
+                            } catch (_e) {
+                                data = {};
+                            }
+
+                            // If user is already deleted, treat as success and clear local session.
+                            if (response.status === 404) {
+                                return { success: true, message: 'Account already deleted' };
+                            }
+
+                            if (!response.ok) {
+                                const msg = (data && data.message) ? data.message : `Delete failed (HTTP ${response.status})`;
+                                throw new Error(msg);
+                            }
+
+                            return data;
+                        })
                         .then(data => {
-                            if (data.success) {
+                            if (data && data.success) {
                                 // Success! Account deleted
                                 // Clear local storage
                                 localStorage.removeItem('isLoggedIn');
                                 localStorage.removeItem('userPhone');
                                 // Also remove userMembership to prevent it from affecting new users
                                 localStorage.removeItem('userMembership');
+                                localStorage.removeItem('authToken');
                                 
                                 // Redirect after animation completes
                                 setTimeout(() => {
@@ -3213,6 +3298,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         })
                         .catch(error => {
+                            // If we threw the Response for auth failure above, it will be caught here.
+                            if (error && typeof error.status === 'number') {
+                                if (error.status === 401 || error.status === 403) {
+                                    // Session invalid; clear local state and redirect.
+                                    localStorage.removeItem('isLoggedIn');
+                                    localStorage.removeItem('userPhone');
+                                    localStorage.removeItem('userMembership');
+                                    localStorage.removeItem('authToken');
+                                    window.location.href = 'login?reason=session_expired';
+                                    return;
+                                }
+                            }
                             // Remove animation
                             document.body.removeChild(animationContainer);
                             if (document.head.contains(style)) {
@@ -4243,6 +4340,9 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (!response.ok) {
+                if (maybeForceLogoutOnAuthError(response)) {
+                    throw new Error('Auth invalid; redirecting');
+                }
                 throw new Error(`Server responded with status: ${response.status}`);
             }
             return response.json();
@@ -4371,6 +4471,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
+            if (isForcedLogoutInProgress) return;
             console.error('Error fetching vehicles:', error);
             showErrorState('Connection Error', 'Could not connect to the server to load your vehicles. Please check your internet connection.');
         });

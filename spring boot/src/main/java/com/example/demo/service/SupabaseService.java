@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Iterator;
+import java.util.HashSet;
+import java.util.Set;
 
 import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
@@ -73,6 +75,10 @@ public class SupabaseService {
     @Value("${supabase.deleted.profiles.bucket.name:deleted-profiles}")
     private String deletedProfilesBucketName;
 
+    // Single private bucket for all deleted-user evidence (vehicles + rc/dl + profile, etc.)
+    @Value("${supabase.deleted.evidence.bucket.name:deleted-evidence}")
+    private String deletedEvidenceBucketName;
+
     // Bucket names for RC and Driving License documents
     @Value("${supabase.rc.bucket.name:rc}")
     private String rcBucketName;
@@ -108,29 +114,38 @@ public class SupabaseService {
     @PostConstruct
     public void init() {
         log.info("Initializing SupabaseService...");
-        
-        // Ensure all required buckets exist
+
+        // Ensure all required buckets exist (best-effort). Creating buckets requires a service-role key.
+        ensureBucketExistsSafe(bucketName, true);
+        ensureBucketExistsSafe(profileBucketName, true);
+        ensureBucketExistsSafe(deletedImagesBucketName, true);
+        ensureBucketExistsSafe(deletedProfilesBucketName, true);
+        ensureBucketExistsSafe(deletedEvidenceBucketName, false);
+        // Best-effort: force private for evidence bucket (must not be publicly readable)
+        try { ensureBucketPrivate(deletedEvidenceBucketName); } catch (Exception ignore) {}
+        ensureBucketExistsSafe(rcBucketName, true);
+        ensureBucketExistsSafe(dlBucketName, true);
+
+        // Ensure posts bucket
+        if (postsBucketName == null || postsBucketName.isBlank()) {
+            postsBucketName = bucketName;
+            log.debug("Posts bucket not configured; defaulting to main bucket");
+        } else {
+            ensureBucketExistsSafe(postsBucketName, true);
+            log.debug("Using dedicated posts bucket");
+        }
+        // Best-effort: ensure posts bucket is public so public URLs work
+        try { ensureBucketPublic(postsBucketName); } catch (Exception ignore) {}
+
+        log.info("Supabase bucket verification completed");
+    }
+
+    private void ensureBucketExistsSafe(String bucket, boolean isPublic) {
         try {
-            ensureBucketExists(bucketName);
-            ensureBucketExists(profileBucketName);
-            ensureBucketExists(deletedImagesBucketName);
-            ensureBucketExists(deletedProfilesBucketName);
-            ensureBucketExists(rcBucketName);
-            ensureBucketExists(dlBucketName);
-            // Ensure posts bucket
-            if (postsBucketName == null || postsBucketName.isBlank()) {
-                postsBucketName = bucketName;
-                log.debug("Posts bucket not configured; defaulting to main bucket");
-            } else {
-                ensureBucketExists(postsBucketName);
-                log.debug("Using dedicated posts bucket");
-            }
-            // Best-effort: ensure posts bucket is public so public URLs work
-            try { ensureBucketPublic(postsBucketName); } catch (Exception ignore) {}
-            log.info("Supabase buckets verified");
-        } catch (IOException e) {
-            log.warn("Error ensuring buckets exist: {}", e.getMessage(), e);
-            // Continue initialization despite bucket creation failures
+            ensureBucketExists(bucket, isPublic);
+        } catch (Exception e) {
+            // Common cause: using anon key instead of service-role key.
+            log.warn("Could not ensure Supabase bucket exists (bucket={}, public={}): {}", bucket, isPublic, e.getMessage());
         }
     }
 
@@ -157,6 +172,35 @@ public class SupabaseService {
                 try (Response resp2 = client.newCall(requestPut).execute()) {
                     if (!resp2.isSuccessful()) {
                         log.debug("Bucket public update failed (status {}): {}", resp2.code(), resp2.message());
+                    }
+                }
+            }
+        }
+    }
+
+    private void ensureBucketPrivate(String bucket) throws IOException {
+        String json = "{\"public\": false}";
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), json);
+        Request request = new Request.Builder()
+                .url(supabaseUrl + "/storage/v1/bucket/" + bucket)
+                .addHeader("apikey", supabaseKey)
+                .addHeader("Authorization", "Bearer " + supabaseKey)
+                .addHeader("Content-Type", "application/json")
+                .patch(body)
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                log.debug("Could not set bucket private via PATCH (status {}) — will try PUT", response.code());
+                Request requestPut = new Request.Builder()
+                        .url(supabaseUrl + "/storage/v1/bucket/" + bucket)
+                        .addHeader("apikey", supabaseKey)
+                        .addHeader("Authorization", "Bearer " + supabaseKey)
+                        .addHeader("Content-Type", "application/json")
+                        .put(body)
+                        .build();
+                try (Response resp2 = client.newCall(requestPut).execute()) {
+                    if (!resp2.isSuccessful()) {
+                        log.debug("Bucket private update failed (status {}): {}", resp2.code(), resp2.message());
                     }
                 }
             }
@@ -259,6 +303,13 @@ public class SupabaseService {
     }
     
     private void ensureBucketExists(String bucket) throws IOException {
+        ensureBucketExists(bucket, true);
+    }
+
+    private void ensureBucketExists(String bucket, boolean isPublic) throws IOException {
+        if (bucket == null || bucket.isBlank()) {
+            throw new IOException("Bucket name is blank");
+        }
         retryWithBackoff(() -> {
             // First check if bucket exists
             Request checkRequest = new Request.Builder()
@@ -271,7 +322,8 @@ public class SupabaseService {
             try (Response response = client.newCall(checkRequest).execute()) {
                 if (!response.isSuccessful() && response.code() == 404) {
                     // Bucket doesn't exist, create it
-                    String bucketConfig = "{\"name\": \"" + bucket + "\", \"public\": true}";
+                    // Supabase expects id + name; using both makes creation reliable across API versions.
+                    String bucketConfig = "{\"id\": \"" + bucket + "\", \"name\": \"" + bucket + "\", \"public\": " + (isPublic ? "true" : "false") + "}";
                     RequestBody body = RequestBody.create(MediaType.parse("application/json"), bucketConfig);
                     
                     Request createRequest = new Request.Builder()
@@ -284,7 +336,8 @@ public class SupabaseService {
                     
                     try (Response createResponse = client.newCall(createRequest).execute()) {
                         if (!createResponse.isSuccessful()) {
-                            throw new IOException("Failed to create bucket " + bucket + ": " + createResponse.message());
+                            String resp = createResponse.body() != null ? createResponse.body().string() : "";
+                            throw new IOException("Failed to create bucket " + bucket + " (status=" + createResponse.code() + "): " + createResponse.message() + (resp.isBlank() ? "" : (" :: " + resp)));
                         }
                         log.debug("Created bucket in Supabase storage");
                     }
@@ -1327,104 +1380,106 @@ public class SupabaseService {
         log.debug("Deleting files with prefix (normalized) in Supabase storage");
         // Normalise prefix: ensure trailing slash so Supabase list treats it as folder
         String normalizedPrefix = prefix.endsWith("/") ? prefix : prefix + "/";
-        int filesDeleted = 0;
-        boolean anyFound = false;
-        
         try {
-            // Supabase Storage list API expects POST with JSON body, not GET with query params.
-            String listUrl = supabaseUrl + "/storage/v1/object/list/" + bucketName;
-            String jsonBody = "{\"prefix\":\"" + normalizedPrefix + "\",\"limit\":1000,\"offset\":0,\"sortBy\":{\"column\":\"name\",\"order\":\"asc\"}}";
-            RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonBody);
-            Request listRequest = new Request.Builder()
-                    .url(listUrl)
-                    .addHeader("apikey", supabaseKey)
-                    .addHeader("Authorization", "Bearer " + supabaseKey)
-                    .post(body)
-                    .build();
-            
-            try (Response response = client.newCall(listRequest).execute()) {
-                if (!response.isSuccessful()) {
-                    log.debug("Primary list POST failed (status={}); attempting legacy GET fallback", response.code());
-                } else {
-                    String responseBody = response.body() != null ? response.body().string() : "[]";
-                    JsonNode fileList = objectMapper.readTree(responseBody);
-                    if (fileList.size() == 0) {
-                        log.debug("No files returned via POST for prefix");
-                    } else {
-                        anyFound = true;
-                        log.debug("Found {} files via POST for prefix", fileList.size());
-                        for (JsonNode file : fileList) {
-                            String filePath = file.get("name").asText();
-                            // Sanity: only delete inside the folder
-                            if (!filePath.startsWith(prefix) && !filePath.startsWith(normalizedPrefix)) {
-                                continue;
-                            }
-                            Request deleteRequest = new Request.Builder()
-                                    .url(supabaseUrl + "/storage/v1/object/" + bucketName + "/" + filePath)
-                                    .addHeader("apikey", supabaseKey)
-                                    .addHeader("Authorization", "Bearer " + supabaseKey)
-                                    .delete()
-                                    .build();
-                            try (Response deleteResponse = client.newCall(deleteRequest).execute()) {
-                                if (!deleteResponse.isSuccessful() && deleteResponse.code() != 404) {
-                                    log.debug("Failed delete (status={}) for a file under prefix", deleteResponse.code());
-                                } else {
-                                    filesDeleted++;
-                                }
-                            }
-                        }
-                    }
-                }
+            int deleted = deleteFilesWithPrefixRecursive(normalizedPrefix, 0, new java.util.HashSet<>());
+            if (deleted > 0) {
+                log.debug("Deleted {} files for prefix", deleted);
             }
-            
-            // Fallback legacy GET (in case older storage behaviour or POST blocked)
-            if (!anyFound) {
-                Request legacyList = new Request.Builder()
-                        .url(supabaseUrl + "/storage/v1/object/list/" + bucketName + "?prefix=" + normalizedPrefix)
-                        .addHeader("apikey", supabaseKey)
-                        .addHeader("Authorization", "Bearer " + supabaseKey)
-                        .get()
-                        .build();
-                try (Response legacyResp = client.newCall(legacyList).execute()) {
-                    if (legacyResp.isSuccessful()) {
-                        String respBody = legacyResp.body() != null ? legacyResp.body().string() : "[]";
-                        JsonNode fileList = objectMapper.readTree(respBody);
-                        if (fileList.size() > 0) {
-                            anyFound = true;
-                            log.debug("Fallback GET found {} files for prefix", fileList.size());
-                            for (JsonNode file : fileList) {
-                                String filePath = file.get("name").asText();
-                                if (!filePath.startsWith(prefix) && !filePath.startsWith(normalizedPrefix)) {
-                                    continue;
-                                }
-                                Request deleteRequest = new Request.Builder()
-                                        .url(supabaseUrl + "/storage/v1/object/" + bucketName + "/" + filePath)
-                                        .addHeader("apikey", supabaseKey)
-                                        .addHeader("Authorization", "Bearer " + supabaseKey)
-                                        .delete()
-                                        .build();
-                                try (Response deleteResponse = client.newCall(deleteRequest).execute()) {
-                                    if (!deleteResponse.isSuccessful() && deleteResponse.code() != 404) {
-                                        log.debug("Failed delete (status={}) for a file under prefix", deleteResponse.code());
-                                    } else {
-                                        filesDeleted++;
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        log.debug("Legacy GET list failed (status={}) for prefix", legacyResp.code());
-                    }
-                }
-            }
+            return deleted > 0;
         } catch (Exception e) {
             log.debug("Exception during deletion for prefix: {}", e.toString());
+            return false;
+        }
+    }
+
+    private int deleteFilesWithPrefixRecursive(String normalizedPrefix, int depth, java.util.Set<String> visited) throws IOException {
+        // Prevent runaway recursion and loops
+        if (depth > 12) return 0;
+        if (normalizedPrefix == null || normalizedPrefix.isBlank()) return 0;
+        if (!normalizedPrefix.endsWith("/")) normalizedPrefix = normalizedPrefix + "/";
+        if (!visited.add(normalizedPrefix)) return 0;
+
+        JsonNode entries = listObjectsWithPrefix(normalizedPrefix);
+        if (entries == null || !entries.isArray() || entries.size() == 0) return 0;
+
+        int deletedCount = 0;
+
+        for (JsonNode entry : entries) {
+            if (entry == null || entry.get("name") == null) continue;
+            String name = entry.get("name").asText();
+            if (name == null || name.isBlank()) continue;
+
+            boolean isFolder = entry.has("id") && entry.get("id").isNull();
+            String fullPath;
+            if (name.startsWith(normalizedPrefix)) {
+                fullPath = name;
+            } else {
+                fullPath = normalizedPrefix + name;
+            }
+
+            if (isFolder || name.endsWith("/")) {
+                String childPrefix = fullPath.endsWith("/") ? fullPath : fullPath + "/";
+                deletedCount += deleteFilesWithPrefixRecursive(childPrefix, depth + 1, visited);
+                continue;
+            }
+
+            Request deleteRequest = new Request.Builder()
+                .url(supabaseUrl + "/storage/v1/object/" + bucketName + "/" + fullPath)
+                .addHeader("apikey", supabaseKey)
+                .addHeader("Authorization", "Bearer " + supabaseKey)
+                .delete()
+                .build();
+            try (Response deleteResponse = client.newCall(deleteRequest).execute()) {
+                if (!deleteResponse.isSuccessful() && deleteResponse.code() != 404) {
+                    log.debug("Failed delete (status={}) for a file under prefix", deleteResponse.code());
+                } else {
+                    deletedCount++;
+                }
+            }
         }
 
-        if (filesDeleted > 0) {
-            log.debug("Deleted {} files for prefix", filesDeleted);
+        return deletedCount;
+    }
+
+    private JsonNode listObjectsWithPrefix(String normalizedPrefix) throws IOException {
+        return listObjectsWithPrefix(bucketName, normalizedPrefix);
+    }
+
+    private JsonNode listObjectsWithPrefix(String bucket, String normalizedPrefix) throws IOException {
+        // Supabase Storage list API expects POST with JSON body. It returns *children* of prefix (not recursive).
+        String listUrl = supabaseUrl + "/storage/v1/object/list/" + bucket;
+        String jsonBody = "{\"prefix\":\"" + normalizedPrefix + "\",\"limit\":1000,\"offset\":0,\"sortBy\":{\"column\":\"name\",\"order\":\"asc\"}}";
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonBody);
+        Request listRequest = new Request.Builder()
+            .url(listUrl)
+            .addHeader("apikey", supabaseKey)
+            .addHeader("Authorization", "Bearer " + supabaseKey)
+            .post(body)
+            .build();
+
+        try (Response response = client.newCall(listRequest).execute()) {
+            if (response.isSuccessful()) {
+                String responseBody = response.body() != null ? response.body().string() : "[]";
+                return objectMapper.readTree(responseBody);
+            }
+            log.debug("Primary list POST failed (status={}); attempting legacy GET fallback", response.code());
         }
-        return filesDeleted > 0;
+
+        // Fallback legacy GET (in case POST blocked)
+        Request legacyList = new Request.Builder()
+            .url(supabaseUrl + "/storage/v1/object/list/" + bucket + "?prefix=" + normalizedPrefix)
+            .addHeader("apikey", supabaseKey)
+            .addHeader("Authorization", "Bearer " + supabaseKey)
+            .get()
+            .build();
+        try (Response legacyResp = client.newCall(legacyList).execute()) {
+            if (!legacyResp.isSuccessful()) {
+                log.debug("Legacy GET list failed (status={}) for prefix", legacyResp.code());
+                return objectMapper.readTree("[]");
+            }
+            String respBody = legacyResp.body() != null ? legacyResp.body().string() : "[]";
+            return objectMapper.readTree(respBody);
+        }
     }
     
     /**
@@ -1599,6 +1654,390 @@ public class SupabaseService {
      */
     public String uploadRcDocument(MultipartFile document, Long registrationId) throws IOException {
         return uploadDocumentToBucket(document, registrationId, rcBucketName, "rc");
+    }
+
+    // ----------------------------
+    // Deleted evidence (archive-before-delete)
+    // ----------------------------
+
+    private static final class ParsedSupabaseObject {
+        final String bucket;
+        final String path;
+        final String filename;
+
+        ParsedSupabaseObject(String bucket, String path) {
+            this.bucket = bucket;
+            this.path = path;
+            int idx = path != null ? path.lastIndexOf('/') : -1;
+            this.filename = (idx >= 0 && idx + 1 < path.length()) ? path.substring(idx + 1) : path;
+        }
+    }
+
+    private ParsedSupabaseObject parseSupabaseObjectUrl(String url) {
+        if (url == null || url.isBlank()) return null;
+        try {
+            String markerPublic = "/storage/v1/object/public/";
+            String markerObject = "/storage/v1/object/";
+            String tail;
+
+            int i = url.indexOf(markerPublic);
+            if (i >= 0) {
+                tail = url.substring(i + markerPublic.length());
+            } else {
+                i = url.indexOf(markerObject);
+                if (i < 0) return null;
+                tail = url.substring(i + markerObject.length());
+            }
+
+            String[] parts = tail.split("/", 2);
+            if (parts.length < 2) return null;
+            String bucket = parts[0];
+            String path = parts[1];
+            if (bucket == null || bucket.isBlank() || path == null || path.isBlank()) return null;
+            return new ParsedSupabaseObject(bucket, path);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private byte[] downloadObjectBytes(String bucket, String path) throws IOException {
+        Request request = new Request.Builder()
+            .url(supabaseUrl + "/storage/v1/object/" + bucket + "/" + path)
+            .addHeader("apikey", supabaseKey)
+            .addHeader("Authorization", "Bearer " + supabaseKey)
+            .get()
+            .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (response.code() == 404) return null;
+            if (!response.isSuccessful()) {
+                throw new IOException("Download failed (status=" + response.code() + ")");
+            }
+            return response.body() != null ? response.body().bytes() : null;
+        }
+    }
+
+    private void uploadObjectBytes(String bucket, String path, byte[] bytes, String contentType) throws IOException {
+        MediaType mt = MediaType.parse((contentType == null || contentType.isBlank()) ? "application/octet-stream" : contentType);
+        RequestBody body = RequestBody.create(mt, bytes != null ? bytes : new byte[0]);
+        Request request = new Request.Builder()
+            .url(supabaseUrl + "/storage/v1/object/" + bucket + "/" + path)
+            .addHeader("apikey", supabaseKey)
+            .addHeader("Authorization", "Bearer " + supabaseKey)
+            .put(body)
+            .build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Upload failed (status=" + response.code() + ")");
+            }
+        }
+    }
+
+    private void deleteObject(String bucket, String path) throws IOException {
+        Request request = new Request.Builder()
+            .url(supabaseUrl + "/storage/v1/object/" + bucket + "/" + path)
+            .addHeader("apikey", supabaseKey)
+            .addHeader("Authorization", "Bearer " + supabaseKey)
+            .delete()
+            .build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful() && response.code() != 404) {
+                throw new IOException("Delete failed (status=" + response.code() + ")");
+            }
+        }
+    }
+
+    private int collectKeysRecursive(String bucket, String normalizedPrefix, int depth, Set<String> visited, Set<String> keys) throws IOException {
+        if (depth > 12) return 0;
+        if (normalizedPrefix == null || normalizedPrefix.isBlank()) return 0;
+        if (!normalizedPrefix.endsWith("/")) normalizedPrefix = normalizedPrefix + "/";
+        if (!visited.add(bucket + "::" + normalizedPrefix)) return 0;
+
+        JsonNode entries = listObjectsWithPrefix(bucket, normalizedPrefix);
+        if (entries == null || !entries.isArray() || entries.size() == 0) return 0;
+
+        int found = 0;
+        for (JsonNode entry : entries) {
+            if (entry == null || entry.get("name") == null) continue;
+            String name = entry.get("name").asText();
+            if (name == null || name.isBlank()) continue;
+
+            boolean isFolder = entry.has("id") && entry.get("id").isNull();
+            String fullPath = name.startsWith(normalizedPrefix) ? name : (normalizedPrefix + name);
+
+            if (isFolder || name.endsWith("/")) {
+                String childPrefix = fullPath.endsWith("/") ? fullPath : fullPath + "/";
+                found += collectKeysRecursive(bucket, childPrefix, depth + 1, visited, keys);
+                continue;
+            }
+
+            if (keys.add(fullPath)) {
+                found++;
+            }
+        }
+
+        return found;
+    }
+
+    private Set<String> collectVehicleImageKeys(Long registrationId) {
+        Set<String> keys = new HashSet<>();
+        if (registrationId == null) return keys;
+
+        Set<String> visited = new HashSet<>();
+        List<String> prefixes = new ArrayList<>();
+
+        try {
+            List<RegistrationImageFolder> folders = registrationImageFolderRepository.findByRegistrationId(registrationId);
+            for (RegistrationImageFolder folder : folders) {
+                if (folder == null) continue;
+                String fp = folder.getFolderPath();
+                if (fp != null && !fp.isBlank()) {
+                    prefixes.add(fp);
+                    prefixes.add(fp + "/");
+                }
+            }
+        } catch (Exception _e) {
+            // best-effort
+        }
+
+        String id = registrationId.toString();
+        prefixes.add(id);
+        prefixes.add(id + "/");
+        prefixes.add("vehicles/" + id);
+        prefixes.add("vehicles/" + id + "/");
+        prefixes.add("vehicle/" + id);
+        prefixes.add("vehicle/" + id + "/");
+        prefixes.add("registration/" + id);
+        prefixes.add("registration/" + id + "/");
+
+        for (String p : prefixes) {
+            String normalized = p.endsWith("/") ? p : p + "/";
+            try {
+                collectKeysRecursive(bucketName, normalized, 0, visited, keys);
+            } catch (Exception _e) {
+                // best-effort
+            }
+        }
+
+        return keys;
+    }
+
+    private static String safeRelPathForRegistration(Long registrationId, String sourceKey) {
+        if (sourceKey == null) return "";
+        String key = sourceKey.startsWith("/") ? sourceKey.substring(1) : sourceKey;
+        String rid = registrationId != null ? registrationId.toString() : null;
+        if (rid != null) {
+            String p1 = rid + "/";
+            String p2 = "vehicles/" + rid + "/";
+            String p3 = "vehicle/" + rid + "/";
+            String p4 = "registration/" + rid + "/";
+            if (key.startsWith(p1)) return key.substring(p1.length());
+            if (key.startsWith(p2)) return key.substring(p2.length());
+            if (key.startsWith(p3)) return key.substring(p3.length());
+            if (key.startsWith(p4)) return key.substring(p4.length());
+        }
+        int idx = key.lastIndexOf('/');
+        return (idx >= 0 && idx + 1 < key.length()) ? key.substring(idx + 1) : key;
+    }
+
+    public Map<String, Object> archiveAndDeleteRegistrationEvidence(Long userId, Registration registration) {
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, Object>> archived = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
+        List<Map<String, String>> pendingDeletes = new ArrayList<>();
+
+        if (userId == null || registration == null || registration.getId() == null) {
+            result.put("archivedObjects", archived);
+            result.put("errors", errors);
+            result.put("success", false);
+            return result;
+        }
+
+        String userFolder = "user_" + userId;
+        Long registrationId = registration.getId();
+
+        // 1) Vehicle images (from main vehicle-images bucket)
+        Set<String> keys = collectVehicleImageKeys(registrationId);
+        for (String srcKey : keys) {
+            String rel = safeRelPathForRegistration(registrationId, srcKey);
+            String destKey = userFolder + "/vehicles/" + registrationId + "/" + rel;
+            Map<String, Object> row = new HashMap<>();
+            row.put("type", "vehicle-image");
+            row.put("sourceBucket", bucketName);
+            row.put("sourcePath", srcKey);
+            row.put("archiveBucket", deletedEvidenceBucketName);
+            row.put("archivePath", destKey);
+
+            try {
+                byte[] bytes = retryWithBackoff(() -> downloadObjectBytes(bucketName, srcKey), "download:" + srcKey);
+                if (bytes == null) {
+                    row.put("status", "missing");
+                } else {
+                    retryWithBackoff(() -> { uploadObjectBytes(deletedEvidenceBucketName, destKey, bytes, "application/octet-stream"); return null; }, "upload:" + destKey);
+                    row.put("status", "copied");
+                    pendingDeletes.add(Map.of("bucket", bucketName, "path", srcKey));
+                }
+            } catch (Exception e) {
+                row.put("status", "error");
+                row.put("error", e.getMessage());
+                errors.add("vehicle-image: " + srcKey + " -> " + e.getMessage());
+            }
+            archived.add(row);
+        }
+
+        // 2) RC and DL documents (based on URLs stored on registration)
+        try {
+            String rcUrl = registration.getRc();
+            ParsedSupabaseObject rcObj = parseSupabaseObjectUrl(rcUrl);
+            if (rcObj != null) {
+                String destKey = userFolder + "/docs/rc/" + registrationId + "/" + rcObj.filename;
+                Map<String, Object> row = new HashMap<>();
+                row.put("type", "rc");
+                row.put("sourceUrl", rcUrl);
+                row.put("sourceBucket", rcObj.bucket);
+                row.put("sourcePath", rcObj.path);
+                row.put("archiveBucket", deletedEvidenceBucketName);
+                row.put("archivePath", destKey);
+                try {
+                    byte[] bytes = retryWithBackoff(() -> downloadObjectBytes(rcObj.bucket, rcObj.path), "download:rc:" + registrationId);
+                    if (bytes != null) {
+                        retryWithBackoff(() -> { uploadObjectBytes(deletedEvidenceBucketName, destKey, bytes, "application/octet-stream"); return null; }, "upload:rc:" + registrationId);
+                        row.put("status", "copied");
+                        pendingDeletes.add(Map.of("bucket", rcObj.bucket, "path", rcObj.path));
+                    } else {
+                        row.put("status", "missing");
+                    }
+                } catch (Exception e) {
+                    row.put("status", "error");
+                    row.put("error", e.getMessage());
+                    errors.add("rc: " + e.getMessage());
+                }
+                archived.add(row);
+            }
+        } catch (Exception _e) {
+            // best-effort
+        }
+
+        try {
+            String dlUrl = registration.getD_l();
+            ParsedSupabaseObject dlObj = parseSupabaseObjectUrl(dlUrl);
+            if (dlObj != null) {
+                String destKey = userFolder + "/docs/dl/" + registrationId + "/" + dlObj.filename;
+                Map<String, Object> row = new HashMap<>();
+                row.put("type", "dl");
+                row.put("sourceUrl", dlUrl);
+                row.put("sourceBucket", dlObj.bucket);
+                row.put("sourcePath", dlObj.path);
+                row.put("archiveBucket", deletedEvidenceBucketName);
+                row.put("archivePath", destKey);
+                try {
+                    byte[] bytes = retryWithBackoff(() -> downloadObjectBytes(dlObj.bucket, dlObj.path), "download:dl:" + registrationId);
+                    if (bytes != null) {
+                        retryWithBackoff(() -> { uploadObjectBytes(deletedEvidenceBucketName, destKey, bytes, "application/octet-stream"); return null; }, "upload:dl:" + registrationId);
+                        row.put("status", "copied");
+                        pendingDeletes.add(Map.of("bucket", dlObj.bucket, "path", dlObj.path));
+                    } else {
+                        row.put("status", "missing");
+                    }
+                } catch (Exception e) {
+                    row.put("status", "error");
+                    row.put("error", e.getMessage());
+                    errors.add("dl: " + e.getMessage());
+                }
+                archived.add(row);
+            }
+        } catch (Exception _e) {
+            // best-effort
+        }
+
+        boolean allCopied = errors.isEmpty();
+        if (allCopied) {
+            for (Map<String, String> del : pendingDeletes) {
+                try {
+                    String b = del.get("bucket");
+                    String p = del.get("path");
+                    retryWithBackoff(() -> { deleteObject(b, p); return null; }, "delete:" + b + ":" + p);
+                } catch (Exception e) {
+                    // If deletion fails at this stage, report but keep copies.
+                    errors.add("delete-source: " + e.getMessage());
+                }
+            }
+        }
+
+        result.put("success", errors.isEmpty());
+        result.put("archivedObjects", archived);
+        result.put("errors", errors);
+        result.put("archiveBucket", deletedEvidenceBucketName);
+        result.put("archiveUserFolder", userFolder);
+        return result;
+    }
+
+    public Map<String, Object> archiveAndDeleteProfileEvidence(Long userId, String profilePhotoUrl) {
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, Object>> archived = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
+        List<Map<String, String>> pendingDeletes = new ArrayList<>();
+
+        if (userId == null || profilePhotoUrl == null || profilePhotoUrl.isBlank()) {
+            result.put("success", true);
+            result.put("archivedObjects", archived);
+            result.put("errors", errors);
+            return result;
+        }
+
+        String userFolder = "user_" + userId;
+        ParsedSupabaseObject obj = parseSupabaseObjectUrl(profilePhotoUrl);
+        if (obj == null) {
+            result.put("success", false);
+            result.put("archivedObjects", archived);
+            result.put("errors", List.of("Could not parse profilePhotoUrl"));
+            return result;
+        }
+
+        String destKey = userFolder + "/profile/" + obj.filename;
+        Map<String, Object> row = new HashMap<>();
+        row.put("type", "profile-photo");
+        row.put("sourceUrl", profilePhotoUrl);
+        row.put("sourceBucket", obj.bucket);
+        row.put("sourcePath", obj.path);
+        row.put("archiveBucket", deletedEvidenceBucketName);
+        row.put("archivePath", destKey);
+
+        try {
+            byte[] bytes = retryWithBackoff(() -> downloadObjectBytes(obj.bucket, obj.path), "download:profile:" + userId);
+            if (bytes != null) {
+                retryWithBackoff(() -> { uploadObjectBytes(deletedEvidenceBucketName, destKey, bytes, "application/octet-stream"); return null; }, "upload:profile:" + userId);
+                row.put("status", "copied");
+                pendingDeletes.add(Map.of("bucket", obj.bucket, "path", obj.path));
+            } else {
+                row.put("status", "missing");
+            }
+        } catch (Exception e) {
+            row.put("status", "error");
+            row.put("error", e.getMessage());
+            errors.add(e.getMessage());
+        }
+
+        archived.add(row);
+
+        if (errors.isEmpty()) {
+            for (Map<String, String> del : pendingDeletes) {
+                try {
+                    String b = del.get("bucket");
+                    String p = del.get("path");
+                    retryWithBackoff(() -> { deleteObject(b, p); return null; }, "delete:" + b + ":" + p);
+                } catch (Exception e) {
+                    errors.add("delete-source: " + e.getMessage());
+                }
+            }
+        }
+
+        result.put("success", errors.isEmpty());
+        result.put("archivedObjects", archived);
+        result.put("errors", errors);
+        result.put("archiveBucket", deletedEvidenceBucketName);
+        result.put("archiveUserFolder", userFolder);
+        return result;
     }
     
     /**

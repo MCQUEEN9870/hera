@@ -1955,6 +1955,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Logout and redirect to login
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('userPhone');
+            localStorage.removeItem('userMembership');
+            localStorage.removeItem('authToken');
             window.location.href = 'login';
         });
     }

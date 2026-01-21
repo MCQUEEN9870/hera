@@ -561,10 +561,10 @@ document.addEventListener('DOMContentLoaded', function () {
             function sync(btn, input){
                 const isVisible = input.type === 'text';
                 const icon = btn.querySelector('i');
-                // When visible, show "eye-slash" (tap to hide). When hidden, show "eye" (tap to show).
-                if (icon) icon.className = isVisible ? 'fas fa-eye-slash' : 'fas fa-eye';
+                // When visible, show "eye" (tap to hide). When hidden, show "eye-slash" (tap to show).
+                if (icon) icon.className = isVisible ? 'fas fa-eye' : 'fas fa-eye-slash';
                 btn.setAttribute('aria-pressed', String(isVisible));
-                btn.setAttribute('aria-label', isVisible ? 'Hide password' : 'Show password');
+                btn.setAttribute('aria-label', isVisible ? 'Show password' : 'Hide password');
             }
             document.querySelectorAll('.pw-eye[data-target]').forEach(function(btn){
                 if (btn.dataset.init === '1') return;

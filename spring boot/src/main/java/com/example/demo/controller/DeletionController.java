@@ -25,7 +25,10 @@ import com.example.demo.model.User;
 import com.example.demo.repository.RegistrationRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.SecurityUtils;
+import com.example.demo.service.DeletionAuditService;
 import com.example.demo.service.SupabaseService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Specialized controller for vehicle deletion operations
@@ -48,13 +51,21 @@ public class DeletionController {
     
     @Autowired
     private RegistrationRepository registrationRepository;
+
+    @Autowired
+    private DeletionAuditService deletionAuditService;
     
     /**
      * Main endpoint for vehicle deletion
      * Uses direct SQL with proper error handling
      */
+    // Internal helper for other controllers that don't have HttpServletRequest
+    public ResponseEntity<?> deleteVehicle(Long registrationId) {
+        return deleteVehicle(registrationId, null);
+    }
+
     @DeleteMapping("/vehicles/delete/{registrationId}")
-    public ResponseEntity<?> deleteVehicle(@PathVariable Long registrationId) {
+    public ResponseEntity<?> deleteVehicle(@PathVariable Long registrationId, HttpServletRequest request) {
         log.debug("Vehicle deletion requested (registrationId={})", registrationId);
         
         Map<String, Object> response = new HashMap<>();
@@ -76,6 +87,101 @@ public class DeletionController {
             }
             if (regOwnerCheck.getUserId() == null || !regOwnerCheck.getUserId().equals(currentUser.getId())) {
                 return SecurityUtils.forbidden("Forbidden");
+            }
+
+            // Archive evidence (vehicle images + RC/DL) to private deleted-evidence bucket BEFORE deleting anything.
+            Map<String, Object> archivalResult = null;
+            try {
+                archivalResult = supabaseService.archiveAndDeleteRegistrationEvidence(currentUser.getId(), regOwnerCheck);
+            } catch (Exception e) {
+                archivalResult = Map.of(
+                    "success", false,
+                    "errors", List.of("archive-exception: " + e.getMessage())
+                );
+            }
+
+            // If evidence archival fails, do not proceed with destructive deletion.
+            // This prevents losing the only copy of images/documents.
+            if (archivalResult != null) {
+                Object ok = archivalResult.get("success");
+                boolean success = ok instanceof Boolean ? (Boolean) ok : false;
+                if (!success) {
+                    response.put("success", false);
+                    response.put("message", "Temporary issue while deleting. Please try again shortly.");
+                    response.put("archival", archivalResult);
+                    return ResponseEntity.status(503).body(response);
+                }
+            }
+
+            // Audit snapshot (do not block deletion if audit fails)
+            try {
+                List<Map<String, Object>> folderRows = jdbcTemplate.queryForList(
+                    "SELECT folder_path FROM registration_image_folders WHERE registration_id = ?",
+                    registrationId
+                );
+                List<String> folderPaths = new ArrayList<>();
+                for (Map<String, Object> r : folderRows) {
+                    Object fp = r.get("folder_path");
+                    if (fp != null) {
+                        String s = fp.toString();
+                        if (!s.isBlank()) folderPaths.add(s);
+                    }
+                }
+
+                Map<String, Object> payload = new HashMap<>();
+                payload.put("action", "VEHICLE_DELETE");
+                payload.put("registrationId", regOwnerCheck.getId());
+                payload.put("userId", regOwnerCheck.getUserId());
+                payload.put("ownerContact", regOwnerCheck.getContactNumber());
+                payload.put("ownerName", regOwnerCheck.getFullName());
+                payload.put("vehicleType", regOwnerCheck.getVehicleType());
+                payload.put("vehiclePlateNumber", regOwnerCheck.getVehiclePlateNumber());
+                payload.put("state", regOwnerCheck.getState());
+                payload.put("city", regOwnerCheck.getCity());
+                payload.put("pincode", regOwnerCheck.getPincode());
+                payload.put("registrationDate", regOwnerCheck.getRegistrationDate() != null ? regOwnerCheck.getRegistrationDate().toString() : null);
+                payload.put("membership", regOwnerCheck.getMembership());
+                payload.put("rc", regOwnerCheck.getRc());
+                payload.put("d_l", regOwnerCheck.getD_l());
+                payload.put("vehicleImageUrls", regOwnerCheck.getVehicleImageUrls());
+
+                Map<String, Object> userSnapshot = new HashMap<>();
+                userSnapshot.put("id", currentUser.getId());
+                userSnapshot.put("contactNumber", currentUser.getContactNumber());
+                userSnapshot.put("fullName", currentUser.getFullName());
+                userSnapshot.put("email", currentUser.getEmail());
+                userSnapshot.put("membership", currentUser.getMembership());
+                userSnapshot.put("profilePhotoUrl", currentUser.getProfilePhotoUrl());
+                userSnapshot.put("joinDate", currentUser.getJoinDate() != null ? currentUser.getJoinDate().toString() : null);
+                payload.put("user", userSnapshot);
+
+                // Storage hints for manual cleanup (and debugging)
+                Map<String, Object> storage = new HashMap<>();
+                storage.put("bucket", "vehicle-images");
+                storage.put("folderPathsFromDb", folderPaths);
+                storage.put("prefixCandidates", List.of(
+                    registrationId.toString(),
+                    registrationId + "/",
+                    ".hidden_folder",
+                    registrationId + "/.hidden_folder/"
+                ));
+                payload.put("storage", storage);
+
+                if (archivalResult != null) {
+                    payload.put("archival", archivalResult);
+                }
+
+                deletionAuditService.record(
+                    "VEHICLE_DELETE",
+                    currentContact,
+                    currentUser.getContactNumber(),
+                    currentUser.getId(),
+                    registrationId,
+                    payload,
+                    request
+                );
+            } catch (Exception e) {
+                log.debug("Vehicle delete: audit snapshot failed (registrationId={}): {}", registrationId, e.toString());
             }
 
             // Step 1: Check if vehicle exists
@@ -102,15 +208,7 @@ public class DeletionController {
                 log.debug("Could not fetch vehicle details for logging (registrationId={}): {}", registrationId, e.toString());
             }
             
-            // Step 3: Delete images from Supabase storage first
-            try {
-                log.debug("Deleting vehicle images from storage (registrationId={})", registrationId);
-                supabaseService.deleteAllVehicleImages(registrationId);
-                log.debug("Deleted vehicle images from storage (registrationId={})", registrationId);
-            } catch (Exception e) {
-                log.warn("Error deleting vehicle images from storage (registrationId={}): {}", registrationId, e.toString());
-                // Continue with deletion even if image deletion fails
-            }
+            // Images/docs already archived+deleted from source bucket above (success enforced).
             
             // Step 4: Delete from registration_image_folders
             try {
@@ -182,8 +280,13 @@ public class DeletionController {
      * Emergency endpoint for vehicle deletion with foreign key checks disabled
      * This is a last resort method when normal deletion fails
      */
+    // Internal helper for other controllers that don't have HttpServletRequest
+    public ResponseEntity<?> forceDeleteVehicle(Long registrationId) {
+        return forceDeleteVehicle(registrationId, null);
+    }
+
     @DeleteMapping("/vehicles/force-delete/{registrationId}")
-    public ResponseEntity<?> forceDeleteVehicle(@PathVariable Long registrationId) {
+    public ResponseEntity<?> forceDeleteVehicle(@PathVariable Long registrationId, HttpServletRequest request) {
         log.warn("FORCE vehicle deletion requested (registrationId={})", registrationId);
         
         Map<String, Object> response = new HashMap<>();
@@ -205,6 +308,72 @@ public class DeletionController {
             }
             if (regOwnerCheck.getUserId() == null || !regOwnerCheck.getUserId().equals(currentUser.getId())) {
                 return SecurityUtils.forbidden("Forbidden");
+            }
+
+            // Audit snapshot (do not block deletion if audit fails)
+            try {
+                List<Map<String, Object>> folderRows = jdbcTemplate.queryForList(
+                    "SELECT folder_path FROM registration_image_folders WHERE registration_id = ?",
+                    registrationId
+                );
+                List<String> folderPaths = new ArrayList<>();
+                for (Map<String, Object> r : folderRows) {
+                    Object fp = r.get("folder_path");
+                    if (fp != null) {
+                        String s = fp.toString();
+                        if (!s.isBlank()) folderPaths.add(s);
+                    }
+                }
+
+                Map<String, Object> payload = new HashMap<>();
+                payload.put("action", "VEHICLE_FORCE_DELETE");
+                payload.put("registrationId", regOwnerCheck.getId());
+                payload.put("userId", regOwnerCheck.getUserId());
+                payload.put("ownerContact", regOwnerCheck.getContactNumber());
+                payload.put("ownerName", regOwnerCheck.getFullName());
+                payload.put("vehicleType", regOwnerCheck.getVehicleType());
+                payload.put("vehiclePlateNumber", regOwnerCheck.getVehiclePlateNumber());
+                payload.put("state", regOwnerCheck.getState());
+                payload.put("city", regOwnerCheck.getCity());
+                payload.put("pincode", regOwnerCheck.getPincode());
+                payload.put("registrationDate", regOwnerCheck.getRegistrationDate() != null ? regOwnerCheck.getRegistrationDate().toString() : null);
+                payload.put("membership", regOwnerCheck.getMembership());
+                payload.put("rc", regOwnerCheck.getRc());
+                payload.put("d_l", regOwnerCheck.getD_l());
+                payload.put("vehicleImageUrls", regOwnerCheck.getVehicleImageUrls());
+
+                Map<String, Object> userSnapshot = new HashMap<>();
+                userSnapshot.put("id", currentUser.getId());
+                userSnapshot.put("contactNumber", currentUser.getContactNumber());
+                userSnapshot.put("fullName", currentUser.getFullName());
+                userSnapshot.put("email", currentUser.getEmail());
+                userSnapshot.put("membership", currentUser.getMembership());
+                userSnapshot.put("profilePhotoUrl", currentUser.getProfilePhotoUrl());
+                userSnapshot.put("joinDate", currentUser.getJoinDate() != null ? currentUser.getJoinDate().toString() : null);
+                payload.put("user", userSnapshot);
+
+                Map<String, Object> storage = new HashMap<>();
+                storage.put("bucket", "vehicle-images");
+                storage.put("folderPathsFromDb", folderPaths);
+                storage.put("prefixCandidates", List.of(
+                    registrationId.toString(),
+                    registrationId + "/",
+                    ".hidden_folder",
+                    registrationId + "/.hidden_folder/"
+                ));
+                payload.put("storage", storage);
+
+                deletionAuditService.record(
+                    "VEHICLE_FORCE_DELETE",
+                    currentContact,
+                    currentUser.getContactNumber(),
+                    currentUser.getId(),
+                    registrationId,
+                    payload,
+                    request
+                );
+            } catch (Exception e) {
+                log.debug("Vehicle force-delete: audit snapshot failed (registrationId={}): {}", registrationId, e.toString());
             }
 
             // Step 1: Check if vehicle exists

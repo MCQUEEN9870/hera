@@ -26,8 +26,11 @@ import com.example.demo.model.User;
 import com.example.demo.repository.RegistrationRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.SecurityUtils;
+import com.example.demo.service.DeletionAuditService;
 import com.example.demo.service.RazorpayPaymentService;
 import com.example.demo.service.SupabaseService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +51,8 @@ public class UserController {
 
     @Autowired
     private SupabaseService supabaseService;
+    @Autowired
+    private DeletionAuditService deletionAuditService;
     
     @Autowired
     private UserRepository userRepository;
@@ -496,7 +501,7 @@ public class UserController {
      * Delete user account and all associated data
      */
     @DeleteMapping("/{contactNumber}")
-    public ResponseEntity<?> deleteUserAccount(@PathVariable String contactNumber) {
+    public ResponseEntity<?> deleteUserAccount(@PathVariable String contactNumber, HttpServletRequest request) {
         try {
             if (!SecurityUtils.isCurrentContact(contactNumber)) {
                 return SecurityUtils.forbidden("Forbidden");
@@ -512,12 +517,145 @@ public class UserController {
             }
             
             log.info("Account deletion requested (maskedContact={}, userId={})", maskPhone(contactNumber), user.getId());
+
+            // Archive evidence first (profile + each vehicle images + RC/DL) so admin can still inspect after deletion.
+            Map<String, Object> profileArchival = null;
+            List<Map<String, Object>> vehiclesArchival = new ArrayList<>();
+            boolean archiveOk = true;
+            try {
+                profileArchival = supabaseService.archiveAndDeleteProfileEvidence(user.getId(), user.getProfilePhotoUrl());
+                Object ok = profileArchival != null ? profileArchival.get("success") : null;
+                if (!(ok instanceof Boolean) || !((Boolean) ok)) {
+                    archiveOk = false;
+                }
+            } catch (Exception e) {
+                archiveOk = false;
+                profileArchival = Map.of("success", false, "errors", List.of("profile-archive-exception: " + e.getMessage()));
+            }
+
+            List<Registration> regsForAudit = registrationRepository.findByUserId(user.getId());
+            for (Registration r : regsForAudit) {
+                try {
+                    Map<String, Object> ar = supabaseService.archiveAndDeleteRegistrationEvidence(user.getId(), r);
+                    vehiclesArchival.add(Map.of(
+                        "registrationId", r.getId(),
+                        "result", ar
+                    ));
+                    Object ok = ar != null ? ar.get("success") : null;
+                    if (!(ok instanceof Boolean) || !((Boolean) ok)) {
+                        archiveOk = false;
+                    }
+                } catch (Exception e) {
+                    archiveOk = false;
+                    vehiclesArchival.add(Map.of(
+                        "registrationId", r.getId(),
+                        "result", Map.of("success", false, "errors", List.of("vehicle-archive-exception: " + e.getMessage()))
+                    ));
+                }
+            }
+
+            // Audit snapshot (do not block deletion if audit fails)
+            try {
+                String actor = SecurityUtils.currentContactOrNull();
+                Map<String, Object> payload = new HashMap<>();
+                payload.put("action", "ACCOUNT_DELETE");
+                payload.put("archiveOk", archiveOk);
+
+                Map<String, Object> userSnapshot = new HashMap<>();
+                userSnapshot.put("id", user.getId());
+                userSnapshot.put("contactNumber", user.getContactNumber());
+                userSnapshot.put("fullName", user.getFullName());
+                userSnapshot.put("email", user.getEmail());
+                userSnapshot.put("membership", user.getMembership());
+                userSnapshot.put("membershipPurchaseTime", user.getMembershipPurchaseTime() != null ? user.getMembershipPurchaseTime().toString() : null);
+                userSnapshot.put("membershipExpireTime", user.getMembershipExpireTime() != null ? user.getMembershipExpireTime().toString() : null);
+                userSnapshot.put("joinDate", user.getJoinDate() != null ? user.getJoinDate().toString() : null);
+                userSnapshot.put("verified", user.getVerified());
+                userSnapshot.put("profilePhotoUrl", user.getProfilePhotoUrl());
+                payload.put("user", userSnapshot);
+
+                List<Map<String, Object>> vehiclesSnapshot = new ArrayList<>();
+                for (Registration r : regsForAudit) {
+                    Map<String, Object> v = new HashMap<>();
+                    v.put("registrationId", r.getId());
+                    v.put("userId", r.getUserId());
+                    v.put("fullName", r.getFullName());
+                    v.put("contactNumber", r.getContactNumber());
+                    v.put("whatsappNumber", r.getWhatsappNumber());
+                    v.put("alternateContactNumber", r.getAlternateContactNumber());
+                    v.put("vehicleType", r.getVehicleType());
+                    v.put("vehiclePlateNumber", r.getVehiclePlateNumber());
+                    v.put("state", r.getState());
+                    v.put("city", r.getCity());
+                    v.put("pincode", r.getPincode());
+                    v.put("registrationDate", r.getRegistrationDate() != null ? r.getRegistrationDate().toString() : null);
+                    v.put("membership", r.getMembership());
+                    v.put("rc", r.getRc());
+                    v.put("d_l", r.getD_l());
+                    v.put("vehicleImageUrls", r.getVehicleImageUrls());
+
+                    // Folder paths recorded in DB (for manual reconciliation)
+                    try {
+                        List<Map<String, Object>> folderRows = jdbcTemplate.queryForList(
+                            "SELECT folder_path FROM registration_image_folders WHERE registration_id = ?",
+                            r.getId()
+                        );
+                        List<String> folderPaths = new ArrayList<>();
+                        for (Map<String, Object> fr : folderRows) {
+                            Object fp = fr.get("folder_path");
+                            if (fp != null) {
+                                String s = fp.toString();
+                                if (!s.isBlank()) folderPaths.add(s);
+                            }
+                        }
+                        v.put("folderPathsFromDb", folderPaths);
+                    } catch (Exception _e) {
+                        v.put("folderPathsFromDb", List.of());
+                    }
+
+                    Map<String, Object> storage = new HashMap<>();
+                    storage.put("bucket", "vehicle-images");
+                    storage.put("prefixCandidates", List.of(
+                        String.valueOf(r.getId()),
+                        r.getId() + "/",
+                        r.getId() + "/.hidden_folder/"
+                    ));
+                    v.put("storage", storage);
+                    vehiclesSnapshot.add(v);
+                }
+                payload.put("vehicles", vehiclesSnapshot);
+
+                payload.put("archival", Map.of(
+                    "profile", profileArchival,
+                    "vehicles", vehiclesArchival
+                ));
+
+                deletionAuditService.record(
+                    "ACCOUNT_DELETE",
+                    actor,
+                    user.getContactNumber(),
+                    user.getId(),
+                    null,
+                    payload,
+                    request
+                );
+            } catch (Exception e) {
+                log.debug("Account delete: audit snapshot failed (maskedContact={}, userId={}): {}", maskPhone(contactNumber), user.getId(), e.toString());
+            }
+
+            if (!archiveOk) {
+                return ResponseEntity.status(503).body(Map.of(
+                    "success", false,
+                    "message", "Temporary issue while deleting. Please try again shortly.",
+                    "archival", Map.of("profile", profileArchival, "vehicles", vehiclesArchival)
+                ));
+            }
             
             // Create a list to track any deletion errors
             List<String> deletionErrors = new ArrayList<>();
             
             // Find all registrations associated with this user by userId
-            List<Registration> userRegistrations = registrationRepository.findByUserId(user.getId());
+            List<Registration> userRegistrations = regsForAudit;
             log.info("Found registrations for account deletion (maskedContact={}, count={})", maskPhone(contactNumber), userRegistrations.size());
             
             // Clear the registration_user_id_fkey constraint
@@ -540,15 +678,7 @@ public class UserController {
                         // Continue with deletion
                     }
                     
-                    // Delete vehicle images from storage
-                    try {
-                        supabaseService.deleteRegistrationFolder(registration.getId());
-                        log.debug("Deleted vehicle images from storage (registrationId={})", registrationId);
-                    } catch (Exception e) {
-                        log.warn("Error deleting vehicle images from storage (registrationId={})", registrationId, e);
-                        deletionErrors.add("Some vehicle images could not be deleted for registrationId=" + registrationId);
-                        // Continue with deletion
-                    }
+                    // Images/docs already archived+deleted from source bucket above (success enforced).
                     
                     // Clear image URLs to avoid LOB issues
                     registration.setVehicleImageUrls(new ArrayList<>());
@@ -577,17 +707,7 @@ public class UserController {
                 }
             }
             
-            // Delete user's profile photo if exists
-            try {
-                if (user.getProfilePhotoUrl() != null && !user.getProfilePhotoUrl().isEmpty()) {
-                    supabaseService.deleteProfilePhoto(user.getProfilePhotoUrl());
-                    log.debug("Deleted profile photo from storage during account deletion (maskedContact={})", maskPhone(contactNumber));
-                }
-            } catch (Exception e) {
-                log.warn("Error deleting profile photo during account deletion (maskedContact={})", maskPhone(contactNumber), e);
-                deletionErrors.add("Profile photo could not be deleted from storage");
-                // Continue with user deletion
-            }
+            // Profile photo already archived+deleted from source bucket above (success enforced).
             
             try {
                 user.setProfilePhotoUrl(null);

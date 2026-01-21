@@ -214,7 +214,7 @@ public class VehicleController {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
             errorResponse.put("message", "Vehicle not found with ID: " + vehicleId);
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.status(404).body(errorResponse);
         }
         
         Registration registration = optionalRegistration.get();
