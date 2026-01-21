@@ -26,8 +26,8 @@
   <meta property="og:title" content="HerapheriGoods - Find & List Goods, Passenger & Rental Vehicles in India" />
   <meta name="twitter:title" content="HerapheriGoods - Find & List Goods, Passenger & Rental Vehicles in India" />
   <meta name="description" content="Find trucks, tempos, pickups, JCB, packers & movers, taxis/cabs, buses, wedding & VIP rental cars near you by pincode. Direct contact with owners. Free listing." />
-  <meta property="og:description" content="HerapheriGoods helps you find & list all types of vehicles: goods transport (trucks, tempos, pickups, refrigerated), passenger (taxis/cabs, tourist buses), and rental & events (wedding/VIP cars). Search by pincode and contact owners directly." />
-  <meta name="twitter:description" content="HerapheriGoods helps you find & list all types of vehicles: goods transport (trucks, tempos, pickups, refrigerated), passenger (taxis/cabs, tourist buses), and rental & events (wedding/VIP cars). Search by pincode and contact owners directly." />
+  <meta property="og:description" content="HerapheriGoods helps you find & list various types of vehicles: goods transport (trucks, tempos, pickups, refrigerated), passenger (taxis/cabs, tourist buses), and rental & events (wedding/VIP cars). Search by pincode and contact owners directly." />
+  <meta name="twitter:description" content="HerapheriGoods helps you find & list varioustypes of vehicles: goods transport (trucks, tempos, pickups, refrigerated), passenger (taxis/cabs, tourist buses), and rental & events (wedding/VIP cars). Search by pincode and contact owners directly." />
   <meta name="keywords" content="transport vehicles, goods transport, truck, tempo, mini truck, tata ace, pickup, bolero maxx, container truck, open body truck, closed body truck, trailer truck, tanker, tipper dumper, refrigerated truck, jcb, crane, packers and movers, courier parcel delivery, taxi, cab, ola uber cab, sedan taxi, suv taxi, innova crysta, ertiga, bus, tourist bus, ac bus, volvo bus, wedding car, vip car, vintage car, fortuner, thar, luxury car rental, local pincode vehicle" />
   
   <!-- Social Media Meta Tags -->
@@ -96,7 +96,23 @@
     <!-- External CSS and Font Awesome for icons -->
     <!-- Critical CSS inline (above-the-fold) to shorten critical request chain -->
       <style>
-      html{box-sizing:border-box;}*,*:before,*:after{box-sizing:inherit;}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#fff;color:#222;}h1{margin:0;font-size:clamp(1.9rem,5vw,3.2rem);line-height:1.15;font-weight:600;} .glass-nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:rgba(255,255,255,.72);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.06);} .hero-content-overlay{position:relative;z-index:2;padding-top:88px;} .hero-container{max-width:1180px;margin:0 auto;padding:0 18px;} .hero-content p{margin:14px 0 24px;font-size:clamp(.95rem,2.2vw,1.15rem);line-height:1.4;} .hero-btn{background:#ff9e1f;color:#fff;border:none;padding:14px 26px;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;box-shadow:0 4px 14px -3px rgba(255,158,31,.5);} .hero-btn:active{transform:scale(.96);} @media (max-width:680px){.glass-nav{padding:8px 14px;} .hero-content-overlay{padding-top:70px;} .hero-content p{margin:10px 0 20px;} .hero-btn{padding:12px 20px;font-size:.95rem;}}
+      html{box-sizing:border-box;}*,*:before,*:after{box-sizing:inherit;}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#fff;color:#222;}h1{margin:0;font-size:clamp(1.9rem,5vw,3.2rem);line-height:1.15;font-weight:600;}
+
+      /* Temporary downtime banner (homepage only) */
+      :root{--hpg-maintenance-height:44px;}
+      .hpg-maintenance-banner{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;gap:10px;min-height:var(--hpg-maintenance-height);padding:10px 16px;background:#2b2b2b;color:#fff;border-bottom:3px solid #e74c3c;}
+      .hpg-maintenance-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;background:#fff;color:#111;font-weight:800;flex:0 0 auto;}
+      .hpg-maintenance-text{font-size:14px;line-height:1.35;letter-spacing:.1px;}
+      .hpg-maintenance-text strong{font-weight:800;}
+      .hpg-maintenance-close{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;cursor:pointer;}
+      .hpg-maintenance-close:focus{outline:2px solid rgba(255,255,255,.7);outline-offset:2px;}
+      .hpg-maintenance-hidden{display:none !important;}
+
+      /* Push fixed nav + hero down when banner is visible */
+      .glass-nav{position:fixed;top:var(--hpg-maintenance-height);left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:rgba(255,255,255,.72);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.06);} .hero-content-overlay{position:relative;z-index:2;padding-top:calc(88px + var(--hpg-maintenance-height));} .hero-container{max-width:1180px;margin:0 auto;padding:0 18px;} .hero-content p{margin:14px 0 24px;font-size:clamp(.95rem,2.2vw,1.15rem);line-height:1.4;} .hero-btn{background:#ff9e1f;color:#fff;border:none;padding:14px 26px;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;box-shadow:0 4px 14px -3px rgba(255,158,31,.5);} .hero-btn:active{transform:scale(.96);} @media (max-width:680px){.glass-nav{padding:8px 14px;} .hero-content-overlay{padding-top:calc(70px + var(--hpg-maintenance-height));} .hero-content p{margin:10px 0 20px;} .hero-btn{padding:12px 20px;font-size:.95rem;}}
+
+      /* If banner is dismissed, remove offsets */
+      body.hpg-maintenance-dismissed{--hpg-maintenance-height:0px;}
 
       /* Snowfall overlay */
       #snowfallCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:10;}
@@ -407,6 +423,26 @@
   </head>
 
   <body>
+    <div id="hpgMaintenanceBanner" class="hpg-maintenance-banner" role="status" aria-live="polite">
+      <span class="hpg-maintenance-badge" aria-hidden="true">!</span>
+      <div class="hpg-maintenance-text">
+        <strong>Temporary Downtime</strong> — Our site is undergoing maintenance and will be back shortly. Team <strong>HerapheriGoods</strong>
+      </div>
+      <button id="hpgMaintenanceClose" class="hpg-maintenance-close" type="button" aria-label="Dismiss maintenance message">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <script>
+      (function () {
+        var closeBtn = document.getElementById('hpgMaintenanceClose');
+        var banner = document.getElementById('hpgMaintenanceBanner');
+        if (!closeBtn || !banner) return;
+        closeBtn.addEventListener('click', function () {
+          banner.classList.add('hpg-maintenance-hidden');
+          document.body.classList.add('hpg-maintenance-dismissed');
+        });
+      })();
+    </script>
     <!-- Snowfall overlay (landing page) -->
     <canvas id="snowfallCanvas" aria-hidden="true"></canvas>
     <nav class="navbar glass-nav">
@@ -1246,7 +1282,7 @@
       <div class="modal-content tutorial-content">
         <h3 style="margin-top: 4px;">New here? Watch a quick tutorial</h3>
         <p style="color:#555; margin: 8px 0 10px;">
-          वाहन रजिस्टर करना सीखें! नीचे दिए गए वीडियो को देखें और जानें की कैसे आप अपने ट्रक, मिनी ट्रक, टेम्पो, या अन्य ट्रांसपोर्ट वाहन को हमारे प्लेटफ़ॉर्म पर मुफ्त में रजिस्टर कर सकते हैं।
+          वाहन रजिस्टर करना सीखें! नीचे दिए गए वीडियो को देखें और जानें की कैसे आप अपने ट्रक, लोडर, टेम्पो, cabs&amp;A.C buses, rental car for royal wedding या अन्य ट्रांसपोर्ट वाहन को हमारे प्लेटफ़ॉर्म पर मुफ्त में रजिस्टर कर सकते हैं।
         </p>
   <a class="tutorial-illustration-link" href="https://youtu.be/FREi_Lb4gWY?si=pA-zy8ryJQ_TEgzC" target="_blank" rel="noopener noreferrer">
           <picture>
@@ -1642,7 +1678,7 @@
         event.preventDefault();
         
         const subject = 'Check out Herapherigoods';
-        const body = `Hi! I found this great platform for finding transport vehicles - Herapherigoods.
+        const body = `Hi! I found this great platform for finding various categories of transport vehicles - Herapherigoods.
         
 No middlemen, no extra charges. Visit https://herapherigoods.in
 
