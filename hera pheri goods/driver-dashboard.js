@@ -100,23 +100,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Add retry functionality to fetch requests
+    // Important: only treat *network* failures as "Connection Error".
+    // HTTP errors (401/403/404/500) mean the server responded and should be handled by callers.
     async function fetchWithRetry(url, options = {}, retries = 3) {
         try {
             const response = await fetch(url, options);
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+
+            // Retry only on transient server errors.
+            if (response.status >= 500 && retries > 0) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                return fetchWithRetry(url, options, retries - 1);
             }
+
             return response;
         } catch (error) {
             if (retries > 0) {
-                // Wait for 1 second before retrying
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 return fetchWithRetry(url, options, retries - 1);
-            } else {
-                // Show error modal after all retries fail
-                handleNetworkError();
-                throw error;
             }
+
+            // Only show connection modal when the request could not be made at all.
+            handleNetworkError('Could not connect to server. Please check your internet connection and try again.');
+            throw error;
         }
     }
     // Check authentication first
@@ -687,8 +692,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadingOverlay.style.display = 'flex';
                 
                 // Create FormData for file upload
+                // Backend expects @RequestParam("photo")
                 const formData = new FormData();
-                formData.append('profilePhoto', photoURL);
+                formData.append('photo', photoURL);
                 
                 // Get user phone number from localStorage
                 const userPhone = localStorage.getItem('userPhone');
@@ -754,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (error.message.includes('NetworkError') || 
                         error.message.includes('Failed to fetch') ||
                         error.message.includes('Network request failed')) {
-                        errorMessage += 'Could not connect to server. Please check if the backend server is running and your internet connection is working.';
+                        errorMessage += 'Could not connect to server. Please check your internet connection and try again.';
                     } else if (error.message.includes('status: 403') || 
                                error.message.includes('Forbidden')) {
                         errorMessage += 'Server permission error. Please try again later.';
@@ -3329,6 +3335,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize profile photo functionality
     function initProfilePhoto() {
+        // This file currently contains multiple init() paths; guard against double-binding events.
+        if (window.__hpgProfilePhotoInitDone) return;
+        window.__hpgProfilePhotoInitDone = true;
+
         const userAvatar = document.getElementById('userAvatar');
         const photoModal = document.getElementById('profilePhotoModal');
         const photoViewer = document.getElementById('profilePhotoViewer');
@@ -3410,43 +3420,44 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Helper function to check if API is reachable
+        // NOTE: "reachable" means the browser got *any* HTTP response.
+        // 401/403/404/405 still indicate the server is up; only network/timeout means unreachable.
         async function isApiReachable() {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
             try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-                
-                // Try multiple endpoints to check API connectivity
                 try {
-                    // First try the health check endpoint
-                    let response = await fetch(getApiUrl('health-check'), {
-                        method: 'HEAD',
+                    // Prefer GET: some servers/proxies block HEAD with 405.
+                    const response = await fetch(getApiUrl('health-check'), {
+                        method: 'GET',
+                        cache: 'no-store',
                         signal: controller.signal
                     });
-                    
-                    clearTimeout(timeoutId);
-                    if (response.ok || response.status === 404) {
-                        return true;
-                    }
+
+                    // Any HTTP response means the server was reached.
+                    if (response) return true;
                 } catch (e) {
-                    console.log("Health check failed, trying users endpoint");
+                    console.log('Health check failed, trying users endpoint');
                 }
-                
-                // If health check fails, try the users endpoint
+
                 const userPhone = localStorage.getItem('userPhone');
                 if (userPhone) {
                     const response = await fetch(getApiUrl(`users/${userPhone}`), {
-                        method: 'HEAD',
+                        method: 'GET',
+                        cache: 'no-store',
                         signal: controller.signal
                     });
-                    
-                    clearTimeout(timeoutId);
-                    return response.ok;
+
+                    return !!response;
                 }
-                
+
                 return false;
             } catch (error) {
                 console.error('API connectivity check failed:', error);
                 return false;
+            } finally {
+                clearTimeout(timeoutId);
             }
         }
 
@@ -3466,7 +3477,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Show detailed connection error with retry option
                     showConfirmModal(
                         'Connection Error',
-                        'Could not connect to server. The backend server appears to be offline or unreachable. Please check if the server is running and your internet connection is working.',
+                        'We could not reach the server right now. Please check your internet connection and try again in a moment.',
                         'Retry',
                         'Cancel',
                         () => {
@@ -3477,7 +3488,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             // Show alternative options when user cancels
                             showAlertModal(
                                 'Server Unavailable',
-                                'You can try again later when the server is available. Alternatively, you can restart the backend server if you have access to it.',
+                                'The server is temporarily unavailable. Please try again after some time.',
                                 'OK'
                             );
                         }
@@ -3512,25 +3523,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 } catch (error) {
                     console.error('Error uploading photo:', error);
-                    let errorMessage = 'Failed to upload photo. ';
+                    let errorMessage = 'Could not upload your photo right now. ';
                     
                     if (error.message.includes('NetworkError') || 
                         error.message.includes('Failed to fetch') ||
                         error.message.includes('Network request failed')) {
-                        errorMessage += 'Could not connect to server. Please check if the backend server is running and your internet connection is working.';
+                        errorMessage += 'Please check your internet connection and try again.';
                     } else if (error.message.includes('status: 403') || 
                                error.message.includes('Forbidden')) {
-                        errorMessage += 'Server permission error. Please try again later.';
+                        errorMessage += 'Please try again later.';
                     } else if (error.message.includes('CORS')) {
-                        errorMessage += 'Cross-origin request blocked. Please try again later.';
+                        errorMessage += 'Please try again later.';
                     } else {
-                        errorMessage += error.message;
+                        // Keep technical details out of the user message; log is already in console.
+                        errorMessage += 'Please try again later.';
                     }
                     
                     // Show error with more details and server status
                     showConfirmModal(
                         'Upload Error', 
-                        `${errorMessage}<br><br>Would you like to retry?`,
+                        `${errorMessage}<br><br>Would you like to try again?`,
                         'Retry',
                         'Cancel',
                         () => {
@@ -4514,6 +4526,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* Document Upload Section Functionality */
     function initDocumentUpload() {
+        // Guard against multiple init() paths that would bind events twice (causes file picker to open twice).
+        if (window.__hpgDocumentUploadInitDone) return;
+        window.__hpgDocumentUploadInitDone = true;
+
         // Get references to document upload elements
         const documentUploadModal = document.getElementById('documentUploadModal');
         const documentPreview = document.getElementById('documentPreview');
@@ -4530,13 +4546,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (rcUploadBtn) {
             rcUploadBtn.addEventListener('click', function() {
-                window.openDocumentModal('rc');
+                openDocumentModal('rc');
             });
         }
         
         if (licenseUploadBtn) {
             licenseUploadBtn.addEventListener('click', function() {
-                window.openDocumentModal('license');
+                openDocumentModal('license');
             });
         }
         
@@ -4570,8 +4586,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Initialize the flag
             documentPreview.dataset.fileJustSelected = 'false';
         }
-        
-        function openDocumentModal(documentType) { window.openDocumentModal(documentType); }
         
         function resetDocumentPreview() {
             if (!documentPreview || !documentFileInput || !submitDocumentUpload) return;
@@ -4762,8 +4776,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const statusElement = document.getElementById(`${documentType}Status`);
             if (!statusElement) return;
             
-            const statusBadge = statusElement.querySelector('.status-badge');
-            const uploadButton = statusElement.querySelector('.upload-document-btn');
+            const statusBadge = statusElement.querySelector('.status-badge, .status-pill');
+            const uploadButton = document.getElementById(documentType === 'rc' ? 'uploadRcBtn' : 'uploadLicenseBtn');
         
             // Get document URL from selectedVehicle if not provided
             if (!documentUrl && selectedVehicle) {
@@ -4785,21 +4799,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (statusBadge) {
-                statusBadge.className = 'status-badge ' + status;
+                statusBadge.className = statusBadge.classList.contains('status-pill') ? 'status-pill ' + status : 'status-badge ' + status;
                 
                 switch (status) {
                     case 'uploaded':
-                        statusBadge.textContent = 'Uploaded';
-                        statusBadge.className += ' success';
+                        statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> Uploaded';
+                        statusBadge.className += ' success uploaded';
                         break;
                     case 'verified':
-                        statusBadge.textContent = 'Verified';
+                        statusBadge.innerHTML = '<i class="fas fa-certificate"></i> Verified';
                         break;
                     case 'rejected':
-                        statusBadge.textContent = 'Rejected';
+                        statusBadge.innerHTML = '<i class="fas fa-times-circle"></i> Rejected';
                         break;
                     default:
-                        statusBadge.textContent = 'Not Uploaded';
+                        statusBadge.innerHTML = '<i class="fas fa-clock"></i> Not Uploaded';
+                        statusBadge.className += ' not_uploaded';
                 }
             }
             
@@ -4814,7 +4829,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Change button to "Uploaded"
                     uploadButton.innerHTML = '<i class="fas fa-check-circle"></i> Uploaded';
                     uploadButton.classList.add('document-uploaded-btn');
-                    uploadButton.classList.remove('upload-document-btn');
                     uploadButton.disabled = true;
                     
                     // Add document actions container if not exists
@@ -4837,9 +4851,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     actionsContainer.appendChild(deleteBtn);
                 } else {
                     // Reset to upload button
-                    uploadButton.innerHTML = '<i class="fas fa-upload"></i> Upload Document';
+                    uploadButton.innerHTML = uploadButton.classList.contains('doc-upload-btn')
+                        ? '<i class="fas fa-cloud-upload-alt"></i> <span>Upload Document</span>'
+                        : '<i class="fas fa-upload"></i> Upload Document';
                     uploadButton.classList.remove('document-uploaded-btn');
-                    uploadButton.classList.add('upload-document-btn');
                     uploadButton.disabled = false;
                     uploadButton.onclick = () => openDocumentModal(documentType);
                     
@@ -4850,7 +4865,36 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             }
+
+            // Update progress indicator
+            updateDocumentProgress();
     }
+
+    // Function to update document upload progress indicator
+    function updateDocumentProgress() {
+        const docProgressCircle = document.getElementById('docProgressCircle');
+        const docProgressText = document.getElementById('docProgressText');
+        const docsUploadedCount = document.getElementById('docsUploadedCount');
+        
+        if (!docProgressCircle || !docProgressText || !docsUploadedCount) return;
+        
+        // Count uploaded documents for current vehicle
+        let uploadedCount = 0;
+        const totalDocs = 2; // RC and License
+        
+        if (selectedVehicle) {
+            if (selectedVehicle.rc && selectedVehicle.rc.trim() !== '') uploadedCount++;
+            if (selectedVehicle.d_l && selectedVehicle.d_l.trim() !== '') uploadedCount++;
+        }
+        
+        const percentage = Math.round((uploadedCount / totalDocs) * 100);
+        
+        // Update circular progress
+        docProgressCircle.setAttribute('stroke-dasharray', `${percentage}, 100`);
+        docProgressText.textContent = `${percentage}%`;
+        docsUploadedCount.textContent = uploadedCount;
+    }
+
     
     // Function removed - Document preview functionality has been completely disabled
     
@@ -5070,18 +5114,24 @@ document.addEventListener('DOMContentLoaded', function() {
             rcStatusElement.dataset.vehicleId = vehicle.id;
             
             // Reset to default state
-            const rcStatusBadge = rcStatusElement.querySelector('.status-badge');
-            const rcUploadButton = rcStatusElement.querySelector('.upload-document-btn, .document-uploaded-btn');
+            const rcStatusBadge = rcStatusElement.querySelector('.status-badge, .status-pill');
+            const rcUploadButton = document.getElementById('uploadRcBtn');
             
             if (rcStatusBadge) {
-                rcStatusBadge.className = 'status-badge';
-                rcStatusBadge.textContent = 'Not Uploaded';
+                if (rcStatusBadge.classList.contains('status-pill')) {
+                    rcStatusBadge.className = 'status-pill not_uploaded';
+                    rcStatusBadge.innerHTML = '<i class="fas fa-clock"></i> Not Uploaded';
+                } else {
+                    rcStatusBadge.className = 'status-badge not_uploaded';
+                    rcStatusBadge.textContent = 'Not Uploaded';
+                }
             }
             
             if (rcUploadButton) {
-                rcUploadButton.innerHTML = '<i class="fas fa-upload"></i> Upload Document';
+                rcUploadButton.innerHTML = rcUploadButton.classList.contains('doc-upload-btn')
+                    ? '<i class="fas fa-cloud-upload-alt"></i> <span>Upload Document</span>'
+                    : '<i class="fas fa-upload"></i> Upload Document';
                 rcUploadButton.classList.remove('document-uploaded-btn');
-                rcUploadButton.classList.add('upload-document-btn');
                 rcUploadButton.disabled = false;
                 rcUploadButton.onclick = () => openDocumentModal('rc');
             }
@@ -5098,18 +5148,24 @@ document.addEventListener('DOMContentLoaded', function() {
             licenseStatusElement.dataset.vehicleId = vehicle.id;
             
             // Reset to default state
-            const licenseStatusBadge = licenseStatusElement.querySelector('.status-badge');
-            const licenseUploadButton = licenseStatusElement.querySelector('.upload-document-btn, .document-uploaded-btn');
+            const licenseStatusBadge = licenseStatusElement.querySelector('.status-badge, .status-pill');
+            const licenseUploadButton = document.getElementById('uploadLicenseBtn');
             
             if (licenseStatusBadge) {
-                licenseStatusBadge.className = 'status-badge';
-                licenseStatusBadge.textContent = 'Not Uploaded';
+                if (licenseStatusBadge.classList.contains('status-pill')) {
+                    licenseStatusBadge.className = 'status-pill not_uploaded';
+                    licenseStatusBadge.innerHTML = '<i class="fas fa-clock"></i> Not Uploaded';
+                } else {
+                    licenseStatusBadge.className = 'status-badge not_uploaded';
+                    licenseStatusBadge.textContent = 'Not Uploaded';
+                }
             }
             
             if (licenseUploadButton) {
-                licenseUploadButton.innerHTML = '<i class="fas fa-upload"></i> Upload Document';
+                licenseUploadButton.innerHTML = licenseUploadButton.classList.contains('doc-upload-btn')
+                    ? '<i class="fas fa-cloud-upload-alt"></i> <span>Upload Document</span>'
+                    : '<i class="fas fa-upload"></i> Upload Document';
                 licenseUploadButton.classList.remove('document-uploaded-btn');
-                licenseUploadButton.classList.add('upload-document-btn');
                 licenseUploadButton.disabled = false;
                 licenseUploadButton.onclick = () => openDocumentModal('license');
             }

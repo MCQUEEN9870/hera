@@ -25,6 +25,7 @@ import com.example.demo.security.JwtService;
 import com.example.demo.service.TwoFactorService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import com.example.demo.util.ClientIpUtil;
 
 @RestController
 @RequestMapping("/auth")
@@ -81,7 +82,7 @@ public class AuthController {
         // Optional CAPTCHA check in prod
         if (captchaEnabled) {
             String token = httpReq.getHeader("X-Captcha-Token");
-            String ip = httpReq.getRemoteAddr();
+            String ip = ClientIpUtil.getClientIp(httpReq);
             if (token == null || token.isEmpty() || !verifyCaptcha(token, ip)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("message", "Captcha verification failed"));
@@ -212,7 +213,7 @@ public class AuthController {
         // CAPTCHA is recommended for signup
         if (captchaEnabled) {
             String token = httpReq.getHeader("X-Captcha-Token");
-            String ip = httpReq.getRemoteAddr();
+            String ip = ClientIpUtil.getClientIp(httpReq);
             if (token == null || token.isEmpty() || !verifyCaptcha(token, ip)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("message", "Captcha verification failed"));
@@ -307,7 +308,7 @@ public class AuthController {
         // Optional CAPTCHA check in prod ONLY when doing OTP login (i.e., password not provided and explicitly requested)
         if (captchaEnabled && (password == null || password.isEmpty()) && otpLogin) {
             String token = httpReq.getHeader("X-Captcha-Token");
-            String ip = httpReq.getRemoteAddr();
+            String ip = ClientIpUtil.getClientIp(httpReq);
             if (token == null || token.isEmpty() || !verifyCaptcha(token, ip)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("message", "Captcha verification failed"));

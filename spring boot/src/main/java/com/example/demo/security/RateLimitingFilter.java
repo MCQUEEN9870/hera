@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
+
+import com.example.demo.util.ClientIpUtil;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
@@ -249,19 +251,8 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     }
 
     private String clientIp(HttpServletRequest request) {
-        // Respect common proxy headers (first IP wins). Do NOT trust for security identity, only for rate limiting.
-        String xff = request.getHeader("X-Forwarded-For");
-        if (StringUtils.hasText(xff)) {
-            String first = xff.split(",")[0].trim();
-            if (StringUtils.hasText(first)) {
-                return first;
-            }
-        }
-        String realIp = request.getHeader("X-Real-IP");
-        if (StringUtils.hasText(realIp)) {
-            return realIp.trim();
-        }
-        return request.getRemoteAddr();
+        String ip = ClientIpUtil.getClientIp(request);
+        return StringUtils.hasText(ip) ? ip : request.getRemoteAddr();
     }
 
     private void writeTooManyRequests(HttpServletResponse response, int retryAfterSeconds) throws IOException {
@@ -325,3 +316,4 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         }
     }
 }
+

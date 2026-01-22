@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.demo.util.ClientIpUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -36,7 +37,7 @@ public class DeletionAuditService {
     ) {
         String payloadJson = toJson(payload);
 
-        String actorIp = extractClientIp(request);
+        String actorIp = ClientIpUtil.getClientIp(request);
         String userAgent = request != null ? safeHeader(request, "User-Agent") : null;
 
         try {
@@ -77,24 +78,5 @@ public class DeletionAuditService {
         }
     }
 
-    private static String extractClientIp(HttpServletRequest request) {
-        if (request == null) return null;
-
-        // Common proxy headers
-        String xff = safeHeader(request, "X-Forwarded-For");
-        if (xff != null) {
-            // XFF can be: client, proxy1, proxy2
-            String first = xff.split(",")[0].trim();
-            if (!first.isBlank()) return first;
-        }
-
-        String xrip = safeHeader(request, "X-Real-IP");
-        if (xrip != null && !xrip.isBlank()) return xrip;
-
-        try {
-            return request.getRemoteAddr();
-        } catch (Exception _e) {
-            return null;
-        }
-    }
 }
+

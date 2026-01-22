@@ -16,6 +16,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.example.demo.model.ContactSubmission;
 import com.example.demo.repository.ContactSubmissionRepository;
+import com.example.demo.util.ClientIpUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -43,7 +44,10 @@ public class ContactController {
     @PostMapping
     public ResponseEntity<?> submit(@Valid @RequestBody ContactSubmission submission) {
         HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        String ip = getClientIp(req);
+        String ip = ClientIpUtil.getClientIp(req);
+        if (ip == null || ip.isBlank()) {
+            ip = "unknown";
+        }
         if (!allow(ip)) {
             return ResponseEntity.status(429).body("Too many requests. Please try again in a minute.");
         }
@@ -94,14 +98,6 @@ public class ContactController {
         }
     }
 
-    private static String getClientIp(HttpServletRequest request) {
-        String h = request.getHeader("X-Forwarded-For");
-        if (h != null && !h.isBlank()) {
-            return h.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
-    }
-
     private static class Window {
         long startMs;
         int count;
@@ -123,5 +119,6 @@ public class ContactController {
         }
     }
 }
+
 
 
