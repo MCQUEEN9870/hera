@@ -3,6 +3,7 @@ package com.example.demo.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -67,9 +68,24 @@ public class EmailService {
             log.info("Email sent (to={}, subject={})", maskEmail(to), subject);
         } catch (Exception e) {
             // Don't leak secrets; log minimal info.
-            log.error("Email send failed (to={}, subject={}): {}", maskEmail(to), subject, e.toString());
+            String smtp = "";
+            try {
+                if (mailSender instanceof JavaMailSenderImpl impl) {
+                    smtp = String.format(" (smtpHost=%s, smtpPort=%s, smtpUser=%s)",
+                        safe(impl.getHost()),
+                        impl.getPort(),
+                        maskEmail(impl.getUsername()));
+                }
+            } catch (Exception _ignored) {
+                // ignore
+            }
+            log.error("Email send failed (to={}, subject={}): {}{}", maskEmail(to), subject, e.toString(), smtp);
             throw new RuntimeException("Email send failed", e);
         }
+    }
+
+    private static String safe(String s) {
+        return s == null ? "" : s;
     }
 
     private static String maskEmail(String email) {
