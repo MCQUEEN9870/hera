@@ -16,6 +16,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.example.demo.model.ContactSubmission;
 import com.example.demo.repository.ContactSubmissionRepository;
+import com.example.demo.service.EmailService;
 import com.example.demo.util.ClientIpUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,10 @@ import jakarta.validation.Valid;
 public class ContactController {
 
     private final ContactSubmissionRepository repository;
+    private final EmailService emailService;
+
+    @Value("${mail.admin.to:info@herapherigoods.in}")
+    private String adminTo;
     @Value("${captcha.enabled:false}")
     private boolean captchaEnabled;
     @Value("${captcha.secret:}")
@@ -37,8 +42,9 @@ public class ContactController {
 
     private static final Map<String, Window> ipWindows = new ConcurrentHashMap<>();
 
-    public ContactController(ContactSubmissionRepository repository) {
+    public ContactController(ContactSubmissionRepository repository, EmailService emailService) {
         this.repository = repository;
+        this.emailService = emailService;
     }
 
     @PostMapping
@@ -79,7 +85,70 @@ public class ContactController {
         }
 
         ContactSubmission saved = repository.save(submission);
+
+        // Fire-and-forget style: try email, but do not block success if email fails.
+        try {
+            String safePhone = submission.getPhone() == null ? "" : submission.getPhone().trim();
+            String userEmail = submission.getEmail() == null ? "" : submission.getEmail().trim();
+
+            String adminSubject = "New Contact Submission: " + submission.getSubject();
+            String adminHtml = """
+                <div style=\"font-family:Arial,sans-serif;line-height:1.5\">
+                  <h2 style=\"margin:0 0 10px 0\">New Contact Submission</h2>
+                  <p><b>Name:</b> %s</p>
+                  <p><b>Email:</b> %s</p>
+                  <p><b>Phone:</b> %s</p>
+                  <p><b>Subject:</b> %s</p>
+                  <p><b>Message:</b><br/>%s</p>
+                  <hr/>
+                  <p style=\"color:#666\">IP: %s | Submission ID: %s</p>
+                </div>
+                """.formatted(
+                    escape(submission.getName()),
+                    escape(userEmail),
+                    escape(safePhone),
+                    escape(submission.getSubject()),
+                    escape(submission.getMessage()).replace("\n", "<br/>") ,
+                    escape(ip),
+                    saved.getId()
+                );
+
+            // Send admin notification with reply-to pointing to the user.
+            emailService.sendHtmlWithReplyTo(adminTo, adminSubject, adminHtml, userEmail);
+
+            // Send acknowledgement to user
+            if (!userEmail.isBlank()) {
+                String ackSubject = "We received your message - Hera Pheri Goods";
+                String ackHtml = """
+                    <div style=\"font-family:Arial,sans-serif;line-height:1.6\">
+                      <p>Hi %s,</p>
+                      <p>Thanks for contacting Hera Pheri Goods. We received your message and will get back to you soon.</p>
+                      <p style=\"margin-top:14px\"><b>Your message:</b><br/>%s</p>
+                      <hr/>
+                      <p style=\"color:#666;font-size:12px\">This is an automated email from %s.</p>
+                    </div>
+                    """.formatted(
+                        escape(submission.getName()),
+                        escape(submission.getMessage()).replace("\n", "<br/>") ,
+                        "info@herapherigoods.in"
+                    );
+                emailService.sendHtml(userEmail, ackSubject, ackHtml);
+            }
+        } catch (Exception e) {
+            // Keep API success; log happens inside EmailService.
+        }
+
         return ResponseEntity.ok().body(saved.getId());
+    }
+
+    private static String escape(String s) {
+        if (s == null) return "";
+        return s
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&#39;");
     }
 
     private static boolean allow(String ip) {
