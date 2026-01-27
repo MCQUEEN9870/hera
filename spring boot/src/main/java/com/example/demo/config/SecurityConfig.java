@@ -126,6 +126,7 @@ public class SecurityConfig {
                 auth
                     .requestMatchers(HttpMethod.POST,
                         "/api/contact-submissions",
+                        "/api/mail/test",
                         "/api/save-feedback",
                         "/api/save-user-feedback"
                     ).permitAll();
