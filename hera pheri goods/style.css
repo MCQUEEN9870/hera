@@ -4301,7 +4301,7 @@ display: flex;
 .modal-header {
     background-color: #FFA500;
     color: white;
-    padding: 3px;
+    padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;

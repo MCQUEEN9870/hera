@@ -594,9 +594,33 @@ document.addEventListener('DOMContentLoaded', function () {
     const forgotLink = document.getElementById('forgotPasswordLink');
     const otpModal = document.getElementById('otpLoginModal');
     if (forgotLink && otpModal) {
+        // Method chooser modal
+        const methodModal = document.getElementById('forgotMethodModal');
+        const methodCloseBtn = document.getElementById('forgotMethodClose');
+        const chooseMobileBtn = document.getElementById('chooseMobileOtpBtn');
+        const chooseEmailBtn = document.getElementById('chooseEmailOtpBtn');
+
+        // Email OTP modal
+        const emailModal = document.getElementById('emailOtpModal');
+        const emailCloseBtn = document.getElementById('emailOtpClose');
+        const emailBackBtn = document.getElementById('emailOtpBack');
+        const emailInput = document.getElementById('emailOtpEmail');
+        const emailInputGroup = document.getElementById('emailOtpEmailGroup');
+        const emailOtpGroup = document.getElementById('emailOtpCodeGroup');
+        const emailOtpInput = document.getElementById('emailOtpCode');
+        const emailOtpTimerEl = document.getElementById('emailOtpTimer');
+        const emailResendRow = document.getElementById('emailOtpResendRow');
+        const emailResendBtn = document.getElementById('emailOtpResendBtn');
+        const emailPrimaryBtn = document.getElementById('emailOtpPrimaryBtn');
+        const emailNewPassBlock = document.getElementById('emailOtpNewPassBlock');
+        const emailNewPass = document.getElementById('emailOtpNewPassword');
+        const emailConfirmPass = document.getElementById('emailOtpConfirmPassword');
+        const emailSetNewPassBtn = document.getElementById('emailOtpSetNewPasswordBtn');
+
         const modalPhone = document.getElementById('otpLoginPhone');
         const modalOtp = document.getElementById('otpLoginOtp');
         const primaryBtn = document.getElementById('otpLoginPrimaryBtn');
+        const otpBackBtn = document.getElementById('otpLoginBack');
         const otpTimerEl = document.getElementById('otpLoginTimer');
         const otpGroupEl = document.getElementById('otpLoginOtpGroup');
         const newPassBlock = document.getElementById('otpLoginNewPassBlock');
@@ -611,9 +635,25 @@ document.addEventListener('DOMContentLoaded', function () {
         let isOtpSent = false;
         let otpFlowLocked = false; // prevents closing until password reset finishes
 
+        // Email OTP state
+        let emailTimerId = null;
+        let emailTimeLeft = 0;
+        let emailOtpSent = false;
+        let emailResetToken = '';
+        let currentForgotNumber = '';
+        let lastInvalidEmailToast = '';
+        let emailFlowLocked = false;
+
+        function setEmailHeaderLock(locked){
+            emailFlowLocked = !!locked;
+            if (emailCloseBtn) emailCloseBtn.style.display = locked ? 'none' : '';
+            if (emailBackBtn) emailBackBtn.style.display = locked ? 'none' : '';
+        }
+
         function openModal() { 
             otpModal.style.display = 'flex'; 
             otpFlowLocked = true;
+            if (otpBackBtn) otpBackBtn.style.display = '';
             // Pre-fill phone number from login form
             if (mobileInputEl && mobileInputEl.value) {
                 modalPhone.value = mobileInputEl.value;
@@ -624,6 +664,91 @@ document.addEventListener('DOMContentLoaded', function () {
             otpModal.style.display = 'none'; 
             resetModalState(); 
             otpFlowLocked = false;
+        }
+
+        function openMethodModal(){
+            if (!methodModal) return;
+            methodModal.style.display = 'flex';
+        }
+
+        function closeMethodModal(){
+            if (!methodModal) return;
+            methodModal.style.display = 'none';
+        }
+
+        function backToMethodFromOtp(){
+            closeModal();
+            openMethodModal();
+        }
+
+        function backToMethodFromEmail(){
+            closeEmailModal();
+            openMethodModal();
+        }
+
+        function stopEmailTimer(){
+            if (emailTimerId) {
+                clearInterval(emailTimerId);
+                emailTimerId = null;
+            }
+        }
+
+        function startEmailTimer(seconds){
+            stopEmailTimer();
+            emailTimeLeft = seconds;
+            if (emailOtpTimerEl) {
+                emailOtpTimerEl.style.display = 'inline';
+                emailOtpTimerEl.textContent = formatTime(emailTimeLeft);
+            }
+            if (emailResendBtn) emailResendBtn.disabled = true;
+            emailTimerId = setInterval(()=>{
+                emailTimeLeft--;
+                if (emailOtpTimerEl) emailOtpTimerEl.textContent = formatTime(emailTimeLeft);
+                if (emailTimeLeft <= 0) {
+                    stopEmailTimer();
+                    if (emailOtpTimerEl) emailOtpTimerEl.textContent = formatTime(0);
+                    if (emailResendBtn) emailResendBtn.disabled = false;
+                    emailOtpSent = false;
+                }
+            }, 1000);
+        }
+
+        function resetEmailModalState(){
+            stopEmailTimer();
+            emailOtpSent = false;
+            emailResetToken = '';
+            setEmailHeaderLock(false);
+            if (emailInput) {
+                emailInput.readOnly = false;
+            }
+            if (emailOtpTimerEl) emailOtpTimerEl.style.display = 'none';
+            if (emailResendRow) emailResendRow.style.display = 'none';
+            if (emailResendBtn) emailResendBtn.disabled = true;
+            if (emailOtpInput) emailOtpInput.value = '';
+            if (emailNewPass) emailNewPass.value = '';
+            if (emailConfirmPass) emailConfirmPass.value = '';
+            if (emailPrimaryBtn) {
+                emailPrimaryBtn.disabled = true;
+                emailPrimaryBtn.style.display = 'block';
+                emailPrimaryBtn.textContent = 'Send OTP';
+            }
+            if (emailInputGroup) emailInputGroup.style.display = 'block';
+            if (emailOtpGroup) emailOtpGroup.style.display = 'none';
+            if (emailNewPassBlock) emailNewPassBlock.style.display = 'none';
+            updateEmailPrimaryBtnState();
+        }
+
+        function openEmailModal(){
+            if (!emailModal) return;
+            resetEmailModalState();
+            emailModal.style.display = 'flex';
+            setTimeout(()=>{ try{ emailInput?.focus(); }catch(_){ } }, 0);
+        }
+
+        function closeEmailModal(){
+            if (!emailModal) return;
+            emailModal.style.display = 'none';
+            resetEmailModalState();
         }
         
         function resetModalState(){ 
@@ -680,19 +805,57 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Remove ability to close by clicking outside while locked
         otpModal.addEventListener('click', (e)=>{ if(!otpFlowLocked) { if(e.target===otpModal) closeModal(); } });
+
+        if (methodCloseBtn && methodModal) {
+            methodCloseBtn.addEventListener('click', function(){ closeMethodModal(); });
+            methodModal.addEventListener('click', function(e){ if (e.target === methodModal) closeMethodModal(); });
+        }
+
+        if (emailCloseBtn && emailModal) {
+            emailCloseBtn.addEventListener('click', function(){
+                if (emailFlowLocked) return;
+                closeEmailModal();
+            });
+            emailModal.addEventListener('click', function(e){
+                if (emailFlowLocked) return;
+                if (e.target === emailModal) closeEmailModal();
+            });
+        }
+
+        if (emailBackBtn) {
+            emailBackBtn.addEventListener('click', function(){
+                if (emailFlowLocked) return;
+                backToMethodFromEmail();
+            });
+        }
+
+        if (otpBackBtn) {
+            otpBackBtn.addEventListener('click', function(){
+                backToMethodFromOtp();
+            });
+        }
         
         forgotLink.addEventListener('click', async function(e){
             e.preventDefault();
-            const number = mobileInputEl.value.trim();
+            // Prefer the verified number from the 2-step login flow (when password field is visible)
+            const number = ((typeof verifiedContactNumber === 'string' && verifiedContactNumber)
+                ? verifiedContactNumber
+                : (mobileInputEl.value || '')).trim();
             if (!validateMobile(number)) { 
                 showToast('Enter valid 10-digit mobile', 'error'); 
                 return; 
             }
-            // Correct existence check: use user profile endpoint instead of /auth/login (which expects password/otpLogin flags)
+            // Correct existence check: do NOT call /api/users/{phone} (it requires auth and returns 403).
+            // Use the public /auth/check-user endpoint.
             try {
-                const rootBase = API_BASE_URL.replace(/\/auth$/,'');
-                const res = await fetch(`${rootBase}/api/users/${number}`, { method:'GET', headers:{'Accept':'application/json'} });
-                if (!res.ok) {
+                const res = await fetch(`${API_BASE_URL}/check-user`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contactNumber: number })
+                });
+                const data = await res.json().catch(() => ({}));
+                const exists = !!(data && (data.exists === true || data.exists === 'true'));
+                if (!res.ok || !exists) {
                     showToast('Number not found. Please sign up first.', 'error');
                     return;
                 }
@@ -700,10 +863,250 @@ document.addEventListener('DOMContentLoaded', function () {
                 showToast('Unable to verify number. Try again.', 'error');
                 return;
             }
-            modalPhone.value = number; 
-            wrongOtpCount = 0; 
-            openModal();
+            currentForgotNumber = number;
+            modalPhone.value = number;
+            wrongOtpCount = 0;
+            openMethodModal();
         });
+
+        if (chooseMobileBtn) {
+            chooseMobileBtn.addEventListener('click', function(){
+                closeMethodModal();
+                openModal();
+            });
+        }
+
+        if (chooseEmailBtn) {
+            chooseEmailBtn.addEventListener('click', function(){
+                closeMethodModal();
+                openEmailModal();
+            });
+        }
+
+        function normalizeEmail(email){
+            return String(email || '').trim().toLowerCase();
+        }
+
+        function isValidEmail(email){
+            const e = normalizeEmail(email);
+            if (!e) return false;
+            if (e.length > 254) return false;
+            if (e.includes('..')) return false;
+            const parts = e.split('@');
+            if (parts.length !== 2) return false;
+            const local = parts[0];
+            const domain = parts[1];
+            if (!local || !domain) return false;
+            if (local.length > 64) return false;
+            if (!domain.includes('.')) return false;
+            if (domain.startsWith('.') || domain.endsWith('.')) return false;
+            if (!/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+$/.test(local)) return false;
+            if (!/^[a-z0-9.-]+$/.test(domain)) return false;
+            const tld = domain.split('.').pop() || '';
+            if (tld.length < 2) return false;
+            return true;
+        }
+
+        function updateEmailPrimaryBtnState(){
+            if (!emailPrimaryBtn) return;
+            const label = (emailPrimaryBtn.textContent || '').trim();
+            if (label !== 'Send OTP' && label !== 'Resend OTP') return;
+            const ok = isValidEmail(emailInput?.value || '');
+            emailPrimaryBtn.disabled = !ok;
+        }
+
+        async function requestEmailOtp(){
+            if (!emailPrimaryBtn) return false;
+            const email = normalizeEmail(emailInput?.value || '');
+            if (!isValidEmail(email)) {
+                showToast('Enter a valid email address', 'error');
+                updateEmailPrimaryBtnState();
+                return false;
+            }
+            if (!validateMobile(currentForgotNumber || '')) {
+                showToast('Mobile number missing. Please try again.', 'error');
+                return false;
+            }
+
+            emailPrimaryBtn.disabled = true;
+            emailPrimaryBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
+            try {
+                const base = window.API_BASE_URL ? `${window.API_BASE_URL}/auth/forgot-email-init` : 'http://localhost:8080/auth/forgot-email-init';
+                const res = await fetch(base, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contactNumber: currentForgotNumber, email })
+                });
+                const data = await res.json().catch(()=>({}));
+                if (!res.ok || data.ok === false) {
+                    showToast(data.message || 'Failed to send email OTP', 'error');
+                    emailPrimaryBtn.disabled = false;
+                    emailPrimaryBtn.textContent = 'Send OTP';
+                    updateEmailPrimaryBtnState();
+                    return false;
+                }
+
+                showToast('OTP sent to your email. Check inbox/spam.', 'success');
+                if (emailInput) emailInput.readOnly = true;
+                if (emailOtpGroup) emailOtpGroup.style.display = 'block';
+                if (emailResendRow) emailResendRow.style.display = 'flex';
+                if (emailOtpInput) emailOtpInput.focus();
+
+                emailPrimaryBtn.disabled = false;
+                emailPrimaryBtn.textContent = 'Verify OTP';
+                startEmailTimer(60);
+                emailOtpSent = true;
+                return true;
+            } catch (err) {
+                showToast('Failed to send email OTP. Try again.', 'error');
+                emailPrimaryBtn.disabled = false;
+                emailPrimaryBtn.textContent = 'Send OTP';
+                updateEmailPrimaryBtnState();
+                return false;
+            }
+        }
+
+        async function verifyEmailOtp(){
+            const email = normalizeEmail(emailInput?.value || '');
+            const otp = (emailOtpInput?.value || '').trim();
+            if (!isValidEmail(email)) {
+                showToast('Enter a valid email address', 'error');
+                return;
+            }
+            if (!/^[0-9]{6}$/.test(otp)) {
+                showToast('Please enter 6-digit OTP', 'error');
+                return;
+            }
+            if (!emailPrimaryBtn) return;
+
+            emailPrimaryBtn.disabled = true;
+            emailPrimaryBtn.textContent = 'Verifying...';
+            try {
+                const base = window.API_BASE_URL ? `${window.API_BASE_URL}/auth/forgot-email-verify` : 'http://localhost:8080/auth/forgot-email-verify';
+                const res = await fetch(base, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contactNumber: currentForgotNumber, email, otp })
+                });
+                const data = await res.json().catch(()=>({}));
+                if (!res.ok || data.ok === false) {
+                    showToast(data.message || 'Invalid OTP. Please try again.', 'error');
+                    emailPrimaryBtn.disabled = false;
+                    emailPrimaryBtn.textContent = 'Verify OTP';
+                    return;
+                }
+
+                emailResetToken = data.resetToken || '';
+                if (!emailResetToken) {
+                    showToast('Verification failed. Please resend OTP.', 'error');
+                    emailPrimaryBtn.disabled = false;
+                    emailPrimaryBtn.textContent = 'Resend OTP';
+                    return;
+                }
+
+                stopEmailTimer();
+                if (emailInputGroup) emailInputGroup.style.display = 'none';
+                if (emailOtpGroup) emailOtpGroup.style.display = 'none';
+                if (emailResendRow) emailResendRow.style.display = 'none';
+                if (emailPrimaryBtn) emailPrimaryBtn.style.display = 'none';
+                if (emailOtpTimerEl) emailOtpTimerEl.style.display = 'none';
+                if (emailNewPassBlock) emailNewPassBlock.style.display = 'block';
+                setEmailHeaderLock(true);
+                if (emailNewPass) emailNewPass.focus();
+                showToast('OTP verified. Set your new password.', 'success');
+            } catch (err) {
+                showToast('Verification failed. Please try again.', 'error');
+                emailPrimaryBtn.disabled = false;
+                emailPrimaryBtn.textContent = 'Verify OTP';
+            }
+        }
+
+        async function setNewPasswordByEmail(){
+            const email = normalizeEmail(emailInput?.value || '');
+            if (!emailResetToken) {
+                showToast('Reset token missing. Please resend OTP.', 'error');
+                return;
+            }
+            if (!emailNewPass || emailNewPass.value.length < 4) {
+                showToast('Password must be at least 4 characters', 'error');
+                return;
+            }
+            if (emailNewPass.value !== (emailConfirmPass?.value || '')) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+            if (!emailSetNewPassBtn) return;
+
+            emailSetNewPassBtn.disabled = true;
+            emailSetNewPassBtn.textContent = 'Setting Password...';
+            try {
+                const base = window.API_BASE_URL ? `${window.API_BASE_URL}/auth/forgot-email-complete` : 'http://localhost:8080/auth/forgot-email-complete';
+                const res = await fetch(base, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contactNumber: currentForgotNumber,
+                        email,
+                        resetToken: emailResetToken,
+                        newPassword: emailNewPass.value
+                    })
+                });
+                const data = await res.json().catch(()=>({}));
+                if (!res.ok || data.ok === false) {
+                    showToast(data.message || 'Password reset failed', 'error');
+                    emailSetNewPassBtn.disabled = false;
+                    emailSetNewPassBtn.textContent = 'Set Password';
+                    return;
+                }
+                showToast('Password reset successful! Please login.', 'success');
+                setTimeout(()=>{ closeEmailModal(); }, 900);
+            } catch (err) {
+                showToast('Password reset failed. Please try again.', 'error');
+                emailSetNewPassBtn.disabled = false;
+                emailSetNewPassBtn.textContent = 'Set Password';
+            }
+        }
+
+        if (emailPrimaryBtn) {
+            emailPrimaryBtn.addEventListener('click', async function(){
+                const label = emailPrimaryBtn.textContent.trim();
+                if (label === 'Send OTP' || label === 'Resend OTP') {
+                    await requestEmailOtp();
+                } else if (label === 'Verify OTP') {
+                    await verifyEmailOtp();
+                }
+            });
+        }
+
+        if (emailInput) {
+            emailInput.addEventListener('input', function(){
+                if (emailInput.readOnly) return;
+                const before = emailInput.value;
+                const normalized = before.replace(/\s+/g, '').toLowerCase();
+                if (before !== normalized) emailInput.value = normalized;
+                updateEmailPrimaryBtnState();
+            });
+            emailInput.addEventListener('blur', function(){
+                const v = String(emailInput.value || '').trim();
+                if (v && !isValidEmail(v) && v !== lastInvalidEmailToast) {
+                    lastInvalidEmailToast = v;
+                    showToast('Please enter a valid email (example: name@gmail.com)', 'error');
+                }
+                updateEmailPrimaryBtnState();
+            });
+        }
+
+        if (emailResendBtn) {
+            emailResendBtn.addEventListener('click', async function(){
+                if (emailResendBtn.disabled) return;
+                emailPrimaryBtn.textContent = 'Resend OTP';
+                await requestEmailOtp();
+            });
+        }
+
+        if (emailSetNewPassBtn) {
+            emailSetNewPassBtn.addEventListener('click', setNewPasswordByEmail);
+        }
 
         async function requestOtp() {
             // Disable button immediately to prevent multiple clicks and show loader
@@ -886,6 +1289,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (timerEl) timerEl.style.display = 'none';
                 // Show new password block
                 newPassBlock.style.display = 'block';
+                if (otpBackBtn) otpBackBtn.style.display = 'none';
                 // Focus new password field for immediate input
                 if (newPass) newPass.focus();
                 showToast('OTP verified successfully! Please set your new password.', 'success');
