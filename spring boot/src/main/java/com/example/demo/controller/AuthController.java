@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +21,9 @@ import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.LoginAttemptService;
 import com.example.demo.security.JwtService;
+import com.example.demo.service.EmailOtpPasswordResetService;
 import com.example.demo.service.TwoFactorService;
+import com.example.demo.service.NotificationEmailService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import com.example.demo.util.ClientIpUtil;
@@ -44,6 +45,13 @@ public class AuthController {
 
     @Autowired
     private LoginAttemptService loginAttemptService;
+
+    @Autowired
+    private EmailOtpPasswordResetService emailOtpPasswordResetService;
+
+    // kept for other email notifications (if/when used)
+    @Autowired
+    private NotificationEmailService notificationEmailService;
 
     @Value("${captcha.enabled:false}")
     private boolean captchaEnabled;
@@ -262,6 +270,8 @@ public class AuthController {
             if (user.getReviewText() == null) user.setReviewText("");
 
             userRepository.save(user);
+
+            // Welcome email is sent via delayed scheduler to avoid wasted email usage.
 
             return ResponseEntity.ok(Map.of(
                     "message", "Signup successful",
@@ -518,6 +528,37 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "OTP verified"));
     }
 
+    // Email OTP password reset (Brevo) - 6 digit code, 60s expiry
+    @PostMapping("/forgot-email-init")
+    public ResponseEntity<Map<String, Object>> forgotEmailInit(@RequestBody Map<String, String> request) {
+        String contactNumber = request.get("contactNumber");
+        String email = request.get("email");
+        Map<String, Object> result = emailOtpPasswordResetService.init(contactNumber, email);
+        boolean ok = Boolean.TRUE.equals(result.get("ok"));
+        return ResponseEntity.status(ok ? HttpStatus.OK : HttpStatus.BAD_REQUEST).body(result);
+    }
+
+    @PostMapping("/forgot-email-verify")
+    public ResponseEntity<Map<String, Object>> forgotEmailVerify(@RequestBody Map<String, String> request) {
+        String contactNumber = request.get("contactNumber");
+        String email = request.get("email");
+        String otp = request.get("otp");
+        Map<String, Object> result = emailOtpPasswordResetService.verify(contactNumber, email, otp);
+        boolean ok = Boolean.TRUE.equals(result.get("ok"));
+        return ResponseEntity.status(ok ? HttpStatus.OK : HttpStatus.UNAUTHORIZED).body(result);
+    }
+
+    @PostMapping("/forgot-email-complete")
+    public ResponseEntity<Map<String, Object>> forgotEmailComplete(@RequestBody Map<String, String> request) {
+        String contactNumber = request.get("contactNumber");
+        String email = request.get("email");
+        String resetToken = request.get("resetToken");
+        String newPassword = request.get("newPassword");
+        Map<String, Object> result = emailOtpPasswordResetService.complete(contactNumber, email, resetToken, newPassword);
+        boolean ok = Boolean.TRUE.equals(result.get("ok"));
+        return ResponseEntity.status(ok ? HttpStatus.OK : HttpStatus.BAD_REQUEST).body(result);
+    }
+
     @PostMapping("/verify-otp")
     public ResponseEntity<Map<String, String>> verifyOtp(@RequestBody Map<String, String> request) {
         String contactNumber = request.get("contactNumber");
@@ -564,6 +605,7 @@ public class AuthController {
             
             // First save to ensure database captures the changes
             User savedUser = userRepository.save(user);
+            // Welcome email is sent via delayed scheduler to avoid wasted email usage.
             
             // Verify changes were applied correctly
             User verifiedUser = userRepository.findByContactNumber(contactNumber);

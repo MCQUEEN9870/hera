@@ -62,6 +62,30 @@ public class User {
     @Column(name = "review_text")
     private String reviewText = ""; // Default to empty string
 
+    // Email OTP password reset fields (stored in users table)
+    @Column(name = "otp_email")
+    private String otpEmail;
+
+    @Column(name = "email_otp_code_hash")
+    private String emailOtpCodeHash;
+
+    // NOTE: Assuming column name is email_otp_expires_at (common). If your DB column is different,
+    // tell me the exact column name and I'll adjust mapping.
+    @Column(name = "email_otp_expires_at", columnDefinition = "TIMESTAMP")
+    private LocalDateTime emailOtpExpiresAt;
+
+    @Column(name = "email_otp_attempts")
+    private Integer emailOtpAttempts = 0;
+
+    @Column(name = "email_reset_token_hash")
+    private String emailResetTokenHash;
+
+    @Column(name = "email_reset_token_expires_at", columnDefinition = "TIMESTAMP")
+    private LocalDateTime emailResetTokenExpiresAt;
+
+    @Column(name = "email_otp_verified_at", columnDefinition = "TIMESTAMP")
+    private LocalDateTime emailOtpVerifiedAt;
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -181,5 +205,61 @@ public class User {
     
     public void setReviewText(String reviewText) {
         this.reviewText = reviewText;
+    }
+
+    public String getOtpEmail() {
+        return otpEmail;
+    }
+
+    public void setOtpEmail(String otpEmail) {
+        this.otpEmail = otpEmail;
+    }
+
+    public String getEmailOtpCodeHash() {
+        return emailOtpCodeHash;
+    }
+
+    public void setEmailOtpCodeHash(String emailOtpCodeHash) {
+        this.emailOtpCodeHash = emailOtpCodeHash;
+    }
+
+    public LocalDateTime getEmailOtpExpiresAt() {
+        return emailOtpExpiresAt;
+    }
+
+    public void setEmailOtpExpiresAt(LocalDateTime emailOtpExpiresAt) {
+        this.emailOtpExpiresAt = emailOtpExpiresAt;
+    }
+
+    public Integer getEmailOtpAttempts() {
+        return emailOtpAttempts;
+    }
+
+    public void setEmailOtpAttempts(Integer emailOtpAttempts) {
+        this.emailOtpAttempts = emailOtpAttempts;
+    }
+
+    public String getEmailResetTokenHash() {
+        return emailResetTokenHash;
+    }
+
+    public void setEmailResetTokenHash(String emailResetTokenHash) {
+        this.emailResetTokenHash = emailResetTokenHash;
+    }
+
+    public LocalDateTime getEmailResetTokenExpiresAt() {
+        return emailResetTokenExpiresAt;
+    }
+
+    public void setEmailResetTokenExpiresAt(LocalDateTime emailResetTokenExpiresAt) {
+        this.emailResetTokenExpiresAt = emailResetTokenExpiresAt;
+    }
+
+    public LocalDateTime getEmailOtpVerifiedAt() {
+        return emailOtpVerifiedAt;
+    }
+
+    public void setEmailOtpVerifiedAt(LocalDateTime emailOtpVerifiedAt) {
+        this.emailOtpVerifiedAt = emailOtpVerifiedAt;
     }
 }
