@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,6 +58,9 @@ public class UserController {
     
     @Autowired
     private UserRepository userRepository;
+
+    @Value("${app.admin.token:}")
+    private String adminToken;
     
     @Autowired
     private RegistrationRepository registrationRepository;
@@ -247,7 +252,16 @@ public class UserController {
      * Get all registered user locations - to be used for displaying location in feedback carousels
      */
     @GetMapping("/get-user-locations")
-    public ResponseEntity<?> getUserLocations() {
+    public ResponseEntity<?> getUserLocations(
+        @RequestHeader(value = "X-Admin-Token", required = false) String token
+    ) {
+        if (adminToken == null || adminToken.isBlank()) {
+            return ResponseEntity.status(403).body("Forbidden");
+        }
+        if (token == null || token.isBlank() || !adminToken.equals(token)) {
+            return ResponseEntity.status(403).body("Forbidden");
+        }
+
         log.debug("Fetching user locations for feedback carousel");
         
         // Find all registrations to get user locations

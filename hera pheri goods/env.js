@@ -51,49 +51,122 @@ function buildUrl(path) {
     return extension ? `${mappedBase}${extension}${suffix}` : `${mappedBase}${suffix}`;
 }
 
-// Set API base URL based on environment (initial guess)
-let base;
-if (location.protocol === 'file:') {
-    base = 'http://localhost:8080';
-} else if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-    base = 'http://localhost:8080';
-} else if (location.hostname.match(/^192\.168\.|^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\./)) {
-    base = `http://${location.hostname}:8080`;
-} else {
-    base = 'https://api.herapherigoods.in';
+function normalizeApiBase(url) {
+    if (!url || typeof url !== 'string') return '';
+    return url.trim().replace(/\/+$/, '');
 }
 
-// Check for URL parameter override
-const urlParams = new URLSearchParams(location.search);
-const apiOverride = urlParams.get('api');
-if (apiOverride) {
-    if (apiOverride === 'local') {
-        base = 'http://localhost:8080';
-    } else if (apiOverride.startsWith('http')) {
-        base = apiOverride;
+const TRUSTED_API_BASES_PROD = new Set([
+    'https://api.herapherigoods.in'
+]);
+
+function computeDefaultApiBase() {
+    if (location.protocol === 'file:') {
+        return 'http://localhost:8080';
+    }
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+        return 'http://localhost:8080';
+    }
+    if (location.hostname.match(/^192\.168\.|^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\./)) {
+        return `http://${location.hostname}:8080`;
+    }
+    return 'https://api.herapherigoods.in';
+}
+
+function isTrustedApiBaseForThisEnv(candidate) {
+    const c = normalizeApiBase(candidate);
+    if (!c) return false;
+    // On live frontend, DO NOT allow overrides (prevents token exfiltration via ?api=...)
+    if (!isLocalEnvironment()) {
+        return TRUSTED_API_BASES_PROD.has(c);
+    }
+    // In local dev, allow localhost/lan http(s) bases.
+    try {
+        const u = new URL(c);
+        const isHttp = u.protocol === 'http:' || u.protocol === 'https:';
+        if (!isHttp) return false;
+        const host = (u.hostname || '').toLowerCase();
+        if (host === 'localhost' || host === '127.0.0.1') return true;
+        if (host.match(/^192\.168\.|^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\./)) return true;
+        return false;
+    } catch (_e) {
+        return false;
     }
 }
 
-// Check for localStorage override
-const storedApi = localStorage.getItem('apiBaseUrl');
-if (storedApi) {
-    base = storedApi;
+// Set API base URL based on environment (initial guess)
+let base = computeDefaultApiBase();
+
+// Allow override ONLY in local environment
+if (isLocalEnvironment()) {
+    const urlParams = new URLSearchParams(location.search);
+    const apiOverride = urlParams.get('api');
+    if (apiOverride) {
+        const candidate = (apiOverride === 'local') ? 'http://localhost:8080' : apiOverride;
+        if (typeof candidate === 'string' && candidate.startsWith('http') && isTrustedApiBaseForThisEnv(candidate)) {
+            base = normalizeApiBase(candidate);
+        }
+    }
+
+    const storedApi = localStorage.getItem('apiBaseUrl');
+    if (storedApi && isTrustedApiBaseForThisEnv(storedApi)) {
+        base = normalizeApiBase(storedApi);
+    }
 }
 
 // Set global API base URL
-window.API_BASE_URL = base;
+window.API_BASE_URL = normalizeApiBase(base);
 console.info('[env] API base in use:', window.API_BASE_URL, '(origin:', location.origin || location.protocol + '//' + location.host, ')');
 
 // Helper functions for URL management
 window.setApiBase = function(url) {
-    localStorage.setItem('apiBaseUrl', url);
-    window.API_BASE_URL = url;
-    console.info('[env] API base updated to:', url);
+    const next = normalizeApiBase(url);
+    if (!isLocalEnvironment()) {
+        console.warn('[env] Refusing to set API base on live frontend');
+        return;
+    }
+    if (!isTrustedApiBaseForThisEnv(next)) {
+        console.warn('[env] Refusing untrusted API base:', url);
+        return;
+    }
+    localStorage.setItem('apiBaseUrl', next);
+    window.API_BASE_URL = next;
+    console.info('[env] API base updated to:', next);
 };
 
 window.clearApiBase = function() {
     localStorage.removeItem('apiBaseUrl');
     location.reload();
+};
+
+// Token storage helper (sessionStorage-first to reduce persistence)
+window.AuthToken = {
+    get: function() {
+        try {
+            const s = sessionStorage.getItem('authToken');
+            if (s) return s;
+        } catch (_e) {}
+        try {
+            const legacy = localStorage.getItem('authToken') || '';
+            if (legacy) {
+                try { sessionStorage.setItem('authToken', legacy); } catch (_e2) {}
+                try { localStorage.removeItem('authToken'); } catch (_e3) {}
+            }
+            return legacy;
+        } catch (_e) {
+            return '';
+        }
+    },
+    set: function(token) {
+        const t = (token || '').toString();
+        try { sessionStorage.setItem('authToken', t); } catch (_e) {}
+        // Back-compat: keep localStorage cleared to reduce persistence.
+        try { localStorage.removeItem('authToken'); } catch (_e) {}
+    },
+    clear: function() {
+        try { sessionStorage.removeItem('authToken'); } catch (_e) {}
+        try { localStorage.removeItem('authToken'); } catch (_e) {}
+    }
 };
 
 // Export the URL building function globally
@@ -157,14 +230,37 @@ window.isLocalEnvironment = isLocalEnvironment;
 
         const originalFetch = window.fetch.bind(window);
         const base = (window.API_BASE_URL || '').replace(/\/+$/, '');
+        const allowedOrigins = new Set();
+        try {
+            if (base) allowedOrigins.add(new URL(base).origin);
+        } catch (_e) {}
+        // Extra safety: on live frontend, only ever attach tokens to the production API origin.
+        if (!isLocalEnvironment()) {
+            allowedOrigins.clear();
+            allowedOrigins.add('https://api.herapherigoods.in');
+        }
 
         window.fetch = function(input, init) {
             try {
-                const token = localStorage.getItem('authToken');
+                const token = (window.AuthToken && typeof window.AuthToken.get === 'function')
+                    ? window.AuthToken.get()
+                    : (localStorage.getItem('authToken') || '');
+
                 if (token && base) {
                     const url = (typeof input === 'string')
                         ? input
                         : (input && typeof input.url === 'string' ? input.url : '');
+
+                    // Never attach tokens to untrusted origins
+                    try {
+                        const parsed = new URL(url, location.href);
+                        if (!allowedOrigins.has(parsed.origin)) {
+                            return originalFetch(input, init);
+                        }
+                    } catch (_e) {
+                        // If URL can't be parsed, fail safe: don't attach token.
+                        return originalFetch(input, init);
+                    }
 
                     const isApiCall = url === base || url.startsWith(base + '/');
                     if (isApiCall) {

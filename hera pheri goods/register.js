@@ -1956,7 +1956,12 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('userPhone');
             localStorage.removeItem('userMembership');
-            localStorage.removeItem('authToken');
+            if (window.AuthToken && typeof window.AuthToken.clear === 'function') {
+                window.AuthToken.clear();
+            } else {
+                try { sessionStorage.removeItem('authToken'); } catch (_e) {}
+                localStorage.removeItem('authToken');
+            }
             window.location.href = 'login';
         });
     }

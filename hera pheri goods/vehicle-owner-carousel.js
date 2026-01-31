@@ -19,20 +19,9 @@ function initVehicleOwnerCarousel() {
                 );
                 
                 if (validFeedbacks.length > 0) {
-                    // First, get all registered user locations to enrich the feedback data
-                    fetchRegisteredUserLocations()
-                        .then(userLocations => {
-                            // Enrich feedback data with user locations
-                            const enrichedFeedbacks = enrichFeedbackWithUserLocations(validFeedbacks, userLocations);
-                            populateVehicleOwnerCarousel(carouselElement, enrichedFeedbacks);
-                            setupLeftToRightScroll(carouselElement);
-                        })
-                        .catch(error => {
-                            
-                            // If we fail to fetch user locations, just proceed with the original feedback data
-                            populateVehicleOwnerCarousel(carouselElement, validFeedbacks);
-                            setupLeftToRightScroll(carouselElement);
-                        });
+                    // Feedback response already contains safe display location (city/state) server-side.
+                    populateVehicleOwnerCarousel(carouselElement, validFeedbacks);
+                    setupLeftToRightScroll(carouselElement);
                 } else {
                     showNoFeedbackMessage(carouselElement);
                 }
@@ -93,63 +82,6 @@ function fetchVehicleOwnerFeedbackData() {
     });
 }
 
-// Fetch registered user locations from the registration table
-function fetchRegisteredUserLocations() {
-    return new Promise((resolve, reject) => {
-        const base = window.API_BASE_URL || 'http://localhost:8080';
-        fetch(`${base}/api/get-user-locations`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => { resolve(data); })
-            .catch(error => {
-                
-                // Try the backend URL directly as fallback
-                fetch(`${base}/api/get-user-locations`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Direct API call failed too');
-                        }
-                        return response.json();
-                    })
-                    .then(data => { resolve(data); })
-                    .catch(directError => {
-                        // Use mock data as last resort
-                        const mockLocations = generateMockUserLocations();
-                        resolve(mockLocations);
-                    });
-            });
-    });
-}
-
-// Generate mock user locations for testing/fallback
-function generateMockUserLocations() {
-    return {
-        1: "Mumbai, Maharashtra",
-        2: "Ahmedabad, Gujarat",
-        3: "Delhi, NCR",
-        4: "Pune, Maharashtra",
-        5: "Hyderabad, Telangana"
-    };
-}
-
-// Enrich feedback data with user locations
-function enrichFeedbackWithUserLocations(feedbacks, userLocations) {
-    return feedbacks.map(feedback => {
-        // Check if this user ID has a registered location
-        if (userLocations && userLocations[feedback.userId]) {
-            // Create a new object with updated address from registration
-            return {
-                ...feedback,
-                address: userLocations[feedback.userId] // Use the registered location
-            };
-        }
-        return feedback; // Return the original if no registered location found
-    });
-}
 
 // Generate mock vehicle owner feedback data for testing/fallback
 function generateMockVehicleOwnerFeedback() {

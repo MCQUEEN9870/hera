@@ -8,12 +8,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,6 +40,9 @@ public class FeedbackController {
     
     @Autowired
     private RegistrationRepository registrationRepository;
+
+    @Value("${app.admin.token:}")
+    private String adminToken;
 
     private static String maskPhone(String phone) {
         if (phone == null) return null;
@@ -165,16 +170,17 @@ public class FeedbackController {
         try {
             logger.info("Fetching feedback from users table only");
             
-            // Get feedback from users table (only include users with ratings)
+                // Get feedback from users table (only include users with ratings)
             List<User> users = userRepository.findByRatingIsNotNull();
             for (User user : users) {
                 if (user.getRating() != null && user.getRating() > 0 
                         && user.getReviewText() != null && !user.getReviewText().trim().isEmpty()) {
                     Map<String, Object> feedback = new HashMap<>();
                     feedback.put("id", user.getId());
-                    feedback.put("userId", user.getId()); // Add userId for location mapping
                     feedback.put("name", user.getFullName() != null ? user.getFullName() : "User");
-                    feedback.put("address", ""); // Address not consistently available in User model
+                    // Address is derived from the latest registration for this user (if any).
+                    // IMPORTANT: do not expose userId mappings publicly.
+                    feedback.put("address", resolveUserLocation(user.getId()));
                     feedback.put("rating", user.getRating());
                     feedback.put("reviewText", user.getReviewText());
                     feedback.put("source", "user");
@@ -200,6 +206,46 @@ public class FeedbackController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    private String resolveUserLocation(Long userId) {
+        if (userId == null) return "";
+        try {
+            List<Registration> regs = registrationRepository.findByUserId(userId);
+            if (regs == null || regs.isEmpty()) return "";
+
+            Registration latest = null;
+            for (Registration r : regs) {
+                if (r == null) continue;
+                if (latest == null) {
+                    latest = r;
+                    continue;
+                }
+                // Best-effort: treat highest id as latest
+                try {
+                    if (r.getId() != null && latest.getId() != null && r.getId() > latest.getId()) {
+                        latest = r;
+                    }
+                } catch (Exception _e) {
+                    // ignore
+                }
+            }
+            if (latest == null) return "";
+
+            String city = latest.getCity();
+            String state = latest.getState();
+            if (city == null) city = "";
+            if (state == null) state = "";
+            city = city.trim();
+            state = state.trim();
+
+            if (!city.isEmpty() && !state.isEmpty()) return city + ", " + state;
+            if (!city.isEmpty()) return city;
+            if (!state.isEmpty()) return state;
+            return "";
+        } catch (Exception _e) {
+            return "";
+        }
+    }
     
     /**
      * Get user locations from registration table
@@ -207,8 +253,19 @@ public class FeedbackController {
      * @return Map of userId to location (city, state)
      */
     @GetMapping("/get-user-locations")
-    public ResponseEntity<Map<String, String>> getUserLocations() {
+    public ResponseEntity<Map<String, String>> getUserLocations(
+        @RequestHeader(value = "X-Admin-Token", required = false) String token
+    ) {
         Map<String, String> userLocations = new HashMap<>();
+
+        // This endpoint exposes userId->location mappings and must never be public.
+        // Keep it behind an admin token to prevent enumeration even by normal authenticated users.
+        if (adminToken == null || adminToken.isBlank()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(userLocations);
+        }
+        if (token == null || token.isBlank() || !adminToken.equals(token)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(userLocations);
+        }
         
         try {
             logger.info("Fetching user locations for feedback carousel");

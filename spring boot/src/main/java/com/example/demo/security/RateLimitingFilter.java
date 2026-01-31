@@ -131,6 +131,16 @@ public class RateLimitingFilter extends OncePerRequestFilter {
                 // Same pattern as signup (OTP send)
                 return enforceIpAndContact(request, "auth:forgot-init", signupIpLimit, signupIpWindowSeconds, signupContactLimit, signupContactWindowSeconds);
             }
+
+            // Email OTP password reset (Brevo)
+            if (PATH_MATCHER.match("/auth/forgot-email-init", path)) {
+                // Email OTP send: treat like signup/forgot-init to prevent spamming
+                return enforceIpAndContact(request, "auth:forgot-email-init", signupIpLimit, signupIpWindowSeconds, signupContactLimit, signupContactWindowSeconds);
+            }
+            if (PATH_MATCHER.match("/auth/forgot-email-verify", path) || PATH_MATCHER.match("/auth/forgot-email-complete", path)) {
+                // Email OTP verify + complete: treat like OTP verify endpoints
+                return enforceIpAndContact(request, "auth:forgot-email-verify", otpVerifyIpLimit, otpVerifyIpWindowSeconds, otpVerifyContactLimit, otpVerifyContactWindowSeconds);
+            }
             if (PATH_MATCHER.match("/auth/verify-otp", path) || PATH_MATCHER.match("/auth/forgot-verify", path) || PATH_MATCHER.match("/auth/forgot-complete", path)) {
                 return enforceIpAndContact(request, "auth:otp-verify", otpVerifyIpLimit, otpVerifyIpWindowSeconds, otpVerifyContactLimit, otpVerifyContactWindowSeconds);
             }

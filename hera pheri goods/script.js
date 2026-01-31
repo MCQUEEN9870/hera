@@ -158,10 +158,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Sync "My Profile" visibility with login state for sidebar too
     (function syncMobileProfileLink(){
+        const hasToken = (function() {
+            try {
+                if (window.AuthToken && typeof window.AuthToken.get === 'function') {
+                    return !!window.AuthToken.get();
+                }
+            } catch (_e) {}
+            try { if (sessionStorage.getItem('authToken')) return true; } catch (_e) {}
+            try { if (localStorage.getItem('authToken')) return true; } catch (_e) {}
+            return false;
+        })();
+
         const isLoggedInSidebar =
             localStorage.getItem('isLoggedIn') === 'true' ||
             !!localStorage.getItem('userPhone') ||
-            !!localStorage.getItem('authToken');
+            hasToken;
 
         let sidebarProfileLink = document.getElementById('profileLink');
         const mobileNav = document.querySelector('.mobile-nav-links');
@@ -990,10 +1001,21 @@ if (vehicleOptions && vehicleOptions.length && vehicleSelectBtn && vehicleDropdo
 // Check if user is logged in
 // and update the profile link accordingly
 document.addEventListener("DOMContentLoaded", function() {
+    const hasToken = (function() {
+        try {
+            if (window.AuthToken && typeof window.AuthToken.get === 'function') {
+                return !!window.AuthToken.get();
+            }
+        } catch (_e) {}
+        try { if (sessionStorage.getItem('authToken')) return true; } catch (_e) {}
+        try { if (localStorage.getItem('authToken')) return true; } catch (_e) {}
+        return false;
+    })();
+
     const isLoggedIn =
         localStorage.getItem('isLoggedIn') === 'true' ||
         !!localStorage.getItem('userPhone') ||
-        !!localStorage.getItem('authToken');
+        hasToken;
 
     const profileLink = document.getElementById("profileLink");
     if (!profileLink) return;

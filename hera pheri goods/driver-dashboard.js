@@ -7,7 +7,12 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('userPhone');
         localStorage.removeItem('userMembership');
-        localStorage.removeItem('authToken');
+        if (window.AuthToken && typeof window.AuthToken.clear === 'function') {
+            window.AuthToken.clear();
+        } else {
+            try { sessionStorage.removeItem('authToken'); } catch (_e) {}
+            localStorage.removeItem('authToken');
+        }
         localStorage.removeItem('lastSelectedVehicleId');
     }
 
@@ -204,7 +209,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if user is authenticated
     function checkAuth() {
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        const token = localStorage.getItem('authToken');
+        const token = (window.AuthToken && typeof window.AuthToken.get === 'function')
+            ? window.AuthToken.get()
+            : (function() {
+                try { return sessionStorage.getItem('authToken'); } catch (_e) { return null; }
+            })();
         const phone = localStorage.getItem('userPhone');
         if (!isLoggedIn) {
             // If not logged in, redirect to login page
@@ -3169,7 +3178,12 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('userPhone');
             // Also remove userMembership to prevent it from affecting new users
             localStorage.removeItem('userMembership');
-            localStorage.removeItem('authToken');
+            if (window.AuthToken && typeof window.AuthToken.clear === 'function') {
+                window.AuthToken.clear();
+            } else {
+                try { sessionStorage.removeItem('authToken'); } catch (_e) {}
+                localStorage.removeItem('authToken');
+            }
             window.location.href = 'index';
                 }, 1500);
         }
@@ -3284,7 +3298,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 localStorage.removeItem('userPhone');
                                 // Also remove userMembership to prevent it from affecting new users
                                 localStorage.removeItem('userMembership');
-                                localStorage.removeItem('authToken');
+                                if (window.AuthToken && typeof window.AuthToken.clear === 'function') {
+                                    window.AuthToken.clear();
+                                } else {
+                                    try { sessionStorage.removeItem('authToken'); } catch (_e) {}
+                                    localStorage.removeItem('authToken');
+                                }
                                 
                                 // Redirect after animation completes
                                 setTimeout(() => {
@@ -3311,7 +3330,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                     localStorage.removeItem('isLoggedIn');
                                     localStorage.removeItem('userPhone');
                                     localStorage.removeItem('userMembership');
-                                    localStorage.removeItem('authToken');
+                                    if (window.AuthToken && typeof window.AuthToken.clear === 'function') {
+                                        window.AuthToken.clear();
+                                    } else {
+                                        try { sessionStorage.removeItem('authToken'); } catch (_e) {}
+                                        localStorage.removeItem('authToken');
+                                    }
                                     window.location.href = 'login?reason=session_expired';
                                     return;
                                 }

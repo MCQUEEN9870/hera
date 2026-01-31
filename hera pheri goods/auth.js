@@ -147,7 +147,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userPhone', contactNumber);
                 if (data.token) {
-                    localStorage.setItem('authToken', data.token);
+                    if (window.AuthToken && typeof window.AuthToken.set === 'function') {
+                        window.AuthToken.set(data.token);
+                    } else {
+                        // Fallback (should be rare if env.js loaded)
+                        sessionStorage.setItem('authToken', data.token);
+                        try { localStorage.removeItem('authToken'); } catch (_e) {}
+                    }
                 }
                 showToast('Login successful!', 'success');
                 setTimeout(() => {
@@ -443,7 +449,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         localStorage.setItem('isLoggedIn', 'true');
                         localStorage.setItem('userPhone', mobileInput.value.trim());
                         if (data.token) {
-                            localStorage.setItem('authToken', data.token);
+                            if (window.AuthToken && typeof window.AuthToken.set === 'function') {
+                                window.AuthToken.set(data.token);
+                            } else {
+                                sessionStorage.setItem('authToken', data.token);
+                                try { localStorage.removeItem('authToken'); } catch (_e) {}
+                            }
                         }
                         localStorage.removeItem('userMembership');
                         let redirectPage = 'index';

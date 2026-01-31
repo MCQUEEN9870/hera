@@ -118,15 +118,13 @@ public class SecurityConfig {
                         "/api/images/**",
                         "/api/get-feedback",
                         "/api/get-all-feedback",
-                        "/api/get-user-feedback",
-                        "/api/get-user-locations"
+                        "/api/get-user-feedback"
                     ).permitAll();
 
                 // Public write APIs (intentionally public)
                 auth
                     .requestMatchers(HttpMethod.POST,
                         "/api/contact-submissions",
-                        "/api/mail/test",
                         "/api/save-feedback",
                         "/api/save-user-feedback"
                     ).permitAll();
