@@ -29,8 +29,12 @@ public class ContactController {
     private final ContactSubmissionRepository repository;
     private final EmailService emailService;
 
-    @Value("${mail.admin.to:info@herapherigoods.in}")
-    private String adminTo;
+    /**
+     * Admin alert recipient for contact form submissions.
+     * Keep separate from other admin mail settings.
+     */
+    @Value("${contact.alert.to:abhishekjha6396@gmail.com}")
+    private String contactAlertTo;
     @Value("${captcha.enabled:false}")
     private boolean captchaEnabled;
     @Value("${captcha.secret:}")
@@ -88,33 +92,16 @@ public class ContactController {
 
         // Fire-and-forget style: try email, but do not block success if email fails.
         try {
-            String safePhone = submission.getPhone() == null ? "" : submission.getPhone().trim();
             String userEmail = submission.getEmail() == null ? "" : submission.getEmail().trim();
 
-            String adminSubject = "New Contact Submission: " + submission.getSubject();
-            String adminHtml = """
-                <div style=\"font-family:Arial,sans-serif;line-height:1.5\">
-                  <h2 style=\"margin:0 0 10px 0\">New Contact Submission</h2>
-                  <p><b>Name:</b> %s</p>
-                  <p><b>Email:</b> %s</p>
-                  <p><b>Phone:</b> %s</p>
-                  <p><b>Subject:</b> %s</p>
-                  <p><b>Message:</b><br/>%s</p>
-                  <hr/>
-                  <p style=\"color:#666\">IP: %s | Submission ID: %s</p>
-                </div>
-                """.formatted(
-                    escape(submission.getName()),
-                    escape(userEmail),
-                    escape(safePhone),
-                    escape(submission.getSubject()),
-                    escape(submission.getMessage()).replace("\n", "<br/>") ,
-                    escape(ip),
-                    saved.getId()
+            // Admin alert: minimal fixed content only (avoid leaking user data via email).
+            if (contactAlertTo != null && !contactAlertTo.isBlank()) {
+                emailService.sendPlainText(
+                    contactAlertTo.trim(),
+                    "Contact form submitted",
+                    "Someone submitted a contact form on Hera Pheri Goods."
                 );
-
-            // Send admin notification with reply-to pointing to the user.
-            emailService.sendHtmlWithReplyTo(adminTo, adminSubject, adminHtml, userEmail);
+            }
 
             // Send acknowledgement to user
             if (!userEmail.isBlank()) {
