@@ -1582,62 +1582,57 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     console.log('Direct API response for this vehicle:', data);
                     
-                    // Check if RC and DL documents exist in the API response
-                    if (data.rc || data.d_l) {
-                        console.log("API returned document data:", { rc: data.rc, dl: data.d_l });
-                        
-                        // Update vehicle object with document data
-                        if (data.rc) vehicle.rc = data.rc;
-                        if (data.d_l) vehicle.d_l = data.d_l;
-                        
-                        // Update document badges
-                        const documentBadgesContainer = document.querySelector('.document-badges-container');
-                        if (documentBadgesContainer) {
-                            // Clear and recreate the badges with the updated data
-                            documentBadgesContainer.innerHTML = '';
-                            
-                            // Create RC badge
-                            const rcBadge = document.createElement('div');
-                            rcBadge.className = 'document-badge-item';
-                            rcBadge.innerHTML = `
-                                <div class="document-badge-icon">
-                                    <i class="fas fa-id-card"></i>
+                    // Update document flags (safe, no URLs) and repaint badges if possible
+                    if (typeof data.rcUploaded !== 'undefined') vehicle.rcUploaded = !!data.rcUploaded;
+                    if (typeof data.dlUploaded !== 'undefined') vehicle.dlUploaded = !!data.dlUploaded;
+                    if (data.rc) vehicle.rc = data.rc;
+                    if (data.d_l) vehicle.d_l = data.d_l;
+
+                    const hasRc = !!(vehicle.rc && String(vehicle.rc).trim()) || vehicle.rcUploaded === true;
+                    const hasDl = !!(vehicle.d_l && String(vehicle.d_l).trim()) || vehicle.dlUploaded === true;
+
+                    const documentBadgesContainer = document.querySelector('.document-badges-container');
+                    if (documentBadgesContainer) {
+                        documentBadgesContainer.innerHTML = '';
+
+                        const rcBadge = document.createElement('div');
+                        rcBadge.className = 'document-badge-item';
+                        rcBadge.innerHTML = `
+                            <div class="document-badge-icon">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <div class="document-badge-info">
+                                <div class="document-badge-title">Vehicle RC</div>
+                                <div class="document-badge-status ${hasRc ? 'verified' : 'not-verified'}">
+                                    <i class="fas ${hasRc ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                                    ${hasRc ? 'Verified' : 'Not Verified'}
                                 </div>
-                                <div class="document-badge-info">
-                                    <div class="document-badge-title">Vehicle RC</div>
-                                    <div class="document-badge-status ${data.rc ? 'verified' : 'not-verified'}">
-                                        <i class="fas ${data.rc ? 'fa-check-circle' : 'fa-times-circle'}"></i> 
-                                        ${data.rc ? 'Verified' : 'Not Verified'}
-                                    </div>
-                                    <div class="document-badge-meaning">
-                                        ${data.rc ? 'Trusted Owner Badge' : 'Registration Certificate not uploaded'}
-                                    </div>
+                                <div class="document-badge-meaning">
+                                    ${hasRc ? 'Trusted Owner Badge' : 'Registration Certificate not uploaded'}
                                 </div>
-                            `;
-                            
-                            // Create DL badge
-                            const dlBadge = document.createElement('div');
-                            dlBadge.className = 'document-badge-item';
-                            dlBadge.innerHTML = `
-                                <div class="document-badge-icon">
-                                    <i class="fas fa-id-badge"></i>
+                            </div>
+                        `;
+
+                        const dlBadge = document.createElement('div');
+                        dlBadge.className = 'document-badge-item';
+                        dlBadge.innerHTML = `
+                            <div class="document-badge-icon">
+                                <i class="fas fa-id-badge"></i>
+                            </div>
+                            <div class="document-badge-info">
+                                <div class="document-badge-title">Driver License</div>
+                                <div class="document-badge-status ${hasDl ? 'verified' : 'not-verified'}">
+                                    <i class="fas ${hasDl ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                                    ${hasDl ? 'Verified' : 'Not Verified'}
                                 </div>
-                                <div class="document-badge-info">
-                                    <div class="document-badge-title">Driver License</div>
-                                    <div class="document-badge-status ${data.d_l ? 'verified' : 'not-verified'}">
-                                        <i class="fas ${data.d_l ? 'fa-check-circle' : 'fa-times-circle'}"></i>
-                                        ${data.d_l ? 'Verified' : 'Not Verified'}
-                                    </div>
-                                    <div class="document-badge-meaning">
-                                        ${data.d_l ? 'Licensed Driver Badge' : 'Driver\'s License not uploaded'}
-                                    </div>
+                                <div class="document-badge-meaning">
+                                    ${hasDl ? 'Licensed Driver Badge' : 'Driver\'s License not uploaded'}
                                 </div>
-                            `;
-                            
-                            // Add badges to container
-                            documentBadgesContainer.appendChild(rcBadge);
-                            documentBadgesContainer.appendChild(dlBadge);
-                        }
+                            </div>
+                        `;
+
+                        documentBadgesContainer.appendChild(rcBadge);
+                        documentBadgesContainer.appendChild(dlBadge);
                     }
                     
                     // Update WhatsApp number if found in API response
@@ -1753,8 +1748,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Check if RC document exists
             const rcBadge = document.createElement('div');
             rcBadge.className = 'document-badge-item';
-            
-            if (vehicle.rc) {
+
+            const hasRc = !!(vehicle.rc && String(vehicle.rc).trim()) || vehicle.rcUploaded === true;
+            if (hasRc) {
                 rcBadge.innerHTML = `
                     <div class="document-badge-icon">
                         <i class="fas fa-id-card"></i>
@@ -1783,8 +1779,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Check if Driver License document exists
             const dlBadge = document.createElement('div');
             dlBadge.className = 'document-badge-item';
-            
-            if (vehicle.d_l) {
+
+            const hasDl = !!(vehicle.d_l && String(vehicle.d_l).trim()) || vehicle.dlUploaded === true;
+            if (hasDl) {
                 dlBadge.innerHTML = `
                     <div class="document-badge-icon">
                         <i class="fas fa-id-badge"></i>

@@ -94,6 +94,11 @@ public class RegistrationController {
             data.put("registrationDate", reg.getRegistrationDate() != null ? reg.getRegistrationDate().toString() : "");
             // Include membership to enable premium UI on card fetch-by-id
             data.put("membership", reg.getMembership());
+            // Safe flags (no URLs) to allow public UI to show document upload/verification badges
+            boolean rcUploaded = reg.getRc() != null && !reg.getRc().isBlank();
+            boolean dlUploaded = reg.getD_l() != null && !reg.getD_l().isBlank();
+            data.put("rcUploaded", rcUploaded);
+            data.put("dlUploaded", dlUploaded);
             return ResponseEntity.ok(data);
         } catch (Exception e) {
             log.warn("Error fetching registration by id={}", id, e);

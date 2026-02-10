@@ -152,6 +152,10 @@ public class VehicleController {
             vehicle.put("ownerPhone", reg.getContactNumber());
             // Include membership for premium/standard styling on frontend
             vehicle.put("membership", reg.getMembership());
+
+            // Safe flags to show document upload badges without exposing URLs
+            vehicle.put("rcUploaded", reg.getRc() != null && !reg.getRc().isBlank());
+            vehicle.put("dlUploaded", reg.getD_l() != null && !reg.getD_l().isBlank());
             
             // Use the actual registration date if available, otherwise format today's date
             String registrationDate = reg.getRegistrationDate() != null 
