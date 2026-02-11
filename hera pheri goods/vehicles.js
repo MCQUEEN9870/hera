@@ -70,6 +70,57 @@ document.addEventListener('DOMContentLoaded', function() {
         return '';
     }
 
+    // Profile photo pretty URL builder (matches /images/vehicles technique)
+    // Returns the full object path inside the bucket (may contain slashes)
+    function getProfilePhotoKeyFromUrl(url) {
+        try {
+            let raw = String(url || '').trim();
+            if (!raw) return '';
+            // Strip query params / fragments
+            const q = raw.indexOf('?');
+            if (q >= 0) raw = raw.substring(0, q);
+            const h = raw.indexOf('#');
+            if (h >= 0) raw = raw.substring(0, h);
+
+            const markerPublic = '/storage/v1/object/public/';
+            const markerObject = '/storage/v1/object/';
+            let tail = '';
+
+            let idx = raw.indexOf(markerPublic);
+            if (idx >= 0) {
+                tail = raw.substring(idx + markerPublic.length);
+            } else {
+                idx = raw.indexOf(markerObject);
+                if (idx < 0) return '';
+                tail = raw.substring(idx + markerObject.length);
+            }
+
+            const slash = tail.indexOf('/');
+            if (slash < 0 || slash + 1 >= tail.length) return '';
+            return tail.substring(slash + 1);
+        } catch (_) {
+            return '';
+        }
+    }
+
+    function encodePathPreservingSlashes(path) {
+        const p = String(path || '').trim();
+        if (!p) return '';
+        return p.split('/').map(seg => encodeURIComponent(seg)).join('/');
+    }
+
+    function buildOwnerProfilePhotoUrlFromKey(key) {
+        const k = String(key || '').trim();
+        if (!k) return '';
+        const enc = encodePathPreservingSlashes(k);
+        // In production, /images/profile/* is rewritten by Netlify to the backend proxy.
+        const pretty = `${window.location.origin}/images/profile/${enc}`;
+        // In local dev, the Netlify rewrite doesn't exist; fall back to the backend proxy directly.
+        const api = `${API_BASE_URL}images/profile/${enc}`;
+        const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(window.location.hostname);
+        return safeUrl(isLocal ? api : pretty);
+    }
+
     // Pagination state (temporary PAGE_SIZE=2 for visual testing; will revert to 20)
     let currentPage = 1;
     const PAGE_SIZE = 20; // Restored standard page size
@@ -1588,6 +1639,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (data.rc) vehicle.rc = data.rc;
                     if (data.d_l) vehicle.d_l = data.d_l;
 
+                    // Update profile photo key/flag (safe public metadata)
+                    if (typeof data.profilePhotoUploaded !== 'undefined') vehicle.profilePhotoUploaded = !!data.profilePhotoUploaded;
+                    if (data.profilePhotoKey) vehicle.profilePhotoKey = data.profilePhotoKey;
+
+                    // If modal already rendered, show/hide the owner-photo row dynamically
+                    try {
+                        const ownerPhotoRow = document.querySelector('[data-field="owner-profile-photo"]');
+                        if (ownerPhotoRow) {
+                            const key = String(vehicle.profilePhotoKey || vehicle.ownerProfilePhotoKey || '').trim();
+                            if ((vehicle.profilePhotoUploaded === true || !!key) && key) {
+                                ownerPhotoRow.style.display = '';
+                                const btn = ownerPhotoRow.querySelector('.view-owner-photo-btn');
+                                if (btn) btn.setAttribute('data-photo-key', key);
+                            } else {
+                                ownerPhotoRow.style.display = 'none';
+                            }
+                        }
+                    } catch (_) {}
+
                     const hasRc = !!(vehicle.rc && String(vehicle.rc).trim()) || vehicle.rcUploaded === true;
                     const hasDl = !!(vehicle.d_l && String(vehicle.d_l).trim()) || vehicle.dlUploaded === true;
 
@@ -2167,6 +2237,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Populate vehicle info
+            const ownerProfileKey = String(vehicle.ownerProfilePhotoKey || vehicle.profilePhotoKey || vehicle.profile_photo_key || '').trim()
+                || getProfilePhotoKeyFromUrl(vehicle.ownerProfilePhotoUrl || vehicle.profilePhotoUrl || vehicle.profilePhoto || '');
+
+            const ownerPhotoRowHtml = `
+                <li class="modal-info-item" data-field="owner-profile-photo" style="${ownerProfileKey ? '' : 'display:none;'}">
+                    <div class="info-icon"><i class="fas fa-camera"></i></div>
+                    <div class="info-content">
+                        <div class="info-label">Owner Photo</div>
+                        <div class="info-value-container">
+                            <div class="info-value">Tap to view</div>
+                            <i class="fas fa-image copy-btn view-owner-photo-btn" title="View owner photo" data-photo-key="${escapeHtml(ownerProfileKey || '')}"></i>
+                        </div>
+                    </div>
+                </li>
+            `;
+
             modalInfo.innerHTML = `
                 <div class="left-column">
                     ${trustCount > 0 ? trustCounterHTML : ''}
@@ -2215,6 +2301,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <div class="info-value">${ownerNameEsc}</div>
                                 </div>
                             </li>
+                            ${ownerPhotoRowHtml}
                             <li class="modal-info-item">
                                 <div class="info-icon"><i class="fas fa-phone"></i></div>
                                 <div class="info-content">
@@ -2256,6 +2343,37 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             `;
+
+            // Owner profile photo lazy-load (only set src when user taps)
+            // Note: this icon uses .copy-btn styling, but must NOT trigger clipboard copy.
+            try {
+                const btn = modalInfo.querySelector('.view-owner-photo-btn');
+                if (btn) {
+                    const fallbackKey = ownerProfileKey;
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // Prevent the generic ".copy-btn" handler from running on this element.
+                        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+
+                        const key = ((btn.getAttribute('data-photo-key') || '').trim() || String(fallbackKey || '').trim());
+                        if (!key) {
+                            showToast('Owner photo not available', 'error');
+                            return;
+                        }
+                        const src = buildOwnerProfilePhotoUrlFromKey(key);
+                        if (!src) {
+                            showToast('Owner photo not available', 'error');
+                            return;
+                        }
+                        lightboxImage.src = src;
+                        imageLightbox.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    });
+                }
+            } catch (e) {
+                console.warn('Failed to bind owner photo viewer', e);
+            }
             
             // Create and populate document badges
             const documentBadgesContainer = document.querySelector('.document-badges-container');
@@ -2331,10 +2449,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 documentBadgesContainer.appendChild(dlBadge);
             }
             
-            // Add event listeners to copy buttons
+            // Add event listeners to copy buttons (only when a real value exists)
             modalInfo.querySelectorAll('.copy-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const textToCopy = this.getAttribute('data-value');
+                    const textToCopyRaw = this.getAttribute('data-value');
+                    const textToCopy = (textToCopyRaw === null || textToCopyRaw === undefined) ? '' : String(textToCopyRaw);
+                    if (!textToCopy.trim()) return;
                     navigator.clipboard.writeText(textToCopy)
                         .then(() => {
                             showToast('Copied to clipboard!', 'success');

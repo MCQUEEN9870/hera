@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.time.LocalDate;
 import java.time.Duration;
+import java.util.Set;
 
 import org.springframework.http.CacheControl;
 
@@ -56,6 +57,32 @@ public class VehicleController {
             if ("prod".equalsIgnoreCase(p) || "production".equalsIgnoreCase(p)) return true;
         }
         return false;
+    }
+
+    private static String extractSupabaseObjectPath(String url) {
+        if (url == null) return null;
+        String s = url.trim();
+        if (s.isEmpty()) return null;
+        int q = s.indexOf('?');
+        if (q >= 0) s = s.substring(0, q);
+        int h = s.indexOf('#');
+        if (h >= 0) s = s.substring(0, h);
+        String markerPublic = "/storage/v1/object/public/";
+        String markerObject = "/storage/v1/object/";
+        String tail;
+        int i = s.indexOf(markerPublic);
+        if (i >= 0) {
+            tail = s.substring(i + markerPublic.length());
+        } else {
+            i = s.indexOf(markerObject);
+            if (i < 0) return null;
+            tail = s.substring(i + markerObject.length());
+        }
+        String[] parts = tail.split("/", 2);
+        if (parts.length < 2) return null;
+        String path = parts[1];
+        if (path == null || path.isBlank()) return null;
+        return path;
     }
 
     @Autowired
@@ -137,6 +164,26 @@ public class VehicleController {
         response.put("success", true);
         
         List<Map<String, Object>> vehicleList = new ArrayList<>();
+
+        // Batch-fetch owners so we can safely expose only a profile-photo *presence* flag + key
+        // (no eager image loading; frontend loads only after user taps).
+        Set<Long> userIds = pageSlice.stream()
+            .map(Registration::getUserId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+        Map<Long, String> userIdToProfilePhotoUrl = new HashMap<>();
+        if (!userIds.isEmpty()) {
+            try {
+                for (User u : userRepository.findAllById(userIds)) {
+                    if (u != null && u.getId() != null) {
+                        userIdToProfilePhotoUrl.put(u.getId(), u.getProfilePhotoUrl());
+                    }
+                }
+            } catch (Exception e) {
+                log.debug("Profile photo lookup failed for vehicle search", e);
+            }
+        }
         
         for (Registration reg : pageSlice) {
             Map<String, Object> vehicle = new HashMap<>();
@@ -156,6 +203,23 @@ public class VehicleController {
             // Safe flags to show document upload badges without exposing URLs
             vehicle.put("rcUploaded", reg.getRc() != null && !reg.getRc().isBlank());
             vehicle.put("dlUploaded", reg.getD_l() != null && !reg.getD_l().isBlank());
+
+            // Owner profile photo: expose only a key + boolean. Frontend uses /images/profile/:key (Netlify rewrite)
+            // and sets <img src> only after the user clicks.
+            String profilePhotoUrl = reg.getUserId() != null ? userIdToProfilePhotoUrl.get(reg.getUserId()) : null;
+            boolean ownerProfilePhotoUploaded = profilePhotoUrl != null && !profilePhotoUrl.isBlank();
+            vehicle.put("ownerProfilePhotoUploaded", ownerProfilePhotoUploaded);
+            if (ownerProfilePhotoUploaded) {
+                String key = null;
+                try {
+                    key = extractSupabaseObjectPath(profilePhotoUrl);
+                } catch (Exception ignored) {
+                    // key stays null
+                }
+                if (key != null && !key.isBlank()) {
+                    vehicle.put("ownerProfilePhotoKey", key);
+                }
+            }
             
             // Use the actual registration date if available, otherwise format today's date
             String registrationDate = reg.getRegistrationDate() != null 

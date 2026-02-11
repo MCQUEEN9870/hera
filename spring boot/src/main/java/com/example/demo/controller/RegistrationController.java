@@ -61,6 +61,36 @@ public class RegistrationController {
                 .anyMatch(p -> "prod".equalsIgnoreCase(p) || "production".equalsIgnoreCase(p));
     }
 
+    private static String extractSupabaseObjectPath(String url) {
+        if (url == null) return null;
+        String s = url.trim();
+        if (s.isEmpty()) return null;
+        // Strip query params / fragments (signed URLs etc.)
+        int q = s.indexOf('?');
+        if (q >= 0) s = s.substring(0, q);
+        int h = s.indexOf('#');
+        if (h >= 0) s = s.substring(0, h);
+
+        String markerPublic = "/storage/v1/object/public/";
+        String markerObject = "/storage/v1/object/";
+        String tail;
+
+        int i = s.indexOf(markerPublic);
+        if (i >= 0) {
+            tail = s.substring(i + markerPublic.length());
+        } else {
+            i = s.indexOf(markerObject);
+            if (i < 0) return null;
+            tail = s.substring(i + markerObject.length());
+        }
+
+        String[] parts = tail.split("/", 2);
+        if (parts.length < 2) return null;
+        String path = parts[1];
+        if (path == null || path.isBlank()) return null;
+        return path;
+    }
+
     /**
      * Fetch a single registration by ID (used by frontend vehicle card/detail)
      */
@@ -99,6 +129,37 @@ public class RegistrationController {
             boolean dlUploaded = reg.getD_l() != null && !reg.getD_l().isBlank();
             data.put("rcUploaded", rcUploaded);
             data.put("dlUploaded", dlUploaded);
+
+            // Owner profile photo: safe public metadata only (presence + key)
+            boolean profilePhotoUploaded = false;
+            String profilePhotoKey = null;
+            try {
+                User u = null;
+                if (reg.getUserId() != null) {
+                    u = userRepository.findById(reg.getUserId()).orElse(null);
+                }
+                // Fallback for any legacy rows where userId may be null but contactNumber exists
+                if (u == null) {
+                    String contact = reg.getContactNumber();
+                    if (contact != null && !contact.isBlank()) {
+                        u = userRepository.findByContactNumber(contact);
+                    }
+                }
+
+                if (u != null) {
+                    String url = u.getProfilePhotoUrl();
+                    profilePhotoUploaded = url != null && !url.isBlank();
+                    if (profilePhotoUploaded) {
+                        profilePhotoKey = extractSupabaseObjectPath(url);
+                    }
+                }
+            } catch (Exception ignored) {
+                // Keep safe defaults
+            }
+            data.put("profilePhotoUploaded", profilePhotoUploaded);
+            if (profilePhotoKey != null && !profilePhotoKey.isBlank()) {
+                data.put("profilePhotoKey", profilePhotoKey);
+            }
             return ResponseEntity.ok(data);
         } catch (Exception e) {
             log.warn("Error fetching registration by id={}", id, e);
@@ -511,6 +572,29 @@ public class RegistrationController {
     @PostMapping("/{id}/rc")
     public ResponseEntity<?> uploadRcDocument(@PathVariable Long id, @RequestParam("document") MultipartFile document) {
         try {
+            // Validate file
+            if (document == null || document.isEmpty()) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Empty file received");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+
+            if (document.getSize() > 5 * 1024 * 1024) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "File too large. Maximum size allowed is 5MB");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+
+            String contentType = document.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Only image files are allowed");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+
             // Check if registration exists
             if (!registrationRepository.existsById(id)) {
                 Map<String, Object> errorResponse = new HashMap<>();
@@ -576,6 +660,29 @@ public class RegistrationController {
     @PostMapping("/{id}/dl")
     public ResponseEntity<?> uploadDrivingLicenseDocument(@PathVariable Long id, @RequestParam("document") MultipartFile document) {
         try {
+            // Validate file
+            if (document == null || document.isEmpty()) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Empty file received");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+
+            if (document.getSize() > 5 * 1024 * 1024) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "File too large. Maximum size allowed is 5MB");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+
+            String contentType = document.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Only image files are allowed");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+
             // Check if registration exists
             if (!registrationRepository.existsById(id)) {
                 Map<String, Object> errorResponse = new HashMap<>();

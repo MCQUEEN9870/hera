@@ -3363,6 +3363,93 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.__hpgProfilePhotoInitDone) return;
         window.__hpgProfilePhotoInitDone = true;
 
+        // Client-side image compression helper (strips EXIF/metadata by re-encoding)
+        // - Enforces reasonable dimensions for faster upload + storage savings.
+        // - Uses WebP when available, falls back to JPEG.
+        async function compressImageFileForUpload(file, opts) {
+            try {
+                if (!file || !file.type || !String(file.type).startsWith('image/')) return file;
+
+                const maxWidth = opts && opts.maxWidth ? opts.maxWidth : 1800;
+                const maxHeight = opts && opts.maxHeight ? opts.maxHeight : 1800;
+                const maxOutputBytes = opts && opts.maxOutputBytes ? opts.maxOutputBytes : null;
+                const preferredQuality = typeof (opts && opts.quality) === 'number' ? opts.quality : 0.82;
+
+                // Prefer WebP where supported
+                const preferredTypes = ['image/webp', 'image/jpeg'];
+
+                let bitmap;
+                try {
+                    // Try to respect EXIF orientation when supported
+                    bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+                } catch (_e) {
+                    bitmap = await createImageBitmap(file);
+                }
+
+                const srcW = bitmap.width || 0;
+                const srcH = bitmap.height || 0;
+                if (!srcW || !srcH) {
+                    try { bitmap.close(); } catch (_e) {}
+                    return file;
+                }
+
+                const scale = Math.min(1, maxWidth / srcW, maxHeight / srcH);
+                const outW = Math.max(1, Math.round(srcW * scale));
+                const outH = Math.max(1, Math.round(srcH * scale));
+
+                const canvas = document.createElement('canvas');
+                canvas.width = outW;
+                canvas.height = outH;
+                const ctx = canvas.getContext('2d', { alpha: false });
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(bitmap, 0, 0, outW, outH);
+                try { bitmap.close(); } catch (_e) {}
+
+                const canvasToBlob = (type, quality) => new Promise((resolve) => {
+                    try {
+                        canvas.toBlob((b) => resolve(b), type, quality);
+                    } catch (_e) {
+                        resolve(null);
+                    }
+                });
+
+                const pickType = async () => {
+                    for (const t of preferredTypes) {
+                        const b = await canvasToBlob(t, preferredQuality);
+                        if (b && b.size > 0) return t;
+                    }
+                    return 'image/jpeg';
+                };
+
+                const mimeType = await pickType();
+
+                let quality = preferredQuality;
+                let blob = await canvasToBlob(mimeType, quality);
+                if (!blob || blob.size === 0) return file;
+
+                if (maxOutputBytes && blob.size > maxOutputBytes) {
+                    // Iteratively reduce quality to meet size cap
+                    for (let i = 0; i < 8 && blob.size > maxOutputBytes; i++) {
+                        quality = Math.max(0.5, quality - 0.07);
+                        const next = await canvasToBlob(mimeType, quality);
+                        if (!next || next.size === 0) break;
+                        blob = next;
+                    }
+                }
+
+                // If compression didn't help, keep original
+                if (blob.size >= file.size) return file;
+
+                const baseName = (file.name || 'image').replace(/\.[^.]+$/, '');
+                const ext = mimeType === 'image/webp' ? 'webp' : 'jpg';
+                return new File([blob], `${baseName}-compressed.${ext}`, { type: mimeType });
+            } catch (e) {
+                console.warn('Image compression failed; uploading original', e);
+                return file;
+            }
+        }
+
         const userAvatar = document.getElementById('userAvatar');
         const photoModal = document.getElementById('profilePhotoModal');
         const photoViewer = document.getElementById('profilePhotoViewer');
@@ -3520,9 +3607,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 
+                // Compress before upload (profile photo is only used in dashboard; keep it small)
+                const fileToUpload = await compressImageFileForUpload(currentPhotoFile, {
+                    maxWidth: 512,
+                    maxHeight: 512,
+                    quality: 0.72,
+                    maxOutputBytes: 300 * 1024
+                });
+
                 // Create form data for API
                 const formData = new FormData();
-                formData.append('photo', currentPhotoFile);
+                formData.append('photo', fileToUpload);
                 
                 // Get user phone number from localStorage
                 const userPhone = localStorage.getItem('userPhone');
@@ -4271,13 +4366,54 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch(tempPhotoUrl);
             const blob = await response.blob();
             const file = new File([blob], "profile-photo.jpg", { type: blob.type });
+
+            // Re-compress before upload (also strips metadata)
+            const fileToUpload = await (async () => {
+                try {
+                    if (!file || !file.type || !String(file.type).startsWith('image/')) return file;
+                    // local helper: use createImageBitmap + canvas re-encode
+                    let bitmap;
+                    try { bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch (_e) { bitmap = await createImageBitmap(file); }
+                    const maxDim = 512;
+                    const scale = Math.min(1, maxDim / bitmap.width, maxDim / bitmap.height);
+                    const w = Math.max(1, Math.round(bitmap.width * scale));
+                    const h = Math.max(1, Math.round(bitmap.height * scale));
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d', { alpha: false });
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(bitmap, 0, 0, w, h);
+                    try { bitmap.close(); } catch (_e) {}
+                    const toBlob = (type, quality) => new Promise((resolve) => canvas.toBlob(resolve, type, quality));
+                    let type = 'image/webp';
+                    let b = await toBlob(type, 0.72);
+                    if (!b || !b.size) { type = 'image/jpeg'; b = await toBlob(type, 0.72); }
+                    if (!b || !b.size) return file;
+                    // Cap around 300KB
+                    const cap = 300 * 1024;
+                    let q = 0.72;
+                    for (let i = 0; i < 8 && b.size > cap; i++) {
+                        q = Math.max(0.5, q - 0.07);
+                        const nb = await toBlob(type, q);
+                        if (!nb || !nb.size) break;
+                        b = nb;
+                    }
+                    if (b.size >= file.size) return file;
+                    const ext = type === 'image/webp' ? 'webp' : 'jpg';
+                    return new File([b], `profile-photo-compressed.${ext}`, { type });
+                } catch (e) {
+                    console.warn('Temp profile compression failed; uploading original', e);
+                    return file;
+                }
+            })();
             
             // Get user phone number from localStorage
             const userPhone = localStorage.getItem('userPhone');
             
             // Create form data
             const formData = new FormData();
-            formData.append('photo', file);
+            formData.append('photo', fileToUpload);
             
             // Upload the photo
             const serverResponse = await fetchWithRetry(getApiUrl(`users/${userPhone}/profile-photo`), {
@@ -4635,6 +4771,22 @@ document.addEventListener('DOMContentLoaded', function() {
         function handleFileSelect(e) {
             const file = e.target.files[0];
             if (file) {
+                if (!file.type || !String(file.type).startsWith('image/')) {
+                    showToast('Please select an image file only (JPG/PNG/WebP)', 'error');
+                    if (documentFileInput) documentFileInput.value = '';
+                    submitDocumentUpload.disabled = true;
+                    window.hasDocumentFile = false;
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('File too large. Maximum allowed is 5MB', 'error');
+                    if (documentFileInput) documentFileInput.value = '';
+                    submitDocumentUpload.disabled = true;
+                    window.hasDocumentFile = false;
+                    return;
+                }
+
                 const reader = new FileReader();
                 
                 reader.onload = function(e) {
@@ -4669,6 +4821,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 showToast('Please select a file first', 'error');
                 return;
             }
+
+            const originalFile = documentFileInput.files[0];
+            if (!originalFile.type || !String(originalFile.type).startsWith('image/')) {
+                showToast('Only image files are allowed for RC/DL', 'error');
+                return;
+            }
+            if (originalFile.size > 5 * 1024 * 1024) {
+                showToast('File too large. Maximum allowed is 5MB', 'error');
+                return;
+            }
             
             // Check if a vehicle is selected
             if (!selectedVehicle || !selectedVehicle.id) {
@@ -4682,7 +4844,49 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Create form data
                 const formData = new FormData();
-                            formData.append('document', documentFileInput.files[0]);
+
+                // Compress before upload (RC/DL are not displayed publicly; keep reasonably small but readable)
+                const compressedFile = await (async () => {
+                    try {
+                        let bitmap;
+                        try { bitmap = await createImageBitmap(originalFile, { imageOrientation: 'from-image' }); } catch (_e) { bitmap = await createImageBitmap(originalFile); }
+                        const maxDim = 1800;
+                        const scale = Math.min(1, maxDim / bitmap.width, maxDim / bitmap.height);
+                        const w = Math.max(1, Math.round(bitmap.width * scale));
+                        const h = Math.max(1, Math.round(bitmap.height * scale));
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w; canvas.height = h;
+                        const ctx = canvas.getContext('2d', { alpha: false });
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        ctx.drawImage(bitmap, 0, 0, w, h);
+                        try { bitmap.close(); } catch (_e) {}
+                        const toBlob = (type, quality) => new Promise((resolve) => canvas.toBlob(resolve, type, quality));
+
+                        // Use JPEG for document photos (consistent + small)
+                        let type = 'image/jpeg';
+                        let q = 0.85;
+                        let b = await toBlob(type, q);
+                        if (!b || !b.size) return originalFile;
+
+                        // Cap around ~900KB to keep storage/bandwidth sane
+                        const cap = 900 * 1024;
+                        for (let i = 0; i < 8 && b.size > cap; i++) {
+                            q = Math.max(0.6, q - 0.06);
+                            const nb = await toBlob(type, q);
+                            if (!nb || !nb.size) break;
+                            b = nb;
+                        }
+
+                        if (b.size >= originalFile.size) return originalFile;
+                        return new File([b], 'document-compressed.jpg', { type });
+                    } catch (e) {
+                        console.warn('Document compression failed; uploading original', e);
+                        return originalFile;
+                    }
+                })();
+
+                formData.append('document', compressedFile);
             
             try {
                 // Determine the endpoint based on document type

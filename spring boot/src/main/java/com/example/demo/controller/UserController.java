@@ -336,10 +336,10 @@ public class UserController {
             return ResponseEntity.badRequest().body(errorResponse);
         }
         
-        if (photo.getSize() > 10 * 1024 * 1024) { // 10MB limit
+        if (photo.getSize() > 5 * 1024 * 1024) { // 5MB limit
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
-            errorResponse.put("message", "File too large. Maximum size allowed is 10MB");
+            errorResponse.put("message", "File too large. Maximum size allowed is 5MB");
             return ResponseEntity.badRequest().body(errorResponse);
         }
         

@@ -231,6 +231,12 @@
   status = 200
   force = true
 
+[[redirects]]
+  from = "/images/profile/*"
+  to = "https://api.herapherigoods.in/api/images/profile/:splat"
+  status = 200
+  force = true
+
 # SPA fallback redirect (must be last)
 [[redirects]]
   from = "/*"
@@ -306,6 +312,11 @@
 # Cache pretty-proxied vehicle images aggressively
 [[headers]]
   for = "/images/vehicles/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/images/profile/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
