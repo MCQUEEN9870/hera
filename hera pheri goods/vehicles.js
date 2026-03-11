@@ -2538,12 +2538,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const documentBadgesContainer = document.querySelector('.document-badges-container');
             if (documentBadgesContainer) {
                 documentBadgesContainer.innerHTML = ''; // Clear previous badges
+
+                // Public-safe flags (preferred). Fall back to legacy URL fields if present.
+                const rcPresent = !!(vehicle.rcUploaded || vehicle.rc);
+                const dlPresent = !!(vehicle.dlUploaded || vehicle.d_l);
                 
                 // Check if RC document exists
                 const rcBadge = document.createElement('div');
                 rcBadge.className = 'document-badge-item';
                 
-                if (vehicle.rc) {
+                if (rcPresent) {
                     rcBadge.innerHTML = `
                         <div class="document-badge-icon">
                             <i class="fas fa-id-card"></i>
@@ -2575,7 +2579,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const dlBadge = document.createElement('div');
                 dlBadge.className = 'document-badge-item';
                 
-                if (vehicle.d_l) {
+                if (dlPresent) {
                     dlBadge.innerHTML = `
                         <div class="document-badge-icon">
                             <i class="fas fa-id-badge"></i>
@@ -2657,53 +2661,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             };
 
-            // After modal content is rendered, refresh document badges from backend to ensure accuracy
-            try {
-                if (vehicleId) {
-                    const docsUrl = `${API_BASE_URL}registration/${vehicleId}/documents?_t=${Date.now()}`;
-                    const paintBadges = (docs) => {
-                        const rcUrl = docs.rc && docs.rc.url ? docs.rc.url : null;
-                        const dlUrl = docs.dl && docs.dl.url ? docs.dl.url : null;
-                        const container = document.querySelector('.document-badges-container');
-                        if (!container) return;
-                        container.innerHTML = '';
-                        const rcBadge = document.createElement('div');
-                        rcBadge.className = 'document-badge-item';
-                        rcBadge.innerHTML = `
-                            <div class="document-badge-icon"><i class="fas fa-id-card"></i></div>
-                            <div class="document-badge-info">
-                                <div class="document-badge-title">Vehicle RC</div>
-                                <div class="document-badge-status ${rcUrl ? 'verified' : 'not-verified'}">
-                                    <i class="fas ${rcUrl ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${rcUrl ? 'Verified' : 'Not Verified'}
-                                </div>
-                                <div class="document-badge-meaning">${rcUrl ? 'Trusted Owner Badge' : 'Registration Certificate not uploaded'}</div>
-                            </div>`;
-                        const dlBadge = document.createElement('div');
-                        dlBadge.className = 'document-badge-item';
-                        dlBadge.innerHTML = `
-                            <div class="document-badge-icon"><i class="fas fa-id-badge"></i></div>
-                            <div class="document-badge-info">
-                                <div class="document-badge-title">Driver License</div>
-                                <div class="document-badge-status ${dlUrl ? 'verified' : 'not-verified'}">
-                                    <i class="fas ${dlUrl ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${dlUrl ? 'Verified' : 'Not Verified'}
-                                </div>
-                                <div class="document-badge-meaning">${dlUrl ? 'Licensed Driver Badge' : 'Driver\'s License not uploaded'}</div>
-                            </div>`;
-                        container.appendChild(rcBadge);
-                        container.appendChild(dlBadge);
-                    };
-                    fetch(docsUrl)
-                        .then(res => res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`)))
-                        .then(payload => {
-                            const docs = payload && payload.documents ? payload.documents : {};
-                            paintBadges(docs);
-                            setTimeout(() => paintBadges(docs), 600);
-                        })
-                        .catch(err => console.warn('Failed to refresh document badges:', err));
-                }
-            } catch (e) {
-                console.warn('Error scheduling document badge refresh', e);
-            }
+            // Do NOT refresh document URLs on public pages.
+            // The /documents endpoint is owner-only and can return 401; public UI uses rcUploaded/dlUploaded flags.
         }
         
         // Use our helper function to get images

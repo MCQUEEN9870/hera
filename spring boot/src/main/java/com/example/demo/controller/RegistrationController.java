@@ -124,6 +124,20 @@ public class RegistrationController {
             data.put("registrationDate", reg.getRegistrationDate() != null ? reg.getRegistrationDate().toString() : "");
             // Include membership to enable premium UI on card fetch-by-id
             data.put("membership", reg.getMembership());
+
+            // Include vehicle images so deep-links can open the modal without extra API calls.
+            // (Prevents CORS/401 issues from registration-images endpoints on public pages.)
+            try {
+                List<String> imgs = reg.getVehicleImageUrls();
+                data.put("images", imgs);
+                data.put("vehicleImageUrls", imgs);
+                String json = reg.getVehicleImageUrlsJson();
+                if (json != null && !json.isBlank()) {
+                    data.put("vehicle_image_urls_json", json);
+                }
+            } catch (Exception ignored) {
+                // Keep response resilient
+            }
             // Safe flags (no URLs) to allow public UI to show document upload/verification badges
             boolean rcUploaded = reg.getRc() != null && !reg.getRc().isBlank();
             boolean dlUploaded = reg.getD_l() != null && !reg.getD_l().isBlank();
