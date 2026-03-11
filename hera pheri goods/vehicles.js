@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalGallery = document.getElementById('modalGallery');
     const modalInfo = document.getElementById('modalInfo');
     const contactDriverBtn = document.getElementById('contactDriverBtn');
+    const shareVehicleBtn = document.getElementById('shareVehicleBtn');
     const imageLightbox = document.getElementById('imageLightbox');
     const lightboxImage = document.getElementById('lightboxImage');
     const closeLightbox = document.getElementById('closeLightbox');
@@ -68,6 +69,144 @@ document.addEventListener('DOMContentLoaded', function() {
         if (/^https?:\/\//i.test(raw)) return raw;
         if (/^data:image\//i.test(raw)) return raw;
         return '';
+    }
+
+    function slugifyForPrettyUrl(value) {
+        const s = (value === null || value === undefined) ? '' : String(value);
+        // Keep it simple and predictable: ASCII-ish slugs.
+        // - Lowercase
+        // - Replace non-alphanum with dashes
+        // - Collapse dashes
+        // - Trim
+        return s
+            .toLowerCase()
+            .replace(/&/g, ' and ')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+    }
+
+    function buildPrettyShareUrlForVehicle(vehicle) {
+        const id = vehicle && (vehicle.id || vehicle.vehicleId);
+        const numericId = id !== null && id !== undefined ? String(id).trim() : '';
+        if (!numericId) return '';
+
+        const ownerName = vehicle.ownerName || vehicle.driverName || vehicle.owner || vehicle.fullName || '';
+        const vehicleType = vehicle.type || vehicle.vehicleType || '';
+
+        const ownerSlug = slugifyForPrettyUrl(ownerName) || 'owner';
+        const typeSlug = slugifyForPrettyUrl(vehicleType) || 'vehicle';
+
+        // v<ID> marker makes parsing reliable.
+        const slug = `${ownerSlug}-${typeSlug}-v${numericId}-herapherigoods`;
+        return `${window.location.origin}/find-vehicles/${slug}`;
+    }
+
+    async function copyTextToClipboard(text) {
+        const t = (text === null || text === undefined) ? '' : String(text);
+        if (!t.trim()) return false;
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(t);
+                return true;
+            }
+        } catch (_) {
+            // fall back below
+        }
+        try {
+            const ta = document.createElement('textarea');
+            ta.value = t;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            const ok = document.execCommand('copy');
+            document.body.removeChild(ta);
+            return !!ok;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    function getDeepLinkVehicleIdFromUrl() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const q = (params.get('v') || params.get('vehicleId') || params.get('id') || '').trim();
+            if (q && /^\d+$/.test(q)) return Number(q);
+
+            const segs = (window.location.pathname || '').split('/').filter(Boolean);
+            const idx = segs.findIndex(s => {
+                const x = String(s || '').toLowerCase();
+                return x === 'find-vehicles' || x === 'vehicles';
+            });
+            if (idx >= 0 && segs.length > idx + 1) {
+                const slug = String(segs[idx + 1] || '');
+                const m = slug.match(/(?:^|-)(?:v)(\d+)(?:-|$)/i);
+                if (m && m[1]) return Number(m[1]);
+            }
+            return null;
+        } catch (_) {
+            return null;
+        }
+    }
+
+    async function openVehicleFromDeepLink(vehicleId) {
+        const id = Number(vehicleId);
+        if (!id || !Number.isFinite(id)) return false;
+        try {
+            if (loadingOverlay) loadingOverlay.style.display = 'flex';
+            const apiUrl = `${API_BASE_URL}registration/${id}`;
+            const res = await fetch(apiUrl, { headers: { 'Accept': 'application/json' } });
+            if (!res.ok) throw new Error(`Failed to fetch vehicle (${res.status})`);
+            const data = await res.json();
+
+            const vehicle = {
+                ...data,
+                id: data.id || id,
+                userId: data.userId,
+                owner: data.owner,
+                fullName: data.owner,
+                vehicleType: data.vehicleType,
+                vehiclePlateNumber: data.vehiclePlateNumber,
+                contact: data.contact,
+                contactNumber: data.contact,
+                whatsappNumber: data.whatsappNumber || data.whatsappNo || data.whatsapp,
+                alternateContactNumber: data.alternateContactNumber || data.alternateContact || data.alternateNumber,
+                city: data.city,
+                state: data.state,
+                pincode: data.pincode,
+                registrationDate: data.registrationDate,
+                membership: data.membership,
+                rcUploaded: data.rcUploaded,
+                dlUploaded: data.dlUploaded,
+                profilePhotoUploaded: data.profilePhotoUploaded,
+                profilePhotoKey: data.profilePhotoKey
+            };
+
+            // Render a single-card result so the user lands on the exact card.
+            currentPage = 1;
+            totalPages = 1;
+            totalItems = 1;
+            displayResults([vehicle]);
+
+            // Scroll to the card and open modal.
+            setTimeout(() => {
+                try {
+                    const card = document.querySelector(`.vehicle-card[data-id="${id}"]`);
+                    if (card && typeof card.scrollIntoView === 'function') {
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                } catch (_) {}
+                try { openVehicleModal(vehicle); } catch (_) {}
+            }, 150);
+
+            return true;
+        } catch (e) {
+            console.warn('Deep-link open failed', e);
+            if (loadingOverlay) loadingOverlay.style.display = 'none';
+            return false;
+        }
     }
 
     // Profile photo pretty URL builder (matches /images/vehicles technique)
@@ -743,8 +882,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Trigger initial load after a short delay to allow environment setup
-    setTimeout(initialLoadAllVehicles, 300);
+    // Trigger initial load after a short delay to allow environment setup.
+    // If a deep-link is present, open that exact vehicle instead (and only fall back to listing if it fails).
+    const deepLinkVehicleId = getDeepLinkVehicleIdFromUrl();
+    if (deepLinkVehicleId) {
+        setTimeout(async () => {
+            const ok = await openVehicleFromDeepLink(deepLinkVehicleId);
+            if (!ok) initialLoadAllVehicles();
+        }, 300);
+    } else {
+        setTimeout(initialLoadAllVehicles, 300);
+    }
     
     // Function to fetch vehicles from the database
     function fetchVehiclesFromDatabase(vehicleType, state, city, pincode) {
@@ -1810,6 +1958,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const documentBadgesContainer = document.querySelector('.document-badges-container');
         const contactDriverBtn = document.getElementById('contactDriverBtn');
         const callDriverBtn = document.getElementById('callDriverBtn');
+        const shareVehicleBtn = document.getElementById('shareVehicleBtn');
+
+        // Share link (copy only)
+        if (shareVehicleBtn) {
+            const shareUrl = buildPrettyShareUrlForVehicle(vehicle);
+            shareVehicleBtn.style.display = shareUrl ? 'inline-flex' : 'none';
+            shareVehicleBtn.onclick = async function() {
+                const ok = await copyTextToClipboard(shareUrl);
+                showToast(ok ? 'Link copied!' : 'Failed to copy link', ok ? 'success' : 'error');
+            };
+        }
         
         // Update document badges section
         if (documentBadgesContainer) {
