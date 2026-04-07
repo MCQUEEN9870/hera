@@ -53,6 +53,36 @@
     
     <style>
         /* Modern Vehicles Page Styles */
+        /* Floating Home button (vehicles page only) */
+        .home-float {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.92);
+            color: #2c3e50;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            z-index: 2500;
+        }
+        .home-float:hover {
+            background: #ffffff;
+        }
+        .home-float i { font-size: 18px; }
+        @media (max-width: 768px) {
+            .home-float {
+                top: 10px;
+                left: 10px;
+                width: 42px;
+                height: 42px;
+            }
+        }
+
         .vehicles-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -258,6 +288,7 @@
             text-align: left;
             min-width: 0;
         }
+
         .vehicle-category-card .title {
             font-weight: 800;
             color: #111827;
@@ -1237,32 +1268,10 @@
     </style>
 </head>
 <body>
-    <!-- Navigation Bar Section -->
-    <nav class="navbar" style ="height: 115px;">
-        <ul class="nav-links">
-           <li>
-                <a href="index" class="nav-item"><span>Home</span></a>
-            </li>
-            
-            <!-- Authentication Section - Only shown when user is logged in -->
-            <li id="authSection" style="display: none;">
-                <a href="driver-dashboard" class="nav-item"> 
-                    <span>
-                        <img loading="lazy" decoding="async" src="attached_assets/images/user.webp" class="profile-icon" alt="User profile" title="User profile">
-                    </span>
-                </a>
-            </li>
-        </ul> 
-        
-        <style>
-            .profile-icon {
-                width: 40px;
-                height: 40px;
-                border-radius: 40%;
-                margin-top: -10px;
-            }
-        </style>
-    </nav>
+    <!-- Vehicles page has no navbar to reduce scroll; keep a small Home icon instead -->
+    <a href="index" class="home-float" aria-label="Home" title="Home">
+        <i class="fas fa-home" aria-hidden="true"></i>
+    </a>
 
     <!-- Main Content -->
     <div class="vehicles-container">
