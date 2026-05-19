@@ -114,7 +114,7 @@ public class TwoFactorService {
             }
             RestTemplate restTemplate = new RestTemplate();
             String normalized = normalizeIndianNumber(phoneNumber);
-            String message = "Your OTP is: " + otp + " (Herapheri Goods)";
+            String message = "Your OTP is: " + otp + " (Herapherigoods)";
             String encodedMsg = java.net.URLEncoder.encode(message, java.nio.charset.StandardCharsets.UTF_8);
             String url = String.format(TWOFACTOR_SMS_WITH_OTP_URL_TEMPLATE, twoFactorApiKey, normalized, encodedMsg, otp);
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);

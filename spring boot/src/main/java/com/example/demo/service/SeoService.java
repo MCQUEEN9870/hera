@@ -43,31 +43,31 @@ public class SeoService {
 
         if ("register".equalsIgnoreCase(intent) || path.startsWith("/register")) {
             String locStr = normalizedCity != null && !normalizedCity.isBlank() ? (" in " + normalizedCity) : "";
-            title = "Register Your " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "Transport Vehicle") + locStr + " | Herapheri Goods";
+            title = "Register Your " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "Transport Vehicle") + locStr + " | Herapherigoods";
             description = "List your " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "transport vehicle")
                     + (normalizedCity != null && !normalizedCity.isBlank() ? " in " + normalizedCity : " at your pincode")
-                    + ". Free listing on Herapheri Goods. Get direct enquiries from nearby customers.";
+                    + ". Free listing on Herapherigoods. Get direct enquiries from nearby customers.";
             heading = "Register Your " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "Vehicle")
                     + (normalizedCity != null && !normalizedCity.isBlank() ? " in " + normalizedCity : "");
         } else if (path.startsWith("/vehicles") || "find".equalsIgnoreCase(intent)) {
             String typeStr = (normalizedType != null && !normalizedType.isBlank()) ? normalizedType : "Transport Vehicles";
             String cityStr = (normalizedCity != null && !normalizedCity.isBlank()) ? (" in " + normalizedCity) : "";
-            title = "Find " + typeStr + cityStr + " | Herapheri Goods";
+            title = "Find " + typeStr + cityStr + " | Herapherigoods";
             description = "Find the best " + typeStr.toLowerCase(Locale.ROOT) + (normalizedCity != null && !normalizedCity.isBlank() ? " near you in " + normalizedCity : " near you")
                     + ". Select your pincode and vehicle type to see verified owners with photos. No middlemen.";
             heading = "Find " + typeStr + cityStr;
         } else { // homepage and others
             if ((normalizedType != null && !normalizedType.isBlank()) || (normalizedCity != null && !normalizedCity.isBlank())) {
                 String cityStr2 = (normalizedCity != null && !normalizedCity.isBlank()) ? (" in " + normalizedCity) : "";
-                title = "Herapheri Goods" + cityStr2 + " | Find " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "Transport Vehicles") + cityStr2;
+                title = "Herapherigoods" + cityStr2 + " | Find " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "Transport Vehicles") + cityStr2;
                 description = "Search by pincode to find " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType.toLowerCase(Locale.ROOT) : "transport vehicles")
                         + (normalizedCity != null && !normalizedCity.isBlank() ? " near you in " + normalizedCity : " near you")
                         + ". Contact owners directly. No brokers.";
                 heading = "Finding " + (normalizedType != null && !normalizedType.isBlank() ? normalizedType : "Transport Vehicles") + cityStr2;
             } else {
-                title = "Herapheri Goods | Aapka Apna Transport Network";
+                title = "Herapherigoods | Aapka Apna Transport Network";
                 description = "Find nearby transport vehicles at your pincode and register your own vehicle for free. Contact owners directly. No middlemen.";
-                heading = "Herapheri Goods";
+                heading = "Herapherigoods";
             }
         }
 
@@ -116,7 +116,7 @@ public class SeoService {
         StringBuilder kw = new StringBuilder();
         if (type != null && !type.isBlank()) kw.append(type).append(", ");
         if (city != null && !city.isBlank()) kw.append(city).append(", ");
-        kw.append("transport, vehicle, trucks, register vehicle, herapheri goods");
+        kw.append("transport, vehicle, trucks, register vehicle, herapherigoods");
         return kw.toString();
     }
 
@@ -127,7 +127,7 @@ public class SeoService {
             .append("{")
             .append("\"@context\":\"https://schema.org\",")
             .append("\"@type\":\"WebSite\",")
-            .append("\"name\":\"Herapheri Goods\",")
+            .append("\"name\":\"Herapherigoods\",")
             .append("\"url\":\"").append(escapeJson(baseUrl)).append("\",")
             .append("\"potentialAction\":{\"@type\":\"SearchAction\",\"target\":\"")
             .append(escapeJson(baseUrl)).append("/?q={search_term_string}\",\"query-input\":\"required name=search_term_string\"}}")
@@ -137,7 +137,7 @@ public class SeoService {
             .append("{")
             .append("\"@context\":\"https://schema.org\",")
             .append("\"@type\":\"Organization\",")
-            .append("\"name\":\"Herapheri Goods\",")
+            .append("\"name\":\"Herapherigoods\",")
             .append("\"url\":\"").append(escapeJson(baseUrl)).append("\",")
             .append("\"logo\":\"").append(escapeJson(baseUrl)).append("/attached_assets/images/new-logo.png\",")
             .append("\"sameAs\":[\"https://www.herapherigoods.in\"]}")
@@ -152,7 +152,7 @@ public class SeoService {
             .append("\"@context\":\"https://schema.org\",")
             .append("\"@type\":\"FAQPage\",")
             .append("\"mainEntity\":[")
-            .append("{\"@type\":\"Question\",\"name\":\"Apne truck ko kaise register kare?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Herapheri Goods par aap apna transport vehicle free mein register kar sakte hain. Bas Register page par jaakar form fill karein, 4 photos upload karein, aur submit kar dein.\"}},")
+            .append("{\"@type\":\"Question\",\"name\":\"Apne truck ko kaise register kare?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Herapherigoods par aap apna transport vehicle free mein register kar sakte hain. Bas Register page par jaakar form fill karein, 4 photos upload karein, aur submit kar dein.\"}},")
             .append("{\"@type\":\"Question\",\"name\":\"Kya registration free hai?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Haan, basic listing free hai. Premium plan se aap 5 vehicles tak register kar sakte hain aur zyada visibility pa sakte hain.\"}}]")
             .append("}")
             .toString();
