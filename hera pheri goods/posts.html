@@ -882,14 +882,16 @@
     <script>
       (function() {
         const backBtn = document.getElementById('backBtn');
-        backBtn.addEventListener('click', function() {
-          if (window.history.length > 1) {
-            window.history.back();
-          } else {
-            const target = typeof window.buildUrl === 'function' ? window.buildUrl('index') : 'index.html';
-            window.location.href = target;
-          }
-        });
+        if (backBtn) {
+          backBtn.addEventListener('click', function() {
+            if (window.history.length > 1) {
+              window.history.back();
+            } else {
+              const target = typeof window.buildUrl === 'function' ? window.buildUrl('index') : 'index.html';
+              window.location.href = target;
+            }
+          });
+        }
 
         const openComposer = document.getElementById('openComposer');
         const closeComposer = document.getElementById('closeComposer');
@@ -926,12 +928,14 @@
             if (cta) cta.style.display = 'none';
           });
         }
-        closeComposer.addEventListener('click', () => {
-          toggleComposer(false);
-          // restore CTA when composer closes
-          const cta = document.querySelector('.cta-wrap');
-          if (cta) cta.style.display = '';
-        });
+        if (closeComposer) {
+          closeComposer.addEventListener('click', () => {
+            toggleComposer(false);
+            // restore CTA when composer closes
+            const cta = document.querySelector('.cta-wrap');
+            if (cta) cta.style.display = '';
+          });
+        }
 
         // Enable post button only if valid 50-500 chars
         function textLength() { return canvas.innerText ? canvas.innerText.replace(/\s+/g, ' ').trim().length : 0; }

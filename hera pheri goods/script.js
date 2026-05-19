@@ -8,14 +8,32 @@ function runIdle(fn, timeout){
   else setTimeout(fn, timeout || 3000);
 }
 
+// Ensure AOS-hidden elements never stay hidden when animations are disabled
+try {
+    if (__perf.reduced || __perf.saveData) {
+        document.documentElement.classList.add('aos-disabled');
+    }
+} catch(_){}
+
 // Dropdown Position Adjustment
 document.addEventListener("DOMContentLoaded", function () {
-    // Initialize AOS (Animate On Scroll) library lazily and lighter
-    if (window.AOS && !window.__AOS_INIT && !__perf.reduced && !__perf.saveData) {
+    // Initialize AOS early so content doesn't appear late
+    const hasAosElements = !!document.querySelector('[data-aos]');
+    if (hasAosElements && window.AOS && !window.__AOS_INIT && !__perf.reduced && !__perf.saveData) {
         window.__AOS_INIT = true;
-        runIdle(() => {
-            try { AOS.init({ once: true, mirror: false, duration: 700 }); } catch(_){}
-        }, 1500);
+        try {
+            AOS.init({
+                once: true,
+                mirror: false,
+                duration: 550,
+                offset: 120,
+                easing: 'ease-out'
+            });
+        } catch(_){}
+        // After images/fonts load, recalc positions so animations trigger at the right time
+        window.addEventListener('load', function(){
+            try { AOS.refreshHard(); } catch(_){}
+        }, { once: true });
     }
 
     // Get dropdown elements (support multiple dropdowns)
