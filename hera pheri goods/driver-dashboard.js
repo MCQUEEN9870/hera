@@ -4045,6 +4045,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const requestData = {
             plan: plan,
             paymentId: razorpayResponse && razorpayResponse.razorpay_payment_id ? razorpayResponse.razorpay_payment_id : '',
+            // Back-compat: some server builds expect razorpay_payment_id
+            razorpay_payment_id: razorpayResponse && razorpayResponse.razorpay_payment_id ? razorpayResponse.razorpay_payment_id : '',
             razorpay_order_id: razorpayResponse && razorpayResponse.razorpay_order_id ? razorpayResponse.razorpay_order_id : '',
             razorpay_signature: razorpayResponse && razorpayResponse.razorpay_signature ? razorpayResponse.razorpay_signature : ''
         };
@@ -4057,9 +4059,19 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify(requestData)
         })
-        .then(response => {
+        .then(async response => {
             if (!response.ok) {
-                throw new Error(`Server responded with status: ${response.status}`);
+                if (maybeForceLogoutOnAuthError(response)) {
+                    throw new Error('Auth invalid; redirecting');
+                }
+                let message = `Unable to proceed. (status: ${response.status})`;
+                try {
+                    const err = await response.json();
+                    if (err && err.message) message = err.message;
+                } catch (_e) {
+                    // ignore parse errors
+                }
+                throw new Error(message);
             }
             return response.json();
         })
@@ -4114,7 +4126,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Show error message
                 showAlertModal(
                     'Update Failed',
-                    'There was a problem updating your membership. Please try again or contact support.',
+                    (data && data.message) ? data.message : 'There was a problem updating your membership. Please try again or contact support.',
                     'OK'
                 );
             }
@@ -4125,7 +4137,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show error message
             showAlertModal(
                 'Update Failed',
-                'There was a problem updating your membership. Please try again or contact support.',
+                (error && error.message) ? error.message : 'There was a problem updating your membership. Please try again or contact support.',
                 'OK'
             );
         });

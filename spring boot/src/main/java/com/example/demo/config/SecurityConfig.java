@@ -124,6 +124,7 @@ public class SecurityConfig {
                 // Public write APIs (intentionally public)
                 auth
                     .requestMatchers(HttpMethod.POST,
+                        "/api/payments/webhook",
                         "/api/contact-submissions",
                         "/api/save-feedback",
                         "/api/save-user-feedback"

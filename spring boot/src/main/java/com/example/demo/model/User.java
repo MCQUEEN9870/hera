@@ -49,6 +49,15 @@ public class User {
     
     @Column(name = "membership_expire_time", columnDefinition = "TIMESTAMP")
     private LocalDateTime membershipExpireTime;
+
+    @Column(name = "membership_plan", length = 32)
+    private String membershipPlan;
+
+    @Column(name = "membership_amount_paid_inr")
+    private Integer membershipAmountPaidInr;
+
+    @Column(name = "membership_payment_id", length = 64)
+    private String membershipPaymentId;
     
     @Column(name = "join_date", columnDefinition = "TIMESTAMP")
     private LocalDateTime joinDate;
@@ -173,6 +182,30 @@ public class User {
     
     public void setMembershipExpireTime(LocalDateTime membershipExpireTime) {
         this.membershipExpireTime = membershipExpireTime;
+    }
+
+    public String getMembershipPlan() {
+        return membershipPlan;
+    }
+
+    public void setMembershipPlan(String membershipPlan) {
+        this.membershipPlan = membershipPlan;
+    }
+
+    public Integer getMembershipAmountPaidInr() {
+        return membershipAmountPaidInr;
+    }
+
+    public void setMembershipAmountPaidInr(Integer membershipAmountPaidInr) {
+        this.membershipAmountPaidInr = membershipAmountPaidInr;
+    }
+
+    public String getMembershipPaymentId() {
+        return membershipPaymentId;
+    }
+
+    public void setMembershipPaymentId(String membershipPaymentId) {
+        this.membershipPaymentId = membershipPaymentId;
     }
 
     public LocalDateTime getJoinDate() {

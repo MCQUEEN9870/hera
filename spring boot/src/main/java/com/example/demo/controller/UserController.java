@@ -29,6 +29,7 @@ import com.example.demo.repository.RegistrationRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.SecurityUtils;
 import com.example.demo.service.DeletionAuditService;
+import com.example.demo.service.PremiumMembershipService;
 import com.example.demo.service.RazorpayPaymentService;
 import com.example.demo.service.SupabaseService;
 
@@ -70,6 +71,9 @@ public class UserController {
 
     @Autowired
     private RazorpayPaymentService razorpayPaymentService;
+
+    @Autowired
+    private PremiumMembershipService premiumMembershipService;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
@@ -156,6 +160,8 @@ public class UserController {
         if (user.getMembership() != null && user.getMembership().equalsIgnoreCase("Premium")) {
             userData.put("membershipPurchaseTime", user.getMembershipPurchaseTime());
             userData.put("membershipExpireTime", user.getMembershipExpireTime());
+            userData.put("membershipPlan", user.getMembershipPlan());
+            userData.put("membershipAmountPaidInr", user.getMembershipAmountPaidInr());
         }
         
         // Use actual join date from entity or current date if null
@@ -583,6 +589,8 @@ public class UserController {
                 userSnapshot.put("membership", user.getMembership());
                 userSnapshot.put("membershipPurchaseTime", user.getMembershipPurchaseTime() != null ? user.getMembershipPurchaseTime().toString() : null);
                 userSnapshot.put("membershipExpireTime", user.getMembershipExpireTime() != null ? user.getMembershipExpireTime().toString() : null);
+                userSnapshot.put("membershipPlan", user.getMembershipPlan());
+                userSnapshot.put("membershipAmountPaidInr", user.getMembershipAmountPaidInr());
                 userSnapshot.put("joinDate", user.getJoinDate() != null ? user.getJoinDate().toString() : null);
                 userSnapshot.put("verified", user.getVerified());
                 userSnapshot.put("profilePhotoUrl", user.getProfilePhotoUrl());
@@ -789,10 +797,13 @@ public class UserController {
             }
             
             // Extract plan details from request body
-            String plan = (String) requestBody.get("plan");
-            String paymentId = (String) requestBody.get("paymentId");
-            String orderId = (String) requestBody.get("razorpay_order_id");
-            String signature = (String) requestBody.get("razorpay_signature");
+            String plan = strOrNull(requestBody.get("plan"));
+            String paymentId = strOrNull(requestBody.get("paymentId"));
+            if (paymentId == null) paymentId = strOrNull(requestBody.get("razorpay_payment_id"));
+            String orderId = strOrNull(requestBody.get("razorpay_order_id"));
+            if (orderId == null) orderId = strOrNull(requestBody.get("orderId"));
+            String signature = strOrNull(requestBody.get("razorpay_signature"));
+            if (signature == null) signature = strOrNull(requestBody.get("signature"));
             
             if (plan == null || plan.isEmpty()) {
                 Map<String, Object> errorResponse = new HashMap<>();
@@ -816,49 +827,15 @@ public class UserController {
                 errorResponse.put("message", "Payment could not be verified");
                 return ResponseEntity.status(402).body(errorResponse);
             }
-            
-            // Calculate membership duration based on plan
-            int durationInMonths;
-            switch (plan.toLowerCase()) {
-                case "monthly":
-                    durationInMonths = 1;
-                    break;
-                case "quarterly":
-                    durationInMonths = 3;
-                    break;
-                case "half-yearly":
-                    durationInMonths = 6;
-                    break;
-                case "yearly":
-                    durationInMonths = 12;
-                    break;
-                default:
-                    durationInMonths = 1; // Default to monthly
-            }
-            
-            // Set membership details
-            user.setMembership("Premium");
-            
-            // Calculate purchase and expiry times
-            LocalDateTime now = LocalDateTime.now();
-            user.setMembershipPurchaseTime(now);
-            user.setMembershipExpireTime(now.plusMonths(durationInMonths));
-            
-            // Save updated user
-            userRepository.save(user);
-            
-            // Also update all registrations for this user to reflect Premium membership
-            try {
-                List<Registration> userRegistrations = registrationRepository.findByUserId(user.getId());
-                if (userRegistrations != null && !userRegistrations.isEmpty()) {
-                    for (Registration reg : userRegistrations) {
-                        reg.setMembership("Premium");
-                    }
-                    registrationRepository.saveAll(userRegistrations);
+
+            // Apply membership in an idempotent + renewal-safe way (extends expiry if already premium).
+            boolean applied = premiumMembershipService.applyVerifiedPremiumPayment(user, plan, orderId, paymentId, "checkout_handler");
+            if (!applied) {
+                // Payment likely processed already (e.g., webhook). Refresh user to return accurate timestamps.
+                User refreshed = userRepository.findByContactNumber(contactNumber);
+                if (refreshed != null) {
+                    user = refreshed;
                 }
-            } catch (Exception syncEx) {
-                // Log but do not fail the premium upgrade response
-                log.warn("Failed to sync registration membership after premium upgrade (userId={})", user.getId(), syncEx);
             }
             
             // Create success response
@@ -882,5 +859,11 @@ public class UserController {
             errorResponse.put("message", "Failed to upgrade to premium");
             return ResponseEntity.status(500).body(errorResponse);
         }
+    }
+
+    private static String strOrNull(Object value) {
+        if (value == null) return null;
+        String s = String.valueOf(value).trim();
+        return s.isEmpty() ? null : s;
     }
 } 
