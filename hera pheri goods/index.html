@@ -1771,9 +1771,19 @@ Best regards,
         
         // Add logout functionality (can be called from other places)
         window.logoutUser = function() {
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('userPhone');
-            window.location.href = window.buildUrl ? window.buildUrl('index') : 'index';
+          localStorage.removeItem('isLoggedIn');
+          localStorage.removeItem('userPhone');
+          localStorage.removeItem('userMembership');
+          localStorage.removeItem('lastSelectedVehicleId');
+          try {
+            if (window.AuthToken && typeof window.AuthToken.clear === 'function') {
+              window.AuthToken.clear();
+            } else {
+              try { sessionStorage.removeItem('authToken'); } catch (_e) {}
+              localStorage.removeItem('authToken');
+            }
+          } catch (_e) {}
+          window.location.href = window.buildUrl ? window.buildUrl('index') : 'index';
         };
         
         // Handle register button click

@@ -139,35 +139,108 @@ window.clearApiBase = function() {
     location.reload();
 };
 
-// Token storage helper (sessionStorage-first to reduce persistence)
-window.AuthToken = {
-    get: function() {
+// Token storage helper
+// Persist token in localStorage so login survives browser close (up to JWT expiry).
+// Auto-clears token + login flags if the JWT is expired/invalid.
+(function initAuthToken(){
+    function b64UrlToString(input){
+        if (!input) return '';
+        // base64url -> base64
+        let s = String(input).replace(/-/g, '+').replace(/_/g, '/');
+        // pad
+        while (s.length % 4) s += '=';
+        try { return atob(s); } catch (_e) { return ''; }
+    }
+
+    function getJwtExpSeconds(token){
         try {
-            const s = sessionStorage.getItem('authToken');
-            if (s) return s;
-        } catch (_e) {}
-        try {
-            const legacy = localStorage.getItem('authToken') || '';
-            if (legacy) {
-                try { sessionStorage.setItem('authToken', legacy); } catch (_e2) {}
-                try { localStorage.removeItem('authToken'); } catch (_e3) {}
-            }
-            return legacy;
+            const parts = String(token || '').split('.');
+            if (parts.length !== 3) return 0;
+            const payloadJson = b64UrlToString(parts[1]);
+            if (!payloadJson) return 0;
+            const payload = JSON.parse(payloadJson);
+            const exp = Number(payload && payload.exp);
+            return Number.isFinite(exp) ? exp : 0;
         } catch (_e) {
-            return '';
+            return 0;
         }
-    },
-    set: function(token) {
-        const t = (token || '').toString();
-        try { sessionStorage.setItem('authToken', t); } catch (_e) {}
-        // Back-compat: keep localStorage cleared to reduce persistence.
-        try { localStorage.removeItem('authToken'); } catch (_e) {}
-    },
-    clear: function() {
+    }
+
+    function isJwtExpired(token){
+        const exp = getJwtExpSeconds(token);
+        if (!exp) return true;
+        const nowSec = Math.floor(Date.now() / 1000);
+        return nowSec >= exp;
+    }
+
+    function clearLoginFlags(){
+        try { localStorage.removeItem('isLoggedIn'); } catch (_e) {}
+        try { localStorage.removeItem('userPhone'); } catch (_e) {}
+        try { localStorage.removeItem('userMembership'); } catch (_e) {}
+        try { localStorage.removeItem('lastSelectedVehicleId'); } catch (_e) {}
+    }
+
+    function clearTokenOnly(){
         try { sessionStorage.removeItem('authToken'); } catch (_e) {}
         try { localStorage.removeItem('authToken'); } catch (_e) {}
     }
-};
+
+    window.AuthToken = {
+        get: function(){
+            // 1) sessionStorage (current tab)
+            try {
+                const s = sessionStorage.getItem('authToken');
+                if (s) {
+                    if (isJwtExpired(s)) {
+                        clearTokenOnly();
+                        clearLoginFlags();
+                        return '';
+                    }
+                    return s;
+                }
+            } catch (_e) {}
+
+            // 2) localStorage (persistent)
+            try {
+                const l = localStorage.getItem('authToken') || '';
+                if (!l) {
+                    // Stale UI state: logged-in flags exist but token is missing.
+                    try {
+                        if (localStorage.getItem('isLoggedIn') === 'true' || localStorage.getItem('userPhone')) {
+                            clearLoginFlags();
+                        }
+                    } catch (_e0) {}
+                    return '';
+                }
+                if (isJwtExpired(l)) {
+                    clearTokenOnly();
+                    clearLoginFlags();
+                    return '';
+                }
+                // Rehydrate into sessionStorage for this tab
+                try { sessionStorage.setItem('authToken', l); } catch (_e2) {}
+                return l;
+            } catch (_e) {
+                return '';
+            }
+        },
+        set: function(token){
+            const t = (token || '').toString();
+            if (!t) {
+                clearTokenOnly();
+                return;
+            }
+            try { sessionStorage.setItem('authToken', t); } catch (_e) {}
+            try { localStorage.setItem('authToken', t); } catch (_e) {}
+        },
+        clear: function(){
+            clearTokenOnly();
+        }
+    };
+
+    // Run once on load so expired tokens don't leave UI stuck in a "logged in" state.
+    try { window.AuthToken.get(); } catch (_e) {}
+})();
 
 // Export the URL building function globally
 window.buildUrl = buildUrl;

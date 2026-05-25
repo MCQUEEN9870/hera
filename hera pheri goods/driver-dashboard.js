@@ -4143,26 +4143,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Toggle notification setting
-    function toggleNotificationSetting(type, isEnabled) {
-        console.log(`${type} notifications ${isEnabled ? 'enabled' : 'disabled'}`);
-        
-        // Show toast notification
-        showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} notifications ${isEnabled ? 'enabled' : 'disabled'}`);
-        
-        // Update toggle switch color
-        const toggleId = `${type}NotificationsToggle`;
-        const toggleElement = document.getElementById(toggleId);
-        
-        if (toggleElement) {
-            // The slider color is controlled by CSS based on the checked state
-            // We're just ensuring the checked state matches the isEnabled parameter
-            toggleElement.checked = isEnabled;
-        }
-        
-        // In a real implementation, this would make an API call to update user preferences
-    }
-
     // Initialize event listeners
     function initEventListeners() {
         // Add Vehicle button
@@ -4262,24 +4242,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
             
-            // Toggle switches for notifications
-            const emailNotificationsToggle = document.getElementById('emailNotificationsToggle');
-            if (emailNotificationsToggle) {
-                emailNotificationsToggle.addEventListener('change', function() {
-                    // Handle email notifications toggle
-                    const isEnabled = this.checked;
-                    toggleNotificationSetting('email', isEnabled);
-                });
-            }
-            
-            const smsNotificationsToggle = document.getElementById('smsNotificationsToggle');
-            if (smsNotificationsToggle) {
-                smsNotificationsToggle.addEventListener('change', function() {
-                    // Handle SMS notifications toggle
-                    const isEnabled = this.checked;
-                    toggleNotificationSetting('sms', isEnabled);
-                });
-            }
         }
     }
 
