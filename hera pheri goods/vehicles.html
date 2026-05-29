@@ -2158,13 +2158,9 @@
                 };
 
                 const getIndiaPostOffices = async (q) => {
-                    try {
-                        const resp = await fetch(`https://api.postalpincode.in/postoffice/${encodeURIComponent(q)}`);
-                        const json = await resp.json();
-                        return (json && json[0] && json[0].Status === 'Success') ? (json[0].PostOffice || []) : [];
-                    } catch (e) {
-                        return [];
-                    }
+                    // Intentionally disabled: direct IndiaPost calls from mobile browsers are unreliable.
+                    // Backend `/api/geo/pincodes` is used for dropdowns; users can still type pincode manually.
+                    return [];
                 };
 
                 const stateSearchAlias = (s, district) => {
@@ -2519,73 +2515,14 @@
                         return true;
                     }
 
-                    const resp = await fetch(`https://api.postalpincode.in/pincode/${encodeURIComponent(pin)}`);
-                    const json = await resp.json();
-                    const list = (json && json[0] && json[0].Status === 'Success') ? (json[0].PostOffice || []) : [];
-                    if (!list.length) return false;
+                    const apiBase = String(window.API_BASE_URL || 'http://localhost:8080').replace(/\/+$/, '');
+                    const resolveResp = await fetch(`${apiBase}/api/geo/resolve?pincode=${encodeURIComponent(String(pin || '').trim())}`, { headers: { 'Accept': 'application/json' } });
+                    const data = await resolveResp.json();
+                    if (!(data && data.valid === true && data.state && data.district)) return false;
 
-                    // Choose the most relevant PostOffice entry (the first one is often misleading for enclaves)
-                    const pickBestPostOffice = (arr) => {
-                        const hasPondicherryMarker = (o) => {
-                            const t = [o.Circle, o.Block, o.Taluk, o.District, o.State, o.Region, o.Division, o.Name]
-                                .map(x => normalizeStateKey(x)).join(' ');
-                            return t.includes('pondicherry') || t.includes('puducherry');
-                        };
-                        const isMaheByText = (o) => {
-                            const t = [o.Name, o.District, o.Block, o.Taluk].map(x => normalizeStateKey(x)).join(' ');
-                            return t.includes('mahe');
-                        };
-                        const score = (o) => {
-                            const stateKey = normalizeStateKey(o.State);
-                            const distKey = normalizeStateKey(o.District);
-                            const nameKey = normalizeStateKey(o.Name);
-                            let s = 0;
-                            if (stateKey === 'pondicherry' || stateKey === 'puducherry') s += 50;
-                            if (distKey === 'mahe' || distKey === 'yanam' || distKey === 'karaikal') s += 25;
-                            if (nameKey.includes('mahe') || nameKey.includes('yanam') || nameKey.includes('karaikal')) s += 20;
-                            if (hasPondicherryMarker(o)) s += 15;
-                            if (isMaheByText(o)) s += 10;
-                            return s;
-                        };
-                        return arr.slice().sort((a,b)=>score(b)-score(a))[0];
-                    };
-
-                    const po = pickBestPostOffice(list);
-                    let apiState = po.State || po.Circle || '';
-                    let apiDistrict = po.District || po.Division || po.Region || '';
-
-                    const dKey = normalizeStateKey(apiDistrict);
-                    const sKey = normalizeStateKey(apiState);
-
-                    // Ladakh: India Post sometimes reports State as J&K for Leh/Kargil
-                    if (sKey === 'jammu and kashmir' && (dKey === 'leh' || dKey === 'kargil')) {
-                        apiState = 'Ladakh';
-                    }
-
-                    // Puducherry enclaves:
-                    // - Mahe pincode may show District=Kozhikode, State=Kerala, but PO.Name=Mahe / other entries have Pondicherry
-                    // - Yanam pincode often shows State=Andhra Pradesh, District=East Godavari, but Circle/Block contains Pondicherry
-                    const poText = [po.Circle, po.Block, po.Taluk, po.District, po.State, po.Region, po.Division, po.Name]
-                        .map(x => normalizeStateKey(x)).join(' ');
-                    const anyHas = (pred) => list.some(pred);
-                    const anyNameIncludes = (needle) => anyHas(o => normalizeStateKey(o.Name).includes(needle));
-                    const anyDistrictIs = (needle) => anyHas(o => normalizeStateKey(o.District) === needle);
-                    const anyMarkerPondicherry = anyHas(o => {
-                        const t = [o.Circle, o.Block, o.Taluk, o.District, o.State, o.Region, o.Division, o.Name]
-                            .map(x => normalizeStateKey(x)).join(' ');
-                        return t.includes('pondicherry') || t.includes('puducherry');
-                    });
-
-                    if (anyDistrictIs('mahe') || anyNameIncludes('mahe') || (normalizeStateKey(po.Name).includes('mahe') || poText.includes('mahe'))) {
-                        apiState = 'Puducherry';
-                        apiDistrict = 'Mahe';
-                    } else if (anyMarkerPondicherry && (sKey === 'andhra pradesh' || normalizeStateKey(po.State) === 'andhra pradesh')) {
-                        apiState = 'Puducherry';
-                        apiDistrict = 'Yanam';
-                    } else if (anyMarkerPondicherry && (sKey === 'tamil nadu' || normalizeStateKey(po.State) === 'tamil nadu')) {
-                        apiState = 'Puducherry';
-                        apiDistrict = 'Karaikal';
-                    }
+                    const apiState = String(data.state || '').trim();
+                    const apiDistrict = String(data.district || '').trim();
+                    if (!apiState || !apiDistrict) return false;
 
                     // Mark verified before triggering state/district change events so progress doesn't regress
                     window.locationVerified = true;

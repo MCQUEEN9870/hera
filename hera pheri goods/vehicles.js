@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     const authSection = document.getElementById('authSection');
     
-    if (isLoggedIn) {
+    if (isLoggedIn && authSection) {
         authSection.style.display = 'block';
     }
     
@@ -554,10 +554,11 @@ document.addEventListener('DOMContentLoaded', function() {
         isVerifyingPincode = true;
         currentPincodeVerificationPromise = (async () => {
             try {
-                const response = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
-                console.log('Pincode API response status:', response.status);
+                const url = `${API_BASE_URL}geo/resolve?pincode=${encodeURIComponent(pin)}`;
+                const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                console.log('Pincode resolve response status:', response.status);
                 const data = await response.json();
-                console.log('Pincode API response:', data);
+                console.log('Pincode resolve response:', data);
                 return !!handlePincodeResponse(data, pin);
             } catch (error) {
                 console.error('Error verifying pincode:', error);
@@ -584,12 +585,33 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to handle pincode API response
     function handlePincodeResponse(data, pincodeValue) {
-        if (data && data[0].Status === 'Success') {
+        // Supports two shapes:
+        // 1) Backend: { valid, pincode, district, state, ... }
+        // 2) Legacy IndiaPost: [{ Status, PostOffice: [...] }]
+        let stateValue = '';
+        let districtName = '';
+
+        if (Array.isArray(data) && data[0] && data[0].Status === 'Success' && data[0].PostOffice && data[0].PostOffice.length) {
             const postOffice = data[0].PostOffice[0];
+            stateValue = (postOffice.State || postOffice.Circle || '').trim();
+            districtName = (postOffice.District || postOffice.Division || postOffice.Region || postOffice.Block || '').trim();
+        } else if (data && typeof data === 'object') {
+            const valid = (data.valid === undefined) ? true : !!data.valid;
+            if (!valid) {
+                console.log('Resolve response invalid:', data);
+                if (!window.locationVerified && !locationVerified) {
+                    showToast('Could not verify pincode. Please recheck or select from dropdown.', 'error');
+                }
+                return false;
+            }
+            stateValue = String(data.state || '').trim();
+            districtName = String(data.district || data.city || '').trim();
+        }
+
+        if (stateValue && districtName) {
             
             // Auto-fill fields
             // Set state by value instead of index for more reliable behavior
-            const stateValue = postOffice.State || postOffice.Circle;
             for (let i = 0; i < stateSelect.options.length; i++) {
                 if (stateSelect.options[i].value === stateValue) {
                     stateSelect.selectedIndex = i;
@@ -608,7 +630,6 @@ document.addEventListener('DOMContentLoaded', function() {
             try { stateSelect.dispatchEvent(new Event('change')); } catch(_) {}
             
             // Set district/city if present in DOM
-            const districtName = postOffice.District || postOffice.Division || postOffice.Region || postOffice.Block;
             if (cityInput) cityInput.value = districtName || '';
             if (districtSelect && districtName) {
                 // Wait briefly for district list to populate after state change
@@ -644,7 +665,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Pincode verification successful:', {
                 pincode: pincodeValue,
                 state: stateValue,
-                city: cityInput.value
+                city: (cityInput ? cityInput.value : (districtSelect ? districtSelect.value : ''))
             });
             
             // Show success message

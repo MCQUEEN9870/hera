@@ -656,13 +656,9 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         const getIndiaPostOffices = async (q) => {
-            try {
-                const resp = await fetch(`https://api.postalpincode.in/postoffice/${encodeURIComponent(q)}`);
-                const json = await resp.json();
-                return (json && json[0] && json[0].Status === 'Success') ? (json[0].PostOffice || []) : [];
-            } catch (_) {
-                return [];
-            }
+            // Intentionally disabled: direct IndiaPost calls from mobile browsers are unreliable
+            // (SSL/CORS/provider downtime). Use backend `/api/geo/pincodes` instead.
+            return [];
         };
 
         const stateSearchAlias = (s, district) => {
@@ -780,23 +776,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            const resp = await fetch(`https://api.postalpincode.in/pincode/${encodeURIComponent(p)}`);
+            const apiBase = String(window.API_BASE_URL || 'http://localhost:8080').replace(/\/+$/, '');
+            const resp = await fetch(`${apiBase}/api/geo/resolve?pincode=${encodeURIComponent(p)}`, { headers: { 'Accept': 'application/json' } });
             const data = await resp.json();
-            if (!(data && data[0] && data[0].Status === 'Success' && data[0].PostOffice && data[0].PostOffice.length)) return false;
-            const postOffice = data[0].PostOffice[0];
-            let st = postOffice.State || postOffice.Circle || '';
-            const dist = postOffice.District || postOffice.Division || postOffice.Region || postOffice.Block || '';
 
-            // Ladakh: India Post sometimes reports J&K for Leh/Kargil
-            if (normalizeStateKey(st) === 'jammu and kashmir') {
-                const dKey = normalizeStateKey(dist);
-                if (dKey === 'leh' || dKey === 'kargil') st = 'Ladakh';
-            }
+            if (!(data && (data.valid === true) && data.state && data.district)) return false;
+
+            const st = String(data.state || '').trim();
+            const dist = String(data.district || '').trim();
+            if (!st || !dist) return false;
 
             setStateFromValue(st);
             setDistrictOptionsForState(stateInput.value);
             if (districtSelect && dist) {
-                // add option if not in list
                 const has = Array.from(districtSelect.options).some(o => (o.value || '').toLowerCase() === String(dist).toLowerCase());
                 if (!has) {
                     const opt = document.createElement('option');
