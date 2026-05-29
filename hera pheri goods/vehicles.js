@@ -1618,6 +1618,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <i class="fas fa-user"></i>
                     <span>${ownerNameEsc}</span>
                 </div>
+                ${isNewVehicle ? `<div class="info-item new-owner-note">
+                    <i class="fas fa-circle-info" aria-hidden="true"></i>
+                    <span><strong>New:</strong> owner recently registered with us</span>
+                </div>` : ''}
                 ${getTrustIndicatorText()}
                 ${highlightsHTML}
             </div>
