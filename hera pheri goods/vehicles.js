@@ -86,20 +86,33 @@ document.addEventListener('DOMContentLoaded', function() {
             .replace(/^-|-$/g, '');
     }
 
-    function buildPrettyShareUrlForVehicle(vehicle) {
+    function buildPrettySlugForVehicle(vehicle) {
         const id = vehicle && (vehicle.id || vehicle.vehicleId);
         const numericId = id !== null && id !== undefined ? String(id).trim() : '';
         if (!numericId) return '';
 
         const ownerName = vehicle.ownerName || vehicle.driverName || vehicle.owner || vehicle.fullName || '';
         const vehicleType = vehicle.type || vehicle.vehicleType || '';
+        const vehicleCity = vehicle.locationCity || vehicle.city || '';
+        const vehicleState = vehicle.locationState || vehicle.state || '';
 
         const ownerSlug = slugifyForPrettyUrl(ownerName) || 'owner';
         const typeSlug = slugifyForPrettyUrl(vehicleType) || 'vehicle';
+        const citySlug = slugifyForPrettyUrl(vehicleCity) || '';
+        const stateSlug = slugifyForPrettyUrl(vehicleState) || '';
 
-        // v<ID> marker makes parsing reliable.
-        const slug = `${ownerSlug}-${typeSlug}-v${numericId}-herapherigoods`;
-        return `${window.location.origin}/find-vehicles/${slug}`;
+        let locParts = [];
+        if (citySlug) locParts.push(citySlug);
+        if (stateSlug) locParts.push(stateSlug);
+        const locSlug = locParts.join('-');
+
+        return [ownerSlug, typeSlug, locSlug, numericId].filter(Boolean).join('-');
+    }
+
+    function buildPrettyShareUrlForVehicle(vehicle) {
+        const slug = buildPrettySlugForVehicle(vehicle);
+        if (!slug) return '';
+        return `${window.location.origin}/vehicles/${slug}`;
     }
 
     async function copyTextToClipboard(text) {
@@ -1626,7 +1639,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ${highlightsHTML}
             </div>
             <div class="vehicle-bottom">
-                <button class="view-details-btn ${isPremium ? 'premium-btn' : ''}">View Details</button>
+                <a href="/vehicles/${buildPrettySlugForVehicle(vehicle)}" class="view-details-btn ${isPremium ? 'premium-btn' : ''}">View Details</a>
             </div>`;
         detailsContainer.appendChild(skeletonBlock);
         detailsContainer.appendChild(realDetails);
@@ -1636,7 +1649,8 @@ document.addEventListener('DOMContentLoaded', function() {
         card.appendChild(detailsContainer);
         
         // Add click event to view details button
-        card.querySelector('.view-details-btn').addEventListener('click', function() {
+        card.querySelector('.view-details-btn').addEventListener('click', function(e) {
+            e.preventDefault();
             openVehicleModal(vehicle);
         });
         

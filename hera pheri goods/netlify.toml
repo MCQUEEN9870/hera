@@ -65,8 +65,8 @@
 
 [[redirects]]
   from = "/vehicles/*"
-  to = "/find-vehicles/:splat"
-  status = 301
+  to = "https://api.herapherigoods.in/vehicles/:splat"
+  status = 200
   force = true
 
 [[redirects]]
@@ -234,6 +234,12 @@
 [[redirects]]
   from = "/images/profile/*"
   to = "https://api.herapherigoods.in/api/images/profile/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "https://api.herapherigoods.in/sitemap.xml"
   status = 200
   force = true
 

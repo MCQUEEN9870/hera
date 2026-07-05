@@ -9,12 +9,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.service.SeoService;
 import com.example.demo.service.SeoService.SeoMeta;
 import com.example.demo.service.PostalLookupService;
+import com.example.demo.repository.RegistrationRepository;
+import com.example.demo.model.Registration;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -24,14 +27,111 @@ public class SeoController {
 
     private final SeoService seoService;
     private final PostalLookupService postalLookupService;
+    private final RegistrationRepository registrationRepository;
     private static final Logger log = LoggerFactory.getLogger(SeoController.class);
     
     @Value("${app.frontendBaseUrl:https://www.herapherigoods.in}")
     private String frontendBaseUrl;
 
-    public SeoController(SeoService seoService, PostalLookupService postalLookupService) {
+    public SeoController(SeoService seoService, PostalLookupService postalLookupService, RegistrationRepository registrationRepository) {
         this.seoService = seoService;
         this.postalLookupService = postalLookupService;
+        this.registrationRepository = registrationRepository;
+    }
+
+    @GetMapping("/vehicles/{slug:[a-zA-Z0-9\\-]+-\\d+}")
+    public String vehicleDetail(@PathVariable("slug") String slug, HttpServletRequest request, Model model) {
+        log.info("Resolving dynamic SEO page for vehicle slug: {}", slug);
+        
+        // Extract the ID from the end of the slug
+        int lastDashIndex = slug.lastIndexOf('-');
+        if (lastDashIndex == -1) {
+            log.warn("Invalid vehicle slug pattern: {}", slug);
+            return "redirect:/vehicles";
+        }
+        
+        String idStr = slug.substring(lastDashIndex + 1);
+        Long vehicleId;
+        try {
+            vehicleId = Long.parseLong(idStr);
+        } catch (NumberFormatException e) {
+            log.warn("Invalid vehicle ID in slug: {}", slug);
+            return "redirect:/vehicles";
+        }
+        
+        java.util.Optional<Registration> optReg = registrationRepository.findById(vehicleId);
+        if (optReg.isEmpty()) {
+            log.warn("Vehicle not found with ID: {}", vehicleId);
+            return "redirect:/vehicles";
+        }
+        
+        Registration reg = optReg.get();
+        
+        // Construct dynamic title, description, and canonical URL
+        String vehicleType = reg.getVehicleType();
+        String ownerName = reg.getFullName();
+        String city = reg.getCity();
+        String state = reg.getState();
+        String pincode = reg.getPincode();
+        
+        String title = "Book " + vehicleType + " by " + ownerName + " in " + city + ", " + state + " - " + pincode + " | HeraPheriGoods";
+        String description = "Book verified " + vehicleType + " from " + ownerName + " in " + city + ", " + state + " (" + pincode + "). Direct owner contact with 0% commission and 100% commission-free transport service. Click to view details.";
+        
+        // Handle images
+        String imagePath = frontendBaseUrl + "/attached_assets/images/default-vehicle.png";
+        java.util.List<String> imageUrls = reg.getVehicleImageUrls();
+        if (imageUrls != null && !imageUrls.isEmpty()) {
+            String firstImg = imageUrls.get(0);
+            if (firstImg != null && !firstImg.isBlank() && !firstImg.endsWith(".hidden_folder") && !firstImg.endsWith(".folder")) {
+                if (firstImg.contains("supabase.co") && firstImg.contains("/storage/v1/object/public/vehicle-images/")) {
+                    try {
+                        String after = firstImg.split("/storage/v1/object/public/vehicle-images/")[1];
+                        imagePath = frontendBaseUrl + "/images/vehicles/" + after;
+                    } catch (Exception e) {
+                        imagePath = firstImg;
+                    }
+                } else {
+                    imagePath = firstImg;
+                }
+            }
+        }
+        
+        // Structured Data Schema markup (Product type or LocalBusiness)
+        String jsonLd = "{\n" +
+                "  \"@context\": \"https://schema.org\",\n" +
+                "  \"@type\": \"LocalBusiness\",\n" +
+                "  \"name\": \"Book " + escapeJson(vehicleType) + " by " + escapeJson(ownerName) + "\",\n" +
+                "  \"image\": \"" + escapeJson(imagePath) + "\",\n" +
+                "  \"description\": \"" + escapeJson(description) + "\",\n" +
+                "  \"address\": {\n" +
+                "    \"@type\": \"PostalAddress\",\n" +
+                "    \"addressLocality\": \"" + escapeJson(city) + "\",\n" +
+                "    \"addressRegion\": \"" + escapeJson(state) + "\",\n" +
+                "    \"postalCode\": \"" + escapeJson(pincode) + "\",\n" +
+                "    \"addressCountry\": \"IN\"\n" +
+                "  },\n" +
+                "  \"telephone\": \"" + escapeJson(reg.getContactNumber()) + "\"\n" +
+                "}";
+        
+        model.addAttribute("title", title);
+        model.addAttribute("description", description);
+        model.addAttribute("keywords", vehicleType + ", " + city + ", transport, vehicle, herapherigoods");
+        model.addAttribute("heading", "Book " + vehicleType + " by " + ownerName);
+        model.addAttribute("canonicalUrl", frontendBaseUrl + "/vehicles/" + slug);
+        model.addAttribute("jsonLd", jsonLd);
+        model.addAttribute("tagline", "Direct Owner Booking • 0% Commission • Verified");
+        
+        model.addAttribute("vehicle", reg);
+        model.addAttribute("vehicleImage", imagePath);
+        model.addAttribute("frontendUrl", frontendBaseUrl + "/find-vehicles/" + slug);
+        model.addAttribute("frontendBase", frontendBaseUrl);
+        
+        return "vehicles";
+    }
+
+    private static String escapeJson(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
     @GetMapping({"/","/index","/index.html"})
