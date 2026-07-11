@@ -35,7 +35,7 @@
                 // Redirect humans to the interactive SPA page to show the modal popup automatically
                 var isBot = /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent || '');
                 if (!isBot || params.get('app') === '1') {
-                    window.location.replace('[[${frontendUrl}]]');
+                    window.location.replace([[${frontendUrl}]]);
                 }
             } catch(_){ }
         })();

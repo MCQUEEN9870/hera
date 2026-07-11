@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             if (idx >= 0 && segs.length > idx + 1) {
                 const slug = String(segs[idx + 1] || '');
-                const m = slug.match(/(?:^|-)(?:v)(\d+)(?:-|$)/i);
+                const m = slug.match(/-(\d+)$/);
                 if (m && m[1]) return Number(m[1]);
             }
             return null;
