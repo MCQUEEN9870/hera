@@ -16,8 +16,10 @@
     <link rel="icon" type="image/png" th:href="${frontendBase} + '/favicon.ico/favicon-16x16.png'" sizes="16x16" />
     <link rel="apple-touch-icon" th:href="${frontendBase} + '/favicon.ico/apple-touch-icon.png'" />
     <meta property="og:site_name" content="Herapherigoods" />
-    <meta property="og:image" th:content="${vehicleImage != null ? vehicleImage : (frontendBase + '/attached_assets/images/new-logo.png')}" />
-    <meta name="twitter:image" th:content="${vehicleImage != null ? vehicleImage : (frontendBase + '/attached_assets/images/new-logo.png')}" />
+    <meta th:if="${vehicleImage != null}" property="og:image" th:content="${vehicleImage}" />
+    <meta th:unless="${vehicleImage != null}" property="og:image" th:content="${frontendBase} + '/attached_assets/images/new-logo.png'" />
+    <meta th:if="${vehicleImage != null}" name="twitter:image" th:content="${vehicleImage}" />
+    <meta th:unless="${vehicleImage != null}" name="twitter:image" th:content="${frontendBase} + '/attached_assets/images/new-logo.png'" />
 
     <script type="application/ld+json" th:utext="${jsonLd}"></script>
 </head>

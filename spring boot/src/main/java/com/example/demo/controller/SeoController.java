@@ -230,6 +230,9 @@ public class SeoController {
         model.addAttribute("tagline", meta.tagline());
         model.addAttribute("frontendUrl", buildFrontendUrl(path, request));
         model.addAttribute("frontendBase", frontendBaseUrl);
+        // Ensure vehicleImage and vehicle are always present so templates don't throw on th:if / ternary
+        model.addAttribute("vehicleImage", null);
+        model.addAttribute("vehicle", null);
         return viewName;
     }
 
