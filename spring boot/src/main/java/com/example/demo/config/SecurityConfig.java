@@ -95,7 +95,11 @@ public class SecurityConfig {
                         "/error",
                         "/auth/**",
                         "/robots.txt",
-                        "/sitemap.xml"
+                        "/sitemap.xml",
+                        // SEO landing pages — must be public so Googlebot can index them without a JWT token
+                        "/vehicles/**",
+                        "/city/**",
+                        "/register/**"
                     ).permitAll();
 
                 // Require auth for endpoints that would otherwise match /api/registration/*
