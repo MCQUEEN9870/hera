@@ -39,34 +39,7 @@ public class SeoController {
         this.registrationRepository = registrationRepository;
     }
 
-    @GetMapping("/vehicles/{slug:[a-zA-Z0-9\\-]+-\\d+}")
-    public String vehicleDetail(@PathVariable("slug") String slug, HttpServletRequest request, Model model) {
-        log.info("Resolving dynamic SEO page for vehicle slug: {}", slug);
-        
-        // Extract the ID from the end of the slug
-        int lastDashIndex = slug.lastIndexOf('-');
-        if (lastDashIndex == -1) {
-            log.warn("Invalid vehicle slug pattern: {}", slug);
-            return "redirect:/vehicles";
-        }
-        
-        String idStr = slug.substring(lastDashIndex + 1);
-        Long vehicleId;
-        try {
-            vehicleId = Long.parseLong(idStr);
-        } catch (NumberFormatException e) {
-            log.warn("Invalid vehicle ID in slug: {}", slug);
-            return "redirect:/vehicles";
-        }
-        
-        java.util.Optional<Registration> optReg = registrationRepository.findById(vehicleId);
-        if (optReg.isEmpty()) {
-            log.warn("Vehicle not found with ID: {}", vehicleId);
-            return "redirect:/vehicles";
-        }
-        
-        Registration reg = optReg.get();
-        
+    private String renderVehicleDetail(String slug, Registration reg, HttpServletRequest request, Model model) {
         // Construct dynamic title, description, and canonical URL
         String vehicleType = reg.getVehicleType();
         String ownerName = reg.getFullName();
@@ -152,13 +125,33 @@ public class SeoController {
         return buildAndRender("/vehicles", city, type, intent, request, model, "vehicles");
     }
 
-    // Path-based SEO: /vehicles/{city} and /vehicles/{city}/{type}
-    @GetMapping({"/vehicles/{city}", "/vehicles/{city}/{type}"})
-    public String vehiclesPath(@org.springframework.web.bind.annotation.PathVariable("city") String city,
+    // Path-based SEO: /vehicles/{city} and /vehicles/{slug}
+    @GetMapping({"/vehicles/{pathVar}", "/vehicles/{pathVar}/{type}"})
+    public String vehiclesPath(@org.springframework.web.bind.annotation.PathVariable("pathVar") String pathVar,
                                @org.springframework.web.bind.annotation.PathVariable(name = "type", required = false) String type,
                                HttpServletRequest request,
                                Model model) {
-        return buildAndRender("/vehicles", city, type, "find", request, model, "vehicles");
+        
+        // Check if pathVar matches a vehicle slug pattern (ends with -[digits])
+        if (type == null && pathVar != null && pathVar.matches(".*-\\d+$")) {
+            int lastDashIndex = pathVar.lastIndexOf('-');
+            if (lastDashIndex != -1) {
+                String idStr = pathVar.substring(lastDashIndex + 1);
+                try {
+                    Long vehicleId = Long.parseLong(idStr);
+                    java.util.Optional<Registration> optReg = registrationRepository.findById(vehicleId);
+                    if (optReg.isPresent()) {
+                        log.info("Resolved dynamic SEO page for vehicle slug: {}", pathVar);
+                        return renderVehicleDetail(pathVar, optReg.get(), request, model);
+                    }
+                } catch (NumberFormatException e) {
+                    // Ignore and fall back to city logic
+                }
+            }
+        }
+        
+        // Fallback to city logic
+        return buildAndRender("/vehicles", pathVar, type, "find", request, model, "vehicles");
     }
 
     @GetMapping({"/register","/register.html"})

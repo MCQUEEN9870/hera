@@ -53,7 +53,7 @@
                 <p><strong>Status:</strong> Verified Listing</p>
             </div>
             <div class="vehicle-image-container" th:if="${vehicleImage != null}">
-                <img th:src="${vehicleImage}" th:alt="'Book ' + ${vehicle.vehicleType} + ' by ' + ${vehicle.fullName} + ' in ' + ${vehicle.city} + ' - HeraPheriGoods'" />
+                <img th:src="${vehicleImage}" th:alt="|Book ${vehicle.vehicleType} by ${vehicle.fullName} in ${vehicle.city} - HeraPheriGoods|" />
             </div>
             <p class="description">Book verified <span th:text="${vehicle.vehicleType}">Vehicle Type</span> from <span th:text="${vehicle.fullName}">Owner Name</span> in <span th:text="${vehicle.city}">City</span>, <span th:text="${vehicle.state}">State</span> (<span th:text="${vehicle.pincode}">Pincode</span>). Direct owner contact with 0% commission and 100% commission-free transport service. Click to view details.</p>
         </div>
