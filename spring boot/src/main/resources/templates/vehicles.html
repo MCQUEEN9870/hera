@@ -35,7 +35,7 @@
                 // Redirect humans to the interactive SPA page to show the modal popup automatically
                 var isBot = /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent || '');
                 if (!isBot || params.get('app') === '1') {
-                    window.location.replace([[${frontendUrl}]]);
+                    window.location.replace(/*[[${frontendUrl}]]*/ '');
                 }
             } catch(_){ }
         })();
@@ -46,14 +46,14 @@
         
         <!-- Crawler-visible vehicle details -->
         <div th:if="${vehicle != null}" class="vehicle-details-seo">
-            <h2>Book <span th:text="${vehicle.vehicleType}">Vehicle Type</span> by <span th:text="${vehicle.fullName}">Owner Name</span></h2>
+            <h2>Hire <span th:text="${vehicle.vehicleType}">Vehicle Type</span> in <span th:text="${vehicle.city}">City</span> (Direct Owner: <span th:text="${vehicle.fullName}">Owner Name</span>)</h2>
             <div class="vehicle-meta">
                 <p><strong>Location:</strong> <span th:text="${vehicle.city}">City</span>, <span th:text="${vehicle.state}">State</span> - <span th:text="${vehicle.pincode}">Pincode</span></p>
                 <p><strong>Owner Name:</strong> <span th:text="${vehicle.fullName}">Owner Name</span></p>
                 <p><strong>Status:</strong> Verified Listing</p>
             </div>
             <div class="vehicle-image-container" th:if="${vehicleImage != null}">
-                <img th:src="${vehicleImage}" th:alt="|Book ${vehicle.vehicleType} by ${vehicle.fullName} in ${vehicle.city} - HeraPheriGoods|" />
+                <img th:src="${vehicleImage}" th:alt="|Hire ${vehicle.vehicleType} in ${vehicle.city} - Direct Owner: ${vehicle.fullName}|" />
             </div>
             <p class="description">Book verified <span th:text="${vehicle.vehicleType}">Vehicle Type</span> from <span th:text="${vehicle.fullName}">Owner Name</span> in <span th:text="${vehicle.city}">City</span>, <span th:text="${vehicle.state}">State</span> (<span th:text="${vehicle.pincode}">Pincode</span>). Direct owner contact with 0% commission and 100% commission-free transport service. Click to view details.</p>
         </div>

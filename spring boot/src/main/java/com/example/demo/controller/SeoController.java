@@ -47,8 +47,9 @@ public class SeoController {
         String state = reg.getState();
         String pincode = reg.getPincode();
         
-        String title = "Book " + vehicleType + " by " + ownerName + " in " + city + ", " + state + " - " + pincode + " | HeraPheriGoods";
-        String description = "Book verified " + vehicleType + " from " + ownerName + " in " + city + ", " + state + " (" + pincode + "). Direct owner contact with 0% commission and 100% commission-free transport service. Click to view details.";
+        // Make titles highly clickable for Search Results (CTR optimized)
+        String title = "Hire " + vehicleType + " in " + city + " - Direct Owner: " + ownerName + " (0% Comm)";
+        String description = "Looking for a " + vehicleType + " in " + city + ", " + state + " (" + pincode + ")? Contact owner " + ownerName + " directly. 100% Commission-free transport booking. Get phone number & photos now!";
         
         // Handle images
         String imagePath = frontendBaseUrl + "/attached_assets/images/default-vehicle.png";
@@ -69,27 +70,31 @@ public class SeoController {
             }
         }
         
-        // Structured Data Schema markup (Product type or LocalBusiness)
+        // Structured Data Schema markup (Product type)
         String jsonLd = "{\n" +
                 "  \"@context\": \"https://schema.org\",\n" +
-                "  \"@type\": \"LocalBusiness\",\n" +
+                "  \"@type\": \"Product\",\n" +
                 "  \"name\": \"Book " + escapeJson(vehicleType) + " by " + escapeJson(ownerName) + "\",\n" +
                 "  \"image\": \"" + escapeJson(imagePath) + "\",\n" +
                 "  \"description\": \"" + escapeJson(description) + "\",\n" +
-                "  \"address\": {\n" +
-                "    \"@type\": \"PostalAddress\",\n" +
-                "    \"addressLocality\": \"" + escapeJson(city) + "\",\n" +
-                "    \"addressRegion\": \"" + escapeJson(state) + "\",\n" +
-                "    \"postalCode\": \"" + escapeJson(pincode) + "\",\n" +
-                "    \"addressCountry\": \"IN\"\n" +
-                "  },\n" +
-                "  \"telephone\": \"" + escapeJson(reg.getContactNumber()) + "\"\n" +
+                "  \"offers\": {\n" +
+                "    \"@type\": \"Offer\",\n" +
+                "    \"url\": \"" + frontendBaseUrl + "/vehicles/" + slug + "\",\n" +
+                "    \"priceCurrency\": \"INR\",\n" +
+                "    \"price\": \"0\",\n" +
+                "    \"availability\": \"https://schema.org/InStock\",\n" +
+                "    \"seller\": {\n" +
+                "      \"@type\": \"Person\",\n" +
+                "      \"name\": \"" + escapeJson(ownerName) + "\",\n" +
+                "      \"telephone\": \"" + escapeJson(reg.getContactNumber()) + "\"\n" +
+                "    }\n" +
+                "  }\n" +
                 "}";
         
         model.addAttribute("title", title);
         model.addAttribute("description", description);
         model.addAttribute("keywords", vehicleType + ", " + city + ", transport, vehicle, herapherigoods");
-        model.addAttribute("heading", "Book " + vehicleType + " by " + ownerName);
+        model.addAttribute("heading", "Hire " + vehicleType + " in " + city);
         model.addAttribute("canonicalUrl", frontendBaseUrl + "/vehicles/" + slug);
         model.addAttribute("jsonLd", jsonLd);
         model.addAttribute("tagline", "Direct Owner Booking • 0% Commission • Verified");
