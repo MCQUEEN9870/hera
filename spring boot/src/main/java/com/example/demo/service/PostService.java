@@ -39,7 +39,9 @@ public class PostService {
         p.setFontSize(req.getFontSize() != null ? req.getFontSize() : 18);
         p.setIsLightText(Boolean.TRUE.equals(req.getIsLightText()));
         p.setImageUrl(req.getImageUrl());
-        // Let DB defaults apply for created_at/expires_at/status when possible
+
+        int hours = (req.getExpiryHours() != null && req.getExpiryHours() > 0) ? req.getExpiryHours() : 24;
+        p.setExpiresAt(OffsetDateTime.now().plusHours(hours));
 
         p = postRepository.save(p);
         return toDto(p);

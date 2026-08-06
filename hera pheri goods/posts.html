@@ -418,7 +418,8 @@
       }
       .composer-canvas[data-placeholder]:empty:before {
         content: attr(data-placeholder);
-        color: #a7b0bb8a;
+        color: inherit;
+        opacity: 0.65;
       }
       .toolbar {
         display: flex;
@@ -454,13 +455,148 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.15);
         border-radius: 8px;
-        padding: 8px 10px;
+        padding: 8px 12px;
         cursor: pointer;
-        color: var(--muted);
+        color: #ffffff;
+        font-weight: 500;
+        font-size: 13px;
+        transition: all 0.2s ease;
       }
+      .text-toggle.is-dark {
+        background: #ffffff;
+        color: #0b0c10;
+        border-color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      }
+      .text-toggle.is-light {
+        background: rgba(255,255,255,0.18);
+        color: #ffffff;
+        border-color: rgba(255,255,255,0.3);
+      }
+
+      .duration-select-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 20px;
+        padding: 4px 10px;
+        font-size: 12px;
+        color: #8ab4f8;
+      }
+      .duration-select-wrap select {
+        background: transparent;
+        color: #ffffff;
+        border: none;
+        outline: none;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      .duration-select-wrap select option { color: #111827; }
+
+      .template-chips-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px 2px 14px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .chips-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #8ab4f8;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .template-chips {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      .chip-btn {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 20px;
+        padding: 5px 12px;
+        color: #e2e8f0;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .chip-btn:hover, .chip-btn:active {
+        background: rgba(138,180,248,0.2);
+        border-color: #8ab4f8;
+        color: #ffffff;
+      }
+
+      .char-counter-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #94a3b8;
+        transition: all 0.2s ease;
+      }
+      .char-badge {
+        font-size: 11px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+        font-weight: 600;
+      }
+      .char-counter-pill.valid .char-badge {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+      }
+      .char-counter-pill.near-limit .char-badge {
+        background: rgba(245, 158, 11, 0.2);
+        color: #f59e0b;
+      }
+      .char-counter-pill.over-limit .char-badge {
+        background: rgba(239, 68, 68, 0.3);
+        color: #ef4444;
+      }
+
+      @media (max-width: 600px) {
+        .composer-header { padding: 10px 12px; }
+        .composer-title {
+          flex-wrap: wrap;
+          gap: 6px;
+          font-size: 13px;
+        }
+        .duration-select-wrap {
+          padding: 2px 6px;
+          font-size: 11px;
+        }
+        .toolbar {
+          gap: 6px;
+        }
+        .category-select, .attach-btn, .font-size-control, .text-toggle {
+          padding: 6px 8px;
+          font-size: 12px;
+        }
+        .font-size-control input[type="range"] {
+          width: 75px;
+        }
+      }
+
       .composer-footer {
         display: flex;
         align-items: center;
@@ -804,9 +940,32 @@
       <div class="composer-card" id="composerCard" aria-hidden="true">
         <div class="composer-inner">
           <div class="composer-header">
-            <div class="composer-title">Create a post • 24h</div>
+            <div class="composer-title">
+              <span>Create a post</span>
+              <div class="duration-select-wrap">
+                <i class="fas fa-clock" aria-hidden="true"></i>
+                <select id="postDuration" aria-label="Select post duration">
+                  <option value="12">Expires in 12h</option>
+                  <option value="24" selected>Expires in 24h</option>
+                  <option value="48">Expires in 48h</option>
+                  <option value="168">Expires in 7 days</option>
+                </select>
+              </div>
+            </div>
             <button class="close-composer" id="closeComposer" aria-label="Close composer"><i class="fas fa-times"></i></button>
           </div>
+
+          <!-- Template Quick Chips -->
+          <div class="template-chips-wrap">
+            <span class="chips-label"><i class="fas fa-bolt"></i> Quick Fill:</span>
+            <div class="template-chips">
+              <button type="button" class="chip-btn" data-template="need_vehicle" data-category="Vehicle Requirement">🚛 Need Vehicle</button>
+              <button type="button" class="chip-btn" data-template="transport_offer" data-category="Transport Offer">📦 Transport Offer</button>
+              <button type="button" class="chip-btn" data-template="local_update" data-category="Local Updates">📍 Local Update</button>
+              <button type="button" class="chip-btn" data-template="general_query" data-category="General Query">❓ General Query</button>
+            </div>
+          </div>
+
           <div class="composer-body">
             <div id="canvas" class="composer-canvas" contenteditable="true" data-placeholder="(e.g., Need Tata Ace from Agra→Mathura at 5 PM, contact no. 98XXXXXXXX, load 1.5Ton, Pincode 282001)"></div>
             <div class="toolbar">
@@ -822,7 +981,7 @@
                 </select>
               </div>
               <div class="swatches" id="swatches">
-                <div class="bg-swatch" title="Plain dark" data-bg="linear-gradient(135deg, #0f172a, #0b0c10)"></div>
+                <div class="bg-swatch selected" title="Plain dark" data-bg="linear-gradient(135deg, #0f172a, #0b0c10)"></div>
                 <div class="bg-swatch" title="Mint gradient" data-bg="linear-gradient(135deg, #00f5a0, #00d9f5)"></div>
                 <div class="bg-swatch" title="Sunset" data-bg="linear-gradient(135deg, #ff9966, #ff5e62)"></div>
                 <div class="bg-swatch" title="Aurora" data-bg="linear-gradient(135deg, #a18cd1, #fbc2eb)"></div>
@@ -841,6 +1000,10 @@
             <div class="preview-grid" id="previewGrid"></div>
           </div>
           <div class="composer-footer">
+            <div class="char-counter-pill" id="charCounterPill">
+              <span id="charCount">0</span>/500
+              <span class="char-badge" id="charBadge">Min 50</span>
+            </div>
             <button class="truck-button post-btn" id="postBtn" disabled>
               <span class="default">Post</span>
               <span class="success">
@@ -937,6 +1100,29 @@
           });
         }
 
+        const charCount = document.getElementById('charCount');
+        const charBadge = document.getElementById('charBadge');
+        const charCounterPill = document.getElementById('charCounterPill');
+
+        function updateCharCounter() {
+          const n = textLength();
+          if (charCount) charCount.textContent = n;
+          if (!charCounterPill || !charBadge) return;
+          charCounterPill.classList.remove('valid', 'near-limit', 'over-limit');
+          if (n < 50) {
+            charBadge.textContent = 'Min 50';
+          } else if (n <= 450) {
+            charCounterPill.classList.add('valid');
+            charBadge.textContent = 'Ready';
+          } else if (n <= 500) {
+            charCounterPill.classList.add('near-limit');
+            charBadge.textContent = 'Near Limit';
+          } else {
+            charCounterPill.classList.add('over-limit');
+            charBadge.textContent = 'Max 500';
+          }
+        }
+
         // Enable post button only if valid 50-500 chars
         function textLength() { return canvas.innerText ? canvas.innerText.replace(/\s+/g, ' ').trim().length : 0; }
         function isValidLength() { const n = textLength(); return n >= 50 && n <= 500; }
@@ -948,10 +1134,40 @@
           postBtn.removeAttribute('disabled');
           postBtn.setAttribute('aria-disabled', ok ? 'false' : 'true');
           postBtn.classList.toggle('enabled', ok);
+          updateCharCounter();
         }
         canvas.addEventListener('input', updatePostButton);
         if (postCategory) postCategory.addEventListener('change', updatePostButton);
         updatePostButton();
+
+        // Template Quick Chips Click Handler
+        const templateChips = document.querySelector('.template-chips');
+        if (templateChips) {
+          templateChips.addEventListener('click', (e) => {
+            const btn = e.target.closest('.chip-btn');
+            if (!btn) return;
+            const t = btn.getAttribute('data-template');
+            const cat = btn.getAttribute('data-category');
+            if (cat && postCategory) {
+              postCategory.value = cat;
+            }
+            let text = '';
+            if (t === 'need_vehicle') {
+              text = 'Need [Vehicle Type] from [Pickup Location] to [Drop Location]. Load: [Weight] Tons, Date: [Date/Time]. Contact: [Phone Number].';
+            } else if (t === 'transport_offer') {
+              text = 'Available [Vehicle Type] from [Current City]. Route: [City A] to [City B]. Empty vehicle ready for load. Contact: [Phone Number].';
+            } else if (t === 'local_update') {
+              text = 'Transport Update [City/Area]: Road condition, permit info, or fuel rate update. Contact for details: [Phone Number].';
+            } else if (t === 'general_query') {
+              text = 'Query regarding transport/permit/tax in [State/City]: Need assistance regarding [Details]. Contact: [Phone Number].';
+            }
+            if (text) {
+              canvas.innerText = text;
+              updatePostButton();
+              canvas.focus();
+            }
+          });
+        }
 
         // Background swatches
         function applyBackground(bg) {
@@ -963,12 +1179,20 @@
           const target = e.target.closest('.bg-swatch');
           if (!target) return;
           // apply to canvas
-          applyBackground(target.getAttribute('data-bg'));
-          // paint swatch boxes so they are visible and mark selected
           const color = target.getAttribute('data-bg');
+          applyBackground(color);
+          // paint swatch boxes so they are visible and mark selected
           target.style.background = color;
           document.querySelectorAll('.bg-swatch').forEach(s => s.classList.remove('selected'));
           target.classList.add('selected');
+
+          // Auto-adjust text contrast based on swatch theme
+          const title = (target.getAttribute('title') || '').toLowerCase();
+          if (title.includes('mint') || title.includes('lime') || title.includes('aurora')) {
+            setTextContrast(false); // Dark text for bright gradients
+          } else {
+            setTextContrast(true); // Light text for dark gradients
+          }
         });
 
         // Initialize swatch visuals on load
@@ -1027,12 +1251,28 @@
         function setTextContrast(isLight) {
           lightText = isLight;
           canvas.style.color = isLight ? '#ffffff' : '#0b0c10';
-          textToggle.setAttribute('aria-pressed', String(isLight));
-          textToggle.querySelector('span').textContent = 'Text: ' + (isLight ? 'Light' : 'Dark');
+          if (textToggle) {
+            textToggle.setAttribute('aria-pressed', String(isLight));
+            const icon = textToggle.querySelector('i');
+            const label = textToggle.querySelector('span');
+            if (isLight) {
+              textToggle.classList.add('is-light');
+              textToggle.classList.remove('is-dark');
+              if (icon) icon.className = 'fas fa-sun';
+              if (label) label.textContent = 'Text: Light';
+            } else {
+              textToggle.classList.add('is-dark');
+              textToggle.classList.remove('is-light');
+              if (icon) icon.className = 'fas fa-moon';
+              if (label) label.textContent = 'Text: Dark';
+            }
+          }
         }
-        textToggle.addEventListener('click', function() {
-          setTextContrast(!lightText);
-        });
+        if (textToggle) {
+          textToggle.addEventListener('click', function() {
+            setTextContrast(!lightText);
+          });
+        }
         setTextContrast(true);
 
         // Changing text animation in hero
@@ -1286,6 +1526,8 @@
                       imageUrlToSave = await apiUploadImage(pendingImageFile);
                     }
                     const storedUserId = parseInt(localStorage.getItem('userId') || '0', 10) || 0;
+                    const durationEl = document.getElementById('postDuration');
+                    const selectedDuration = durationEl ? (parseInt(durationEl.value, 10) || 24) : 24;
                     await apiCreatePost({
                       userId: storedUserId,
                       content: canvas.innerText.trim(),
@@ -1293,7 +1535,8 @@
                       fontSize: parseInt(getComputedStyle(canvas).fontSize, 10) || 18,
                       isLightText: lightText,
                       backgroundCss: canvas.style.background || '',
-                      imageUrl: imageUrlToSave
+                      imageUrl: imageUrlToSave,
+                      expiryHours: selectedDuration
                     });
                   } catch (err) {
                     showTip('Server error. Please try again.');
@@ -1302,12 +1545,14 @@
                   }
                   // success UI
                   button.classList.add('done');
+                  const durationEl = document.getElementById('postDuration');
+                  const selectedDuration = durationEl ? (parseInt(durationEl.value, 10) || 24) : 24;
                   const container = document.querySelector('.composer');
                   if (container) {
                     container.innerHTML = '<div style="max-width:780px;margin:20px auto;padding:18px;border:1px solid rgba(255,255,255,0.12);border-radius:12px;background:rgba(255,255,255,0.04);text-align:center">\
                       <div style="margin-bottom:8px;"><span class="badge-cat">' + (postCategory ? postCategory.value : 'General') + '</span></div>\
                       <h3 style="margin:6px 0 10px 0;">Your post is live!</h3>\
-                      <p style=\"color:#cbd5e1;margin:6px 0;\">It will automatically expire after 24 hours to keep the feed clean and updated.</p>\
+                      <p style=\"color:#cbd5e1;margin:6px 0;\">It will automatically expire after ' + selectedDuration + ' hours to keep the feed clean and updated.</p>\
                       <p style=\"color:#9aa3af;margin:6px 0;\">If you want to repost then refresh the page</p>\
                     </div>';
                   }

@@ -29,6 +29,10 @@ public class PostCreateRequest {
     // one image only
     private String imageUrl;
 
+    @Min(1)
+    @Max(168)
+    private Integer expiryHours = 24;
+
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
     public String getContent() { return content; }
@@ -43,6 +47,8 @@ public class PostCreateRequest {
     public void setBackgroundCss(String backgroundCss) { this.backgroundCss = backgroundCss; }
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public Integer getExpiryHours() { return expiryHours; }
+    public void setExpiryHours(Integer expiryHours) { this.expiryHours = expiryHours; }
 }
 
 
