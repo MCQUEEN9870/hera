@@ -113,6 +113,7 @@ public class SecurityConfig {
                 auth
                     .requestMatchers(HttpMethod.GET,
                         "/api/geo/**",
+                        "/api/posts",
                         "/api/posts/**",
                         "/api/vehicles/search",
                         "/api/vehicles/check",
@@ -131,7 +132,9 @@ public class SecurityConfig {
                         "/api/payments/webhook",
                         "/api/contact-submissions",
                         "/api/save-feedback",
-                        "/api/save-user-feedback"
+                        "/api/save-user-feedback",
+                        "/api/posts",
+                        "/api/posts/upload-image"
                     ).permitAll();
 
                 // Everything else requires a valid JWT
