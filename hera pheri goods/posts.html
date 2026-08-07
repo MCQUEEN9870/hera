@@ -679,11 +679,84 @@
         left: 100%;
       }
       @media (max-width: 720px) { .post-card { grid-column: span 12; } }
-      .post-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+      .post-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; flex-wrap: wrap; }
+      .head-left { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
       .post-meta { color: var(--muted); font-size: 12px; }
       .post-title { font-weight: 600; margin: 4px 0 6px 0; }
       .post-text { color: #cdd3da; font-size: 14px; white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; }
       .badge-cat { font-size: 11px; padding: 4px 8px; border-radius: 999px; background: rgba(138,180,248,0.18); border: 1px solid rgba(138,180,248,0.35); color: #d7e3ff; }
+
+      .has-image-badge {
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+      }
+      .card-image-clue {
+        margin-top: 10px;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      /* Dynamic Theme Contrast Adjustments */
+      .post-card.theme-dark-text .badge-cat {
+        background: rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(0, 0, 0, 0.28);
+        color: #0b0c10;
+        font-weight: 700;
+      }
+      .post-card.theme-dark-text .post-meta {
+        color: rgba(11, 12, 16, 0.85);
+        font-weight: 600;
+      }
+      .post-card.theme-dark-text .has-image-badge {
+        background: rgba(0, 0, 0, 0.18);
+        border: 1px solid rgba(0, 0, 0, 0.35);
+        color: #0b0c10;
+      }
+      .post-card.theme-dark-text .card-image-clue {
+        background: rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(0, 0, 0, 0.22);
+        color: #0b0c10;
+      }
+      .post-card.theme-dark-text .card-image-clue:hover {
+        background: rgba(0, 0, 0, 0.22);
+      }
+
+      .post-card.theme-light-text .badge-cat {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #ffffff;
+        font-weight: 600;
+      }
+      .post-card.theme-light-text .post-meta {
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 500;
+      }
+      .post-card.theme-light-text .has-image-badge {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        color: #ffffff;
+      }
+      .post-card.theme-light-text .card-image-clue {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        color: #ffffff;
+      }
+      .post-card.theme-light-text .card-image-clue:hover {
+        background: rgba(255, 255, 255, 0.22);
+      }
     
     @media (max-width: 420px){
         .posts-hero h1{
@@ -1358,17 +1431,26 @@
 
         function cardTpl(p) {
           const el = document.createElement('div');
-          el.className = 'post-card';
+          const isDarkText = (typeof p.isLight === 'boolean') && (!p.isLight);
+          el.className = 'post-card ' + (isDarkText ? 'theme-dark-text' : 'theme-light-text');
           el.dataset.id = p.id || '';
           el.dataset.created = p.createdAt || '';
           el.dataset.expires = p.expiresAt || '';
+
+          const photoBadge = p.imageUrl ? `<span class="has-image-badge" title="Image attached"><i class="fas fa-camera"></i> 1 Photo</span>` : '';
+          const photoBanner = p.imageUrl ? `<div class="card-image-clue"><i class="fas fa-image"></i> <span>View Attached Photo</span> <i class="fas fa-chevron-right"></i></div>` : '';
+
           el.innerHTML = `
             <div class="post-head">
-              <span class="badge-cat">${p.cat}</span>
+              <div class="head-left">
+                <span class="badge-cat">${p.cat}</span>
+                ${photoBadge}
+              </div>
               <span class="post-meta"></span>
             </div>
             <div class="post-title">${p.title || ''}</div>
             <div class="post-text">${p.text}</div>
+            ${photoBanner}
           `;
           // Apply card background and text styles (preview)
           if (p.bg) {
