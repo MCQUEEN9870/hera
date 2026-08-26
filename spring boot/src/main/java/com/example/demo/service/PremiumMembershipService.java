@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -117,5 +118,79 @@ public class PremiumMembershipService {
         }
 
         return true;
+    }
+
+    /**
+     * Checks if a user's membership has expired. If expired, downgrades the user
+     * and all registrations owned by that user to "Standard".
+     */
+    @Transactional
+    public boolean checkAndSyncUserMembership(User user) {
+        if (user == null) return false;
+        if ("Premium".equalsIgnoreCase(user.getMembership()) && user.getMembershipExpireTime() != null) {
+            if (!user.getMembershipExpireTime().isAfter(LocalDateTime.now())) {
+                log.info("Downgrading expired premium user (userId={}, expireTime={})", user.getId(), user.getMembershipExpireTime());
+                user.setMembership("Standard");
+                userRepository.save(user);
+
+                try {
+                    List<Registration> regs = registrationRepository.findByUserId(user.getId());
+                    if (regs != null && !regs.isEmpty()) {
+                        for (Registration r : regs) {
+                            r.setMembership("Standard");
+                        }
+                        registrationRepository.saveAll(regs);
+                    }
+                } catch (Exception ex) {
+                    log.warn("Failed to downgrade registrations for expired user (userId={})", user.getId(), ex);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Scheduled background cron task running every 5 minutes.
+     * Finds and downgrades all expired premium users and their vehicles across the database.
+     */
+    @Scheduled(cron = "0 */5 * * * *")
+    @Transactional
+    public void cleanupExpiredMemberships() {
+        try {
+            LocalDateTime now = LocalDateTime.now();
+            List<User> expiredUsers = userRepository.findExpiredPremiumUsers(now);
+            if (expiredUsers != null && !expiredUsers.isEmpty()) {
+                log.info("Cron: Found {} expired premium users to clean up.", expiredUsers.size());
+                for (User u : expiredUsers) {
+                    u.setMembership("Standard");
+                    userRepository.save(u);
+
+                    List<Registration> regs = registrationRepository.findByUserId(u.getId());
+                    if (regs != null && !regs.isEmpty()) {
+                        for (Registration r : regs) {
+                            r.setMembership("Standard");
+                        }
+                        registrationRepository.saveAll(regs);
+                    }
+                }
+            }
+
+            // Cleanup stray registrations marked Premium whose owners are no longer Premium
+            List<Registration> premiumRegs = registrationRepository.findByMembershipIgnoreCase("Premium");
+            if (premiumRegs != null && !premiumRegs.isEmpty()) {
+                for (Registration r : premiumRegs) {
+                    if (r.getUserId() != null) {
+                        User owner = userRepository.findById(r.getUserId()).orElse(null);
+                        if (owner == null || !owner.isPremiumActive()) {
+                            r.setMembership("Standard");
+                            registrationRepository.save(r);
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            log.error("Error during scheduled cleanupExpiredMemberships", ex);
+        }
     }
 }

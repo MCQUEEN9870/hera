@@ -55,6 +55,9 @@ public class RegistrationController {
     @Autowired
     private Environment environment;
 
+    @Autowired
+    private com.example.demo.service.PremiumMembershipService premiumMembershipService;
+
     private boolean isProdProfile() {
         if (environment == null) return false;
         return Arrays.stream(environment.getActiveProfiles())
@@ -240,10 +243,12 @@ public class RegistrationController {
             registration.setPincode(pincode);
             registration.setUserId(user.getId()); // Set the user ID
             
-            // Ensure registration inherits current user's membership
-            if (user.getMembership() != null && !user.getMembership().isEmpty()) {
-                registration.setMembership(user.getMembership());
+            // Ensure user membership is synced and registration inherits active membership
+            if (premiumMembershipService != null) {
+                premiumMembershipService.checkAndSyncUserMembership(user);
             }
+            String activeMembership = user.isPremiumActive() ? "Premium" : "Standard";
+            registration.setMembership(activeMembership);
 
             // Save to local database first to get the ID
             Registration savedRegistration = registrationRepository.save(registration);
@@ -1095,10 +1100,14 @@ public class RegistrationController {
                     return ResponseEntity.status(404).body(error);
                 }
 
+                if (premiumMembershipService != null) {
+                    premiumMembershipService.checkAndSyncUserMembership(user);
+                }
+                String activeMembership = user.isPremiumActive() ? "Premium" : "Standard";
                 List<Registration> regs = registrationRepository.findByUserId(userId);
                 if (regs != null && !regs.isEmpty()) {
                     for (Registration r : regs) {
-                        r.setMembership(user.getMembership() != null ? user.getMembership() : "Standard");
+                        r.setMembership(activeMembership);
                     }
                     registrationRepository.saveAll(regs);
                     updatedCount = regs.size();
@@ -1110,7 +1119,11 @@ public class RegistrationController {
                     if (r.getUserId() != null) {
                         User u = userRepository.findById(r.getUserId()).orElse(null);
                         if (u != null) {
-                            r.setMembership(u.getMembership() != null ? u.getMembership() : "Standard");
+                            if (premiumMembershipService != null) {
+                                premiumMembershipService.checkAndSyncUserMembership(u);
+                            }
+                            String activeM = u.isPremiumActive() ? "Premium" : "Standard";
+                            r.setMembership(activeM);
                             updatedCount++;
                         }
                     }

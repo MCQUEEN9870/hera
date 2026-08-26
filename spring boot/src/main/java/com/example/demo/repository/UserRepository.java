@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,4 +36,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT u FROM User u WHERE u.id = :id")
     Optional<User> findByIdForUpdate(@Param("id") Long id);
+
+    @Query("SELECT u FROM User u WHERE LOWER(u.membership) = 'premium' AND u.membershipExpireTime IS NOT NULL AND u.membershipExpireTime <= :now")
+    List<User> findExpiredPremiumUsers(@Param("now") LocalDateTime now);
 }

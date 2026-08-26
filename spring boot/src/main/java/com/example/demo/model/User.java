@@ -160,8 +160,24 @@ public class User {
         this.profilePhotoUrl = profilePhotoUrl;
     }
     
+    public boolean isPremiumActive() {
+        if ("Premium".equalsIgnoreCase(this.membership)) {
+            if (this.membershipExpireTime == null) {
+                return true;
+            }
+            return this.membershipExpireTime.isAfter(LocalDateTime.now());
+        }
+        return false;
+    }
+
     public String getMembership() {
-        return membership;
+        if ("Premium".equalsIgnoreCase(this.membership)) {
+            if (this.membershipExpireTime != null && !this.membershipExpireTime.isAfter(LocalDateTime.now())) {
+                return "Standard";
+            }
+            return "Premium";
+        }
+        return this.membership != null ? this.membership : "Standard";
     }
     
     public void setMembership(String membership) {

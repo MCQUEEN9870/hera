@@ -628,6 +628,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const emailConfirmPass = document.getElementById('emailOtpConfirmPassword');
         const emailSetNewPassBtn = document.getElementById('emailOtpSetNewPasswordBtn');
 
+        const emailModalIcon = document.getElementById('emailOtpModalIcon');
+        const emailModalTitle = document.getElementById('emailOtpModalTitle');
+        const emailModalSub = document.getElementById('emailOtpModalSub');
+
         const modalPhone = document.getElementById('otpLoginPhone');
         const modalOtp = document.getElementById('otpLoginOtp');
         const primaryBtn = document.getElementById('otpLoginPrimaryBtn');
@@ -746,6 +750,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (emailInputGroup) emailInputGroup.style.display = 'block';
             if (emailOtpGroup) emailOtpGroup.style.display = 'none';
             if (emailNewPassBlock) emailNewPassBlock.style.display = 'none';
+            if (emailModalIcon) emailModalIcon.innerHTML = '<i class="fas fa-envelope"></i>';
+            if (emailModalTitle) emailModalTitle.textContent = 'Email OTP';
+            if (emailModalSub) emailModalSub.textContent = 'Enter your email to receive a 6-digit code';
             updateEmailPrimaryBtnState();
         }
 
@@ -1022,6 +1029,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (emailPrimaryBtn) emailPrimaryBtn.style.display = 'none';
                 if (emailOtpTimerEl) emailOtpTimerEl.style.display = 'none';
                 if (emailNewPassBlock) emailNewPassBlock.style.display = 'block';
+                if (emailModalIcon) emailModalIcon.innerHTML = '<i class="fas fa-lock"></i>';
+                if (emailModalTitle) emailModalTitle.textContent = 'Set New Password';
+                if (emailModalSub) emailModalSub.textContent = 'Create a new password for your account';
                 setEmailHeaderLock(true);
                 if (emailNewPass) emailNewPass.focus();
                 showToast('OTP verified. Set your new password.', 'success');

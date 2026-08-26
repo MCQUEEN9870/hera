@@ -148,6 +148,10 @@ public class UserController {
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         
+        if (premiumMembershipService != null) {
+            premiumMembershipService.checkAndSyncUserMembership(user);
+        }
+
         Map<String, Object> userData = new HashMap<>();
         userData.put("id", user.getId());
         userData.put("fullName", user.getFullName());
@@ -156,8 +160,8 @@ public class UserController {
         userData.put("profilePhoto", user.getProfilePhotoUrl());
         userData.put("membership", user.getMembership());
         
-        // Include membership details if premium
-        if (user.getMembership() != null && user.getMembership().equalsIgnoreCase("Premium")) {
+        // Include membership details if active premium
+        if (user.isPremiumActive()) {
             userData.put("membershipPurchaseTime", user.getMembershipPurchaseTime());
             userData.put("membershipExpireTime", user.getMembershipExpireTime());
             userData.put("membershipPlan", user.getMembershipPlan());
@@ -484,6 +488,10 @@ public class UserController {
                 return ResponseEntity.status(404).body(errorResponse);
             }
             
+            if (premiumMembershipService != null) {
+                premiumMembershipService.checkAndSyncUserMembership(user);
+            }
+
             // Find count of user's registered vehicles using userId
             long vehicleCount = registrationRepository.findByUserId(user.getId()).size();
             
@@ -491,12 +499,16 @@ public class UserController {
             String membership = "Standard"; // Default membership
             int maxVehicles = 3; // Default limit for standard membership
             
-            if (user.getMembership() != null && user.getMembership().equalsIgnoreCase("Premium")) {
+            if (user.isPremiumActive()) {
                 membership = "Premium";
                 maxVehicles = 5; // Limit for premium membership
             }
             
             boolean hasReachedLimit = vehicleCount >= maxVehicles;
+            String warningMessage = null;
+            if (vehicleCount > maxVehicles && !user.isPremiumActive()) {
+                warningMessage = "Your Premium membership has expired. You currently have " + vehicleCount + " registered vehicles, which exceeds the Standard limit of " + maxVehicles + ". Your existing vehicles remain safe, but to register new vehicles, please renew Premium.";
+            }
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -506,6 +518,7 @@ public class UserController {
             response.put("vehicleCount", vehicleCount);
             response.put("maxVehicles", maxVehicles);
             response.put("hasReachedLimit", hasReachedLimit);
+            response.put("warningMessage", warningMessage);
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {

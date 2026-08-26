@@ -42,7 +42,7 @@ public class ContactController {
 
     // Simple in-memory rate limit: max N requests per IP per windowMs
     private static final long WINDOW_MS = 60_000; // 1 minute
-    private static final int MAX_REQUESTS = 5;    // 5 per minute per IP
+    private static final int MAX_REQUESTS = 5; // 5 per minute per IP
 
     private static final Map<String, Window> ipWindows = new ConcurrentHashMap<>();
 
@@ -53,7 +53,8 @@ public class ContactController {
 
     @PostMapping
     public ResponseEntity<?> submit(@Valid @RequestBody ContactSubmission submission) {
-        HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                .getRequest();
         String ip = ClientIpUtil.getClientIp(req);
         if (ip == null || ip.isBlank()) {
             ip = "unknown";
@@ -97,28 +98,27 @@ public class ContactController {
             // Admin alert: minimal fixed content only (avoid leaking user data via email).
             if (contactAlertTo != null && !contactAlertTo.isBlank()) {
                 emailService.sendPlainText(
-                    contactAlertTo.trim(),
-                    "Contact form submitted",
-                    "Someone submitted a contact form on Hera Pheri Goods."
-                );
+                        contactAlertTo.trim(),
+                        "Contact form submitted",
+                        "Someone submitted a contact form on Herapherigoods.");
             }
 
             // Send acknowledgement to user
             if (!userEmail.isBlank()) {
-                String ackSubject = "We received your message - Hera Pheri Goods";
+                String ackSubject = "We received your message - Herapherigoods";
                 String ackHtml = """
-                    <div style=\"font-family:Arial,sans-serif;line-height:1.6\">
-                      <p>Hi %s,</p>
-                      <p>Thanks for contacting Hera Pheri Goods. We received your message and will get back to you soon.</p>
-                      <p style=\"margin-top:14px\"><b>Your message:</b><br/>%s</p>
-                      <hr/>
-                      <p style=\"color:#666;font-size:12px\">This is an automated email from %s.</p>
-                    </div>
-                    """.formatted(
-                        escape(submission.getName()),
-                        escape(submission.getMessage()).replace("\n", "<br/>") ,
-                        "info@herapherigoods.in"
-                    );
+                        <div style=\"font-family:Arial,sans-serif;line-height:1.6\">
+                          <p>Hi %s,</p>
+                          <p>Thanks for contacting Herapherigoods. We received your message and will get back to you soon.</p>
+                          <p style=\"margin-top:14px\"><b>Your message:</b><br/>%s</p>
+                          <hr/>
+                          <p style=\"color:#666;font-size:12px\">This is an automated email from %s.</p>
+                        </div>
+                        """
+                        .formatted(
+                                escape(submission.getName()),
+                                escape(submission.getMessage()).replace("\n", "<br/>"),
+                                "info@herapherigoods.in");
                 emailService.sendHtml(userEmail, ackSubject, ackHtml);
             }
         } catch (Exception e) {
@@ -129,13 +129,14 @@ public class ContactController {
     }
 
     private static String escape(String s) {
-        if (s == null) return "";
+        if (s == null)
+            return "";
         return s
-            .replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-            .replace("\"", "&quot;")
-            .replace("'", "&#39;");
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 
     private static boolean allow(String ip) {
@@ -157,24 +158,28 @@ public class ContactController {
     private static class Window {
         long startMs;
         int count;
-        Window(long startMs, int count) { this.startMs = startMs; this.count = count; }
+
+        Window(long startMs, int count) {
+            this.startMs = startMs;
+            this.count = count;
+        }
     }
 
     private boolean verifyCaptcha(String token, String ip) {
         try {
             // Google reCAPTCHA v3 endpoint
-            String url = "https://www.google.com/recaptcha/api/siteverify?secret=" + captchaSecret + "&response=" + token + "&remoteip=" + ip;
+            String url = "https://www.google.com/recaptcha/api/siteverify?secret=" + captchaSecret + "&response="
+                    + token + "&remoteip=" + ip;
             RestTemplate rt = new RestTemplate();
-            java.util.Map<?,?> resp = rt.postForObject(url, null, java.util.Map.class);
-            if (resp == null) return false;
+            java.util.Map<?, ?> resp = rt.postForObject(url, null, java.util.Map.class);
+            if (resp == null)
+                return false;
             Object success = resp.get("success");
-            if (success instanceof Boolean b) return b;
+            if (success instanceof Boolean b)
+                return b;
             return false;
         } catch (IllegalArgumentException | org.springframework.web.client.RestClientException e) {
             return false;
         }
     }
 }
-
-
-

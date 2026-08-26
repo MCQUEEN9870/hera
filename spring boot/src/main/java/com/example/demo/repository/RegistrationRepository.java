@@ -23,4 +23,6 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     
     // Find registrations by full name containing the search term (case insensitive)
     List<Registration> findByFullNameContainingIgnoreCase(String fullName);
+
+    List<Registration> findByMembershipIgnoreCase(String membership);
 }

@@ -1087,33 +1087,41 @@ document.addEventListener('DOMContentLoaded', function() {
         // REMOVED: Don't check localStorage for membership status
         // Instead, use the userData.membership that was fetched from the database
         
+        const addVehicleBtn = document.getElementById('addVehicleBtn');
         const currentVehicleCount = vehicles.length;
         const maxVehicles = userData.membership === 'Premium' ? 5 : 3;
         
         if (currentVehicleCount >= maxVehicles) {
+            if (addVehicleBtn) addVehicleBtn.style.display = 'none';
+            const isExceededDueToExpiry = (currentVehicleCount > maxVehicles && userData.membership !== 'Premium');
+            const noticeMessage = isExceededDueToExpiry ? 
+                `Your Premium membership has expired. You currently have <strong>${currentVehicleCount} registered vehicles</strong>, which exceeds the Standard limit of ${maxVehicles}. Your existing vehicles remain safe, but to register new vehicles, please renew Premium.` :
+                `You've reached your vehicle limit (${currentVehicleCount}/${maxVehicles}).`;
+
             vehicleLimitNotice.innerHTML = `
-                <div class="limit-notice-box">
+                <div class="limit-notice-box ${isExceededDueToExpiry ? 'limit-warning-exceeded' : ''}">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <p>You've reached your vehicle limit (${currentVehicleCount}/${maxVehicles}).</p>
+                    <p>${noticeMessage}</p>
                     ${userData.membership !== 'Premium' ? 
                         `<button class="upgrade-btn" id="upgradeFromNoticeBtn">
-                            <i class="fas fa-crown"></i> Upgrade to Premium
+                            <i class="fas fa-crown"></i> Renew Premium Membership
                         </button>` : ''
                     }
-                    </div>
-                `;
+                </div>
+            `;
             
             // Add event listener to the upgrade button if present
             const upgradeBtn = document.getElementById('upgradeFromNoticeBtn');
             if (upgradeBtn) {
                 upgradeBtn.addEventListener('click', showPremiumPlansModal);
             }
-            } else {
+        } else {
+            if (addVehicleBtn) addVehicleBtn.style.display = '';
             vehicleLimitNotice.innerHTML = `
                 <div class="limit-info">
                     <p>Vehicle count: ${currentVehicleCount}/${maxVehicles}</p>
-                    </div>
-                `;
+                </div>
+            `;
         }
     }
 

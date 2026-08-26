@@ -1618,21 +1618,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const vehicleCountEsc = escapeHtml((limitData && limitData.vehicleCount != null) ? limitData.vehicleCount : '');
         const maxVehiclesEsc = escapeHtml((limitData && limitData.maxVehicles != null) ? limitData.maxVehicles : '');
         
+        const warningMessageEsc = limitData && limitData.warningMessage ? escapeHtml(limitData.warningMessage) : '';
+        
         modalContent.innerHTML = `
             <div class="limit-modal-header">
-                <h3>Vehicle Limit Reached</h3>
+                <h3>Vehicle Limit Reached (${vehicleCountEsc}/${maxVehiclesEsc})</h3>
                 <span class="close-limit-modal">&times;</span>
             </div>
             <div class="limit-modal-body">
                 <div class="limit-icon">
-                    <i class="fas fa-exclamation-circle"></i>
+                    <i class="fas fa-exclamation-triangle"></i>
                 </div>
-                <p>You have already registered <strong>${vehicleCountEsc}</strong> vehicles with your ${membershipEsc} account, which is the maximum limit.</p>
+                ${warningMessageEsc ? 
+                    `<p style="color:#ef4444; font-weight:600; margin-bottom:12px;">${warningMessageEsc}</p>` :
+                    `<p>You have registered <strong>${vehicleCountEsc}</strong> vehicles with your ${membershipEsc} account, which is the limit (${vehicleCountEsc}/${maxVehiclesEsc}).</p>`
+                }
                 
                 ${isPremium ? 
-                    `<p>As a Premium member, you can register up to ${maxVehiclesEsc} vehicles. To register more vehicles, please use a different phone number to create a new account.</p>` : 
-                    `<p>You can upgrade to Premium to register up to 5 vehicles, or use a different phone number to create a new account.</p>
-                    <button class="upgrade-button">Upgrade to Premium</button>`
+                    `<p>As a Premium member, you can register up to ${maxVehiclesEsc} vehicles.</p>` : 
+                    `<p>Renew or upgrade to Premium to register up to 5 vehicles and unlock premium features.</p>
+                    <button class="upgrade-button"><i class="fas fa-crown"></i> Renew / Upgrade to Premium</button>`
                 }
                 
                 <button class="new-account-button">Use Different Number</button>

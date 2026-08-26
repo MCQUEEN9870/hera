@@ -1,16 +1,17 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta name="robots" content="noindex,nofollow">
-        <!-- Google tag (gtag.js) – deferred to user interaction to reduce unused JS -->
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){ dataLayer.push(arguments); }
-    (function(){
-        var loaded=false; function loadGA(){ if(loaded) return; loaded=true; var s=document.createElement('script'); s.async=true; s.src='https://www.googletagmanager.com/gtag/js?id=G-V9X30VY879'; s.onload=function(){ try{ gtag('js', new Date()); gtag('config','G-V9X30VY879'); }catch(e){} }; document.head.appendChild(s); }
-        ['pointerdown','touchstart','keydown','click'].forEach(function(ev){ window.addEventListener(ev,function(){ loadGA(); },{once:true,passive:true}); });
-    })();
-</script>
+    <!-- Google tag (gtag.js) – deferred to user interaction to reduce unused JS -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        (function () {
+            var loaded = false; function loadGA() { if (loaded) return; loaded = true; var s = document.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-V9X30VY879'; s.onload = function () { try { gtag('js', new Date()); gtag('config', 'G-V9X30VY879'); } catch (e) { } }; document.head.appendChild(s); }
+            ['pointerdown', 'touchstart', 'keydown', 'click'].forEach(function (ev) { window.addEventListener(ev, function () { loadGA(); }, { once: true, passive: true }); });
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login / Sign Up- Register Your Transport Vehicle - No Documents Required</title>
@@ -18,33 +19,35 @@
     <meta name="twitter:title" content="Login / Sign Up- Register Your Transport Vehicle - No Documents Required">
     <meta name="description" content="Login & Sign Up – List Your Transport Vehicle Free, No Documents needed" />
     <meta property="og:description" content="Login & Sign Up – List Your Transport Vehicle Free, No Documents needed" />
-    <meta name="twitter:description" content="Login & Sign Up – List Your Transport Vehicle Free, No Documents needed" />
-        <!-- Social Media Meta Tags -->
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://herapherigoods.in/login" />
-        <meta property="og:site_name" content="Herapherigoods" />
-        <meta property="og:image" content="attached_assets/images/1200x630.jpg" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="attached_assets/images/1200x630.jpg" />
+    <meta name="twitter:description"
+        content="Login & Sign Up – List Your Transport Vehicle Free, No Documents needed" />
+    <!-- Social Media Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://herapherigoods.in/login" />
+    <meta property="og:site_name" content="Herapherigoods" />
+    <meta property="og:image" content="attached_assets/images/1200x630.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="attached_assets/images/1200x630.jpg" />
     <link rel="stylesheet" href="style.css?v=20260108-1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 
- <!-- Favicons -->
- <link rel="icon" type="image/x-icon" href="/favicon.ico">
- <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
- <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
- <link rel="apple-touch-icon" href="/apple-touch-icon.png">
- <link rel="manifest" href="site.webmanifest">
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
 
 
 
     <style>
         /* Add some styling for debugging messages if needed */
         .debug-info {
-            display: none; /* Hidden by default */
+            display: none;
+            /* Hidden by default */
             margin-top: 10px;
             padding: 5px;
             background-color: #f8f9fa;
@@ -52,62 +55,306 @@
             font-size: 12px;
             color: #666;
         }
+
         /* Modern modal styles */
-        .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:1000;padding:14px}
-        .modal{background:linear-gradient(180deg,#ffffff 0%,#fbfbff 100%);border-radius:18px;max-width:520px;width:100%;padding:18px 18px 16px;box-shadow:0 24px 60px rgba(0,0,0,.28);border:1px solid rgba(15,23,42,.08)}
-        .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-        .modal-title{display:flex;gap:10px;align-items:center}
-        .modal-title .icon{width:38px;height:38px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0b57d0,#22c55e);color:#fff}
-        .modal-header h3{margin:0;font-size:18px;line-height:1.2}
-        .modal-sub{margin:2px 0 0 0;color:#f8f9fa;font-size:13px}
-        .modal-close{background:rgba(0 0 0 / 0%);border:none;font-size:22px;cursor:pointer;border-radius:12px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;color:#0f172a}
-        .modal-close:hover{background:rgba(2,6,23,.10)}
-        .modal-actions{display:flex;align-items:center;gap:8px}
-        .modal-back{background:rgba(2,6,23,.04);border:1px solid rgba(15,23,42,.10);color:#0f172a;border-radius:12px;height:40px;min-width:40px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:background .12s ease,transform .12s ease}
-        .modal-back:hover{background:rgba(2,6,23,.10);transform:translateY(-1px)}
-        .modal-back span{font-size:13px;font-weight:800;margin-left:6px}
-        @media (max-width:420px){ .modal-back span{display:none} }
-        .choice-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
-        .choice-btn{width:100%;text-align:left;border-radius:16px;padding:12px 12px;border:1px solid rgba(15,23,42,.10);background:#fff;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:transform .12s ease, box-shadow .12s ease,border-color .12s ease}
-        .choice-btn:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(2,6,23,.10);border-color:rgba(11,87,208,.35)}
-        .choice-btn .c-ico{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(11,87,208,.10);color:#0b57d0;font-size:18px;flex:0 0 auto}
-        .choice-btn strong{display:block;font-size:14px;color:#0f172a}
-        .choice-btn span{display:block;font-size:12px;color:#64748b;margin-top:2px}
-        .choice-btn.reco .c-ico{background:rgba(34,197,94,.12);color:#16a34a}
-        .choice-btn.reco{border-color:rgba(34,197,94,.25)}
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, .55);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 14px
+        }
+
+        .modal {
+            background: linear-gradient(180deg, #ffffff 0%, #fbfbff 100%);
+            border-radius: 18px;
+            max-width: 520px;
+            width: 100%;
+            padding: 18px 18px 16px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, .28);
+            border: 1px solid rgba(15, 23, 42, .08)
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px
+        }
+
+        .modal-title {
+            display: flex;
+            gap: 10px;
+            align-items: center
+        }
+
+        .modal-title .icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0b57d0, #22c55e);
+            color: #fff
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.2
+        }
+
+        .modal-sub {
+            margin: 2px 0 0 0;
+            color: #f8f9fa;
+            font-size: 13px
+        }
+
+        .modal-close {
+            background: rgba(0 0 0 / 0%);
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #0f172a
+        }
+
+        .modal-close:hover {
+            background: rgba(2, 6, 23, .10)
+        }
+
+        .modal-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .modal-back {
+            background: rgba(2, 6, 23, .04);
+            border: 1px solid rgba(15, 23, 42, .10);
+            color: #0f172a;
+            border-radius: 12px;
+            height: 40px;
+            min-width: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background .12s ease, transform .12s ease
+        }
+
+        .modal-back:hover {
+            background: rgba(2, 6, 23, .10);
+            transform: translateY(-1px)
+        }
+
+        .modal-back span {
+            font-size: 13px;
+            font-weight: 800;
+            margin-left: 6px
+        }
+
+        @media (max-width:420px) {
+            .modal-back span {
+                display: none
+            }
+        }
+
+        .choice-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 10px
+        }
+
+        .choice-btn {
+            width: 100%;
+            text-align: left;
+            border-radius: 16px;
+            padding: 12px 12px;
+            border: 1px solid rgba(15, 23, 42, .10);
+            background: #fff;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            cursor: pointer;
+            transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 30px rgba(2, 6, 23, .10);
+            border-color: rgba(11, 87, 208, .35)
+        }
+
+        .choice-btn .c-ico {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(11, 87, 208, .10);
+            color: #0b57d0;
+            font-size: 18px;
+            flex: 0 0 auto
+        }
+
+        .choice-btn strong {
+            display: block;
+            font-size: 14px;
+            color: #0f172a
+        }
+
+        .choice-btn span {
+            display: block;
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 2px
+        }
+
+        .choice-btn.reco .c-ico {
+            background: rgba(34, 197, 94, .12);
+            color: #16a34a
+        }
+
+        .choice-btn.reco {
+            border-color: rgba(34, 197, 94, .25)
+        }
+
         /* Replace text show/hide with eye icon button inside input */
-        .pw-toggle{display:none}
-        .form-group{position:relative}
-        .pw-eye{position:absolute; right:10px; top:50%; transform:translateY(-50%); background:transparent; border:none; cursor:pointer; padding:6px; color:#6b7280; z-index:2; width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center}
-        
-        .pw-eye i{font-size:16px}
-        .form-group input.has-eye{ padding-right: 44px; }
-        .otp-timer{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:#64748b;background:rgba(2,6,23,.04);padding:3px 8px;border-radius:999px}
-        .form-group input.has-timer{padding-right:92px;}
-        .otp-group{transition:all 0.3s ease;opacity:1;transform:translateY(0);}
-        .otp-group[style*="display: none"]{opacity:0;transform:translateY(-10px);}
-        .method-note{margin:0 0 6px 0;color:#475569;font-size:13px}
-        .badge{display:inline-block;margin-left:8px;background:rgba(34,197,94,.12);color:#16a34a;border:1px solid rgba(34,197,94,.25);border-radius:999px;padding:2px 8px;font-size:12px;font-weight:800}
-        .resend-row{display:flex;justify-content:flex-start;align-items:center;margin-top:8px}
-        .link-btn{background:none;border:none;color:#0b57d0;font-weight:700;cursor:pointer;padding:0}
-        .link-btn:disabled{color:#94a3b8;cursor:not-allowed}
-        @media (min-width:520px){
-            .choice-grid{grid-template-columns:1fr 1fr}
+        .pw-toggle {
+            display: none
+        }
+
+        .form-group {
+            position: relative
+        }
+
+        .pw-eye {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            color: #6b7280;
+            z-index: 2;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .pw-eye i {
+            font-size: 16px
+        }
+
+        .form-group input.has-eye {
+            padding-right: 44px;
+        }
+
+        .otp-timer {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #64748b;
+            background: rgba(2, 6, 23, .04);
+            padding: 3px 8px;
+            border-radius: 999px
+        }
+
+        .form-group input.has-timer {
+            padding-right: 92px;
+        }
+
+        .otp-group {
+            transition: all 0.3s ease;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .otp-group[style*="display: none"] {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .method-note {
+            margin: 0 0 6px 0;
+            color: #475569;
+            font-size: 13px
+        }
+
+        .badge {
+            display: inline-block;
+            margin-left: 8px;
+            background: rgba(34, 197, 94, .12);
+            color: #16a34a;
+            border: 1px solid rgba(34, 197, 94, .25);
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 800
+        }
+
+        .resend-row {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-top: 8px
+        }
+
+        .link-btn {
+            background: none;
+            border: none;
+            color: #0b57d0;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0
+        }
+
+        .link-btn:disabled {
+            color: #94a3b8;
+            cursor: not-allowed
+        }
+
+        @media (min-width:520px) {
+            .choice-grid {
+                grid-template-columns: 1fr 1fr
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="auth-container">
         <a href="index" class="back-btn">
             <i class="fas fa-arrow-left"></i>
         </a>
         <div class="auth-box">
-            
+
             <div class="auth-header">
-                <img src="attached_assets\images\herapheri_logo-removebg-preview.webp" alt="Herapherigoods Logo" title="Herapherigoods Logo" class="auth-logo">
+                <img src="attached_assets\images\herapheri_logo-removebg-preview.webp" alt="Herapherigoods Logo"
+                    title="Herapherigoods Logo" class="auth-logo">
                 <h2>Welcome to Herapherigoods</h2>
                 <p>Register Transport vehicles Free & Fast – No Documents Needed</p>
-                <video class="login-animation" style="width: 15%; height: auto;" autoplay muted loop playsinline preload="metadata" aria-label="Login Animation" title="Login Animation">
+                <video class="login-animation" style="width: 15%; height: auto;" autoplay muted loop playsinline
+                    preload="metadata" aria-label="Login Animation" title="Login Animation">
                     <source src="attached_assets/animation/login-page.webm" type="video/webm">
                     Sorry, your browser doesn't support embedded videos.
                 </video>
@@ -119,23 +366,27 @@
                 <form id="loginForm">
                     <div class="form-group" style="margin-bottom: 5px;">
                         <i class="fas fa-phone"></i>
-                        <input type="tel" id="loginContactNumber" name="contactNumber" placeholder="Enter Contact Number" required pattern="[0-9]{10}" maxlength="10">
+                        <input type="tel" id="loginContactNumber" name="contactNumber"
+                            placeholder="Enter Contact Number" required pattern="[0-9]{10}" maxlength="10">
                         <span class="validation-message">Please enter a valid 10-digit mobile number</span>
                     </div>
                     <div class="form-group" id="loginPasswordGroup" style="display:none;">
                         <i class="fas fa-lock"></i>
-                        <input type="password" id="loginPassword" class="has-eye" name="password" placeholder="Enter Password " minlength="4" autocomplete="current-password">
-                        <button type="button" class="pw-eye" aria-label="Show password" aria-pressed="false" data-target="loginPassword"><i class="fas fa-eye"></i></button>
+                        <input type="password" id="loginPassword" class="has-eye" name="password"
+                            placeholder="Enter Password " minlength="4" autocomplete="current-password">
+                        <button type="button" class="pw-eye" aria-label="Show password" aria-pressed="false"
+                            data-target="loginPassword"><i class="fas fa-eye"></i></button>
                     </div>
                     <button type="submit" class="auth-btn" id="loginBtn">Continue</button>
-                    <div id="forgotPasswordBlock" style="margin-top:8px; display:none;"><a href="#" id="forgotPasswordLink">Forgot password?</a></div>
+                    <div id="forgotPasswordBlock" style="margin-top:8px; display:none;"><a href="#"
+                            id="forgotPasswordLink">Forgot password?</a></div>
                     <div class="debug-info" id="loginDebugInfo"></div>
                 </form>
                 <p class="auth-switch">New to Herapherigoods? <a href="#" id="showSignup">Sign up</a></p>
 
-                
-                
-            </div> 
+
+
+            </div>
 
             <!-- Signup Form -->
             <div class="auth-form signup-form" style="display: none;">
@@ -143,27 +394,14 @@
                 <form id="signupForm">
                     <div class="form-group">
                         <i class="fas fa-user"></i>
-                        <input 
-                            type="text" 
-                            name="fullName" 
-                            placeholder="Full Name" 
-                            required
-                            minlength="2"
-                            title="Please enter only letters"
-                        >
+                        <input type="text" name="fullName" placeholder="Full Name" required minlength="2"
+                            title="Please enter only letters">
                         <span class="validation-message">Please enter a valid name (only letters allowed)</span>
                     </div>
                     <div class="form-group">
                         <i class="fas fa-mobile-alt"></i>
-                        <input 
-                            type="tel" 
-                            name="contactNumber"
-                            placeholder="Contact Number" 
-                            required 
-                            pattern="[0-9]{10}"
-                            maxlength="10"
-                            title="Please enter a 10-digit mobile number"
-                        >
+                        <input type="tel" name="contactNumber" placeholder="Contact Number" required pattern="[0-9]{10}"
+                            maxlength="10" title="Please enter a 10-digit mobile number">
                         <span class="validation-message">Please enter a valid 10-digit mobile number</span>
                     </div>
                     <div class="form-group">
@@ -172,8 +410,11 @@
                     </div>
                     <div class="form-group">
                         <i class="fas fa-lock"></i>
-                        <input type="password" id="signupPassword" class="has-eye" name="password" placeholder="Create Password (min 4 chars)" minlength="4" required autocomplete="new-password">
-                        <button type="button" class="pw-eye" aria-label="Show password" aria-pressed="false" data-target="signupPassword"><i class="fas fa-eye"></i></button>
+                        <input type="password" id="signupPassword" class="has-eye" name="password"
+                            placeholder="Create Password (min 4 chars)" minlength="4" required
+                            autocomplete="new-password">
+                        <button type="button" class="pw-eye" aria-label="Show password" aria-pressed="false"
+                            data-target="signupPassword"><i class="fas fa-eye"></i></button>
                     </div>
                     <div class="form-group otp-group" style="display: none;">
                         <i class="fas fa-key"></i>
@@ -212,7 +453,8 @@
                     </div>
                 </div>
                 <div class="modal-actions">
-                    <button class="modal-back" id="otpLoginBack" type="button" aria-label="Back to OTP method"><i class="fas fa-arrow-left"></i><span>Back</span></button>
+                    <button class="modal-back" id="otpLoginBack" type="button" aria-label="Back to OTP method"><i
+                            class="fas fa-arrow-left"></i><span>Back</span></button>
                 </div>
             </div>
             <div class="form-group">
@@ -221,7 +463,8 @@
             </div>
             <div class="form-group" id="otpLoginOtpGroup" style="display:none;">
                 <i class="fas fa-key"></i>
-                <input type="text" id="otpLoginOtp" class="has-timer" placeholder="Enter OTP" maxlength="4" pattern="[0-9]{4}">
+                <input type="text" id="otpLoginOtp" class="has-timer" placeholder="Enter OTP" maxlength="4"
+                    pattern="[0-9]{4}">
                 <span id="otpLoginTimer" class="otp-timer" style="display:none;"></span>
             </div>
             <div style="margin:10px 0;">
@@ -232,12 +475,14 @@
                 <div class="form-group">
                     <i class="fas fa-lock"></i>
                     <input type="password" id="otpNewPassword" class="has-eye" placeholder="New Password (min 4)">
-                    <button type="button" class="pw-eye" aria-label="Show password" aria-pressed="false" data-target="otpNewPassword"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="pw-eye" aria-label="Show password" aria-pressed="false"
+                        data-target="otpNewPassword"><i class="fas fa-eye"></i></button>
                 </div>
                 <div class="form-group">
                     <i class="fas fa-lock"></i>
                     <input type="password" id="otpConfirmPassword" class="has-eye" placeholder="Confirm Password">
-                    <button type="button" class="pw-eye" aria-label="Show password" aria-pressed="false" data-target="otpConfirmPassword"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="pw-eye" aria-label="Show password" aria-pressed="false"
+                        data-target="otpConfirmPassword"><i class="fas fa-eye"></i></button>
                 </div>
                 <button id="otpSetNewPasswordBtn" class="auth-btn" type="button">Set Password</button>
             </div>
@@ -284,24 +529,27 @@
         <div class="modal">
             <div class="modal-header">
                 <div class="modal-title">
-                    <div class="icon"><i class="fas fa-envelope"></i></div>
+                    <div class="icon" id="emailOtpModalIcon"><i class="fas fa-envelope"></i></div>
                     <div>
-                        <h3>Email OTP</h3>
-                        <p class="modal-sub">Enter your email to receive a 6-digit code</p>
+                        <h3 id="emailOtpModalTitle">Email OTP</h3>
+                        <p class="modal-sub" id="emailOtpModalSub">Enter your email to receive a 6-digit code</p>
                     </div>
                 </div>
                 <div class="modal-actions">
-                    <button class="modal-back" id="emailOtpBack" type="button" aria-label="Back to OTP method"><i class="fas fa-arrow-left"></i><span>Back</span></button>
+                    <button class="modal-back" id="emailOtpBack" type="button" aria-label="Back to OTP method"><i
+                            class="fas fa-arrow-left"></i><span>Back</span></button>
                     <button class="modal-close" id="emailOtpClose" aria-label="Close">&times;</button>
                 </div>
             </div>
             <div class="form-group" id="emailOtpEmailGroup">
                 <i class="fas fa-envelope"></i>
-                <input type="email" id="emailOtpEmail" placeholder="Enter your email" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" maxlength="254">
+                <input type="email" id="emailOtpEmail" placeholder="Enter your email" autocomplete="email"
+                    inputmode="email" autocapitalize="none" spellcheck="false" maxlength="254">
             </div>
             <div class="form-group" id="emailOtpCodeGroup" style="display:none;">
                 <i class="fas fa-key"></i>
-                <input type="text" id="emailOtpCode" class="has-timer" placeholder="Enter 6-digit OTP" maxlength="6" pattern="[0-9]{6}">
+                <input type="text" id="emailOtpCode" class="has-timer" placeholder="Enter 6-digit OTP" maxlength="6"
+                    pattern="[0-9]{6}">
                 <span id="emailOtpTimer" class="otp-timer" style="display:none;"></span>
             </div>
             <div class="resend-row" id="emailOtpResendRow" style="display:none;">
@@ -311,13 +559,16 @@
             <div id="emailOtpNewPassBlock" style="display:none; margin-top:12px;">
                 <div class="form-group">
                     <i class="fas fa-lock"></i>
-                    <input type="password" id="emailOtpNewPassword" class="has-eye" placeholder="New Password (min 4)" minlength="4">
-                    <button type="button" class="pw-eye" aria-label="Show password" aria-pressed="false" data-target="emailOtpNewPassword"><i class="fas fa-eye"></i></button>
+                    <input type="password" id="emailOtpNewPassword" class="has-eye" placeholder="New Password (min 4)"
+                        minlength="4">
+                    <button type="button" class="pw-eye" aria-label="Show password" aria-pressed="false"
+                        data-target="emailOtpNewPassword"><i class="fas fa-eye"></i></button>
                 </div>
                 <div class="form-group">
                     <i class="fas fa-lock"></i>
                     <input type="password" id="emailOtpConfirmPassword" class="has-eye" placeholder="Confirm Password">
-                    <button type="button" class="pw-eye" aria-label="Show password" aria-pressed="false" data-target="emailOtpConfirmPassword"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="pw-eye" aria-label="Show password" aria-pressed="false"
+                        data-target="emailOtpConfirmPassword"><i class="fas fa-eye"></i></button>
                 </div>
                 <button id="emailOtpSetNewPasswordBtn" class="auth-btn" type="button">Set Password</button>
             </div>
@@ -339,9 +590,9 @@
     <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
     <script src="env.js?v=20260108-1"></script>
     <script src="auth.js?v=20260108-1"></script>
-    
+
     <script>
-        
+
         // Smart URL conversion - automatically adds .html for local development
         if (typeof window.buildUrl === 'function') {
             // Convert all internal links to use smart URLs
@@ -361,7 +612,7 @@
             });
         }
         // Show signup form if signup param is present
-        (function(){
+        (function () {
             const params = new URLSearchParams(window.location.search);
             if (params.has('signup') || params.get('mode') === 'signup') {
                 const loginForm = document.querySelector('.login-form');
@@ -373,7 +624,7 @@
             }
         })();
     </script>
-    
-</body>
-</html>
 
+</body>
+
+</html>
