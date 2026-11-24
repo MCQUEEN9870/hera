@@ -1,14 +1,18 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Post your Requirements, Services, Queries & More | Herapherigoods</title>
   <meta property="og:title" content="Post your Requirements, Services, Queries, Local Updates & More | Herapherigoods">
   <meta name="twitter:title" content="Post your Requirements, Services, Queries, Local Updates & More | Herapherigoods">
-  <meta name="description" content="Create a 24‑hour post - Share transport vehicle requirements, Services or local updates. Let Vehicle owners find You - Realtime feed, no login required." />
-  <meta property="og:description" content="Create a 24‑hour post - Share transport vehicle requirements, Services or local updates. Let Vehicle owners find You - Realtime feed, no login required." />
-  <meta name="twitter:description" content="Create a 24‑hour post - Share transport vehicle requirements, Services or local updates. Let Vehicle owners find You - Realtime feed, no login required." />
+  <meta name="description"
+    content="Create a 24‑hour post - Share transport vehicle requirements, Services or local updates. Let Vehicle owners find You - Realtime feed, no login required." />
+  <meta property="og:description"
+    content="Create a 24‑hour post - Share transport vehicle requirements, Services or local updates. Let Vehicle owners find You - Realtime feed, no login required." />
+  <meta name="twitter:description"
+    content="Create a 24‑hour post - Share transport vehicle requirements, Services or local updates. Let Vehicle owners find You - Realtime feed, no login required." />
   <!-- Social Media Meta Tags -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://herapherigoods.in/posts" />
@@ -18,751 +22,1041 @@
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="attached_assets/images/1200x630.jpg" />
-    <link rel="stylesheet" href="style.css?v=20260108-1" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <style>
-      :root {
-        --bg: #0b0c10;
-        --card: #121317;
-        --muted: #9aa3af;
-        --primary: #01d28e;
-        --primary-2: #00a875;
-        --text: #e8eaed;
-        --accent: #8ab4f8;
-        --danger: #ff6b6b;
+  <link rel="stylesheet" href="style.css?v=20260108-1" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --card: #121317;
+      --muted: #9aa3af;
+      --primary: #01d28e;
+      --primary-2: #00a875;
+      --text: #e8eaed;
+      --accent: #8ab4f8;
+      --danger: #ff6b6b;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 1200px at 16% 98%, #0f172a 10%, #0b0c10 100%, #0b0c10 100%);
+      color: var(--text);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Aurora Background Effect */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        radial-gradient(ellipse 800px 400px at 20% 10%, rgba(138, 180, 248, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse 600px 300px at 80% 20%, rgba(167, 139, 250, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 700px 350px at 50% 80%, rgba(1, 210, 142, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse 500px 250px at 10% 60%, rgba(255, 107, 107, 0.06) 0%, transparent 50%);
+      animation: auroraFlow 20s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Aurora Burn Effect Overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        linear-gradient(45deg, transparent 30%, rgba(138, 180, 248, 0.03) 50%, transparent 70%),
+        linear-gradient(-45deg, transparent 30%, rgba(167, 139, 250, 0.02) 50%, transparent 70%);
+      animation: auroraBurn 15s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes auroraFlow {
+      0% {
+        transform: translateX(-2%) translateY(-1%) scale(1);
+        filter: hue-rotate(0deg) brightness(1);
       }
 
-      body {
-        margin: 0;
-        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-        background: radial-gradient(1200px 1200px at 16% 98%, #0f172a 10%, #0b0c10 100%, #0b0c10 100%);
-        color: var(--text);
-        min-height: 100vh;
-        position: relative;
-        overflow-x: hidden;
+      25% {
+        transform: translateX(3%) translateY(-3%) scale(1.02);
+        filter: hue-rotate(15deg) brightness(1.1);
       }
 
-      /* Aurora Background Effect */
-      body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: 
-          radial-gradient(ellipse 800px 400px at 20% 10%, rgba(138, 180, 248, 0.15) 0%, transparent 50%),
-          radial-gradient(ellipse 600px 300px at 80% 20%, rgba(167, 139, 250, 0.12) 0%, transparent 50%),
-          radial-gradient(ellipse 700px 350px at 50% 80%, rgba(1, 210, 142, 0.08) 0%, transparent 50%),
-          radial-gradient(ellipse 500px 250px at 10% 60%, rgba(255, 107, 107, 0.06) 0%, transparent 50%);
-        animation: auroraFlow 20s ease-in-out infinite alternate;
-        pointer-events: none;
-        z-index: -1;
+      50% {
+        transform: translateX(-1%) translateY(-5%) scale(1.05);
+        filter: hue-rotate(30deg) brightness(1.2);
       }
 
-      /* Aurora Burn Effect Overlay */
-      body::after {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: 
-          linear-gradient(45deg, transparent 30%, rgba(138, 180, 248, 0.03) 50%, transparent 70%),
-          linear-gradient(-45deg, transparent 30%, rgba(167, 139, 250, 0.02) 50%, transparent 70%);
-        animation: auroraBurn 15s ease-in-out infinite alternate;
-        pointer-events: none;
-        z-index: -1;
+      75% {
+        transform: translateX(4%) translateY(-2%) scale(1.03);
+        filter: hue-rotate(45deg) brightness(1.1);
       }
 
-      @keyframes auroraFlow {
-        0% {
-          transform: translateX(-2%) translateY(-1%) scale(1);
-          filter: hue-rotate(0deg) brightness(1);
-        }
-        25% {
-          transform: translateX(3%) translateY(-3%) scale(1.02);
-          filter: hue-rotate(15deg) brightness(1.1);
-        }
-        50% {
-          transform: translateX(-1%) translateY(-5%) scale(1.05);
-          filter: hue-rotate(30deg) brightness(1.2);
-        }
-        75% {
-          transform: translateX(4%) translateY(-2%) scale(1.03);
-          filter: hue-rotate(45deg) brightness(1.1);
-        }
-        100% {
-          transform: translateX(-3%) translateY(-4%) scale(1.01);
-          filter: hue-rotate(60deg) brightness(1.05);
-        }
+      100% {
+        transform: translateX(-3%) translateY(-4%) scale(1.01);
+        filter: hue-rotate(60deg) brightness(1.05);
+      }
+    }
+
+    @keyframes auroraBurn {
+      0% {
+        opacity: 0.3;
+        transform: translateX(-1%) translateY(-1%) rotate(0deg);
+        filter: blur(1px);
       }
 
-      @keyframes auroraBurn {
-        0% {
-          opacity: 0.3;
-          transform: translateX(-1%) translateY(-1%) rotate(0deg);
-          filter: blur(1px);
-        }
-        33% {
-          opacity: 0.6;
-          transform: translateX(2%) translateY(-2%) rotate(1deg);
-          filter: blur(0.5px);
-        }
-        66% {
-          opacity: 0.4;
-          transform: translateX(-2%) translateY(-3%) rotate(-1deg);
-          filter: blur(1.5px);
-        }
-        100% {
-          opacity: 0.5;
-          transform: translateX(1%) translateY(-1%) rotate(0.5deg);
-          filter: blur(0.8px);
-        }
+      33% {
+        opacity: 0.6;
+        transform: translateX(2%) translateY(-2%) rotate(1deg);
+        filter: blur(0.5px);
       }
 
-      /* Animated Back Button (top-left) */
-      .back-btn {
-        position: fixed;
-        top: 14px;
-        left: 14px;
-        z-index: 20;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 14px;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 999px;
-        color: var(--text);
-        cursor: pointer;
-        backdrop-filter: blur(8px);
-        transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
-      }
-      .back-btn i { transition: transform 180ms ease; }
-      .back-btn:hover {
-        background: rgba(255,255,255,0.12);
-        border-color: rgba(255,255,255,0.16);
-        transform: translateY(-1px);
-      }
-      .back-btn:hover i { transform: translateX(-2px); }
-      .back-pulse {
-        position: absolute;
-        inset: -4px;
-        border-radius: 999px;
-        background: radial-gradient(circle at 10% 50%, rgba(1,210,142,0.25), transparent 60%);
-        z-index: -1;
-        animation: pulse 2.2s infinite ease-in-out;
-      }
-      @keyframes pulse {
-        0% { opacity: 0.4; }
-        50% { opacity: 0.85; }
-        100% { opacity: 0.4; }
+      66% {
+        opacity: 0.4;
+        transform: translateX(-2%) translateY(-3%) rotate(-1deg);
+        filter: blur(1.5px);
       }
 
-      /* Hero Section */
-      .posts-hero {
-        padding: 88px 20px 28px 20px;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
+      100% {
+        opacity: 0.5;
+        transform: translateX(1%) translateY(-1%) rotate(0.5deg);
+        filter: blur(0.8px);
       }
-      .posts-hero .glow {
-        position: absolute;
-        inset: 0% -10% auto -10%;
-        height: 420px;
-        background: 
-          radial-gradient(600px 220px at 50% 0%, rgba(1,210,142,0.25), transparent 75%),
-          radial-gradient(520px 200px at 70% 10%, rgba(138,180,248,0.15), transparent 80%),
-          radial-gradient(400px 180px at 30% 20%, rgba(167,139,250,0.12), transparent 70%),
-          radial-gradient(350px 160px at 80% 30%, rgba(255,107,107,0.08), transparent 65%);
-        filter: blur(25px);
-        pointer-events: none;
-        animation: auroraGlow 22s ease-in-out infinite alternate;
+    }
+
+    /* Animated Back Button (top-left) */
+    .back-btn {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 20;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      color: var(--text);
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .back-btn i {
+      transition: transform 180ms ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.16);
+      transform: translateY(-1px);
+    }
+
+    .back-btn:hover i {
+      transform: translateX(-2px);
+    }
+
+    .back-pulse {
+      position: absolute;
+      inset: -4px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 10% 50%, rgba(1, 210, 142, 0.25), transparent 60%);
+      z-index: -1;
+      animation: pulse 2.2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0% {
+        opacity: 0.4;
       }
-      @keyframes auroraGlow {
-        0% { 
-          transform: translate3d(-2%, 0, 0) scale(1) rotate(0deg); 
-          opacity: 0.9; 
-          filter: blur(25px) hue-rotate(0deg) brightness(1);
-        }
-        20% { 
-          transform: translate3d(4%, -2%, 0) scale(1.03) rotate(1deg); 
-          opacity: 1; 
-          filter: blur(20px) hue-rotate(20deg) brightness(1.1);
-        }
-        40% { 
-          transform: translate3d(-3%, -4%, 0) scale(1.06) rotate(-1deg); 
-          opacity: 0.95; 
-          filter: blur(30px) hue-rotate(40deg) brightness(1.2);
-        }
-        60% { 
-          transform: translate3d(3%, -1%, 0) scale(1.02) rotate(0.5deg); 
-          opacity: 1; 
-          filter: blur(18px) hue-rotate(60deg) brightness(1.15);
-        }
-        80% { 
-          transform: translate3d(-1%, -3%, 0) scale(1.05) rotate(-0.5deg); 
-          opacity: 0.92; 
-          filter: blur(28px) hue-rotate(80deg) brightness(1.05);
-        }
-        100% { 
-          transform: translate3d(2%, -2%, 0) scale(1.01) rotate(0deg); 
-          opacity: 0.88; 
-          filter: blur(22px) hue-rotate(100deg) brightness(1);
-        }
+
+      50% {
+        opacity: 0.85;
       }
-      .posts-hero h1 {
-        margin: 22px auto 10px auto;
-        max-width: 800px;
-        line-height: 1.12;
-        font-size: 63px;
-        letter-spacing: -0.02em;
+
+      100% {
+        opacity: 0.4;
       }
-      .hero-headline {
-        margin: 22px auto 10px auto;
-        max-width: 840px;
-        line-height: 1.12;
-        font-size: clamp(28px, 5.6vw, 44px);
-        letter-spacing: -0.02em;
+    }
+
+    /* Hero Section */
+    .posts-hero {
+      padding: 88px 20px 28px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .posts-hero .glow {
+      position: absolute;
+      inset: 0% -10% auto -10%;
+      height: 420px;
+      background:
+        radial-gradient(600px 220px at 50% 0%, rgba(1, 210, 142, 0.25), transparent 75%),
+        radial-gradient(520px 200px at 70% 10%, rgba(138, 180, 248, 0.15), transparent 80%),
+        radial-gradient(400px 180px at 30% 20%, rgba(167, 139, 250, 0.12), transparent 70%),
+        radial-gradient(350px 160px at 80% 30%, rgba(255, 107, 107, 0.08), transparent 65%);
+      filter: blur(25px);
+      pointer-events: none;
+      animation: auroraGlow 22s ease-in-out infinite alternate;
+    }
+
+    @keyframes auroraGlow {
+      0% {
+        transform: translate3d(-2%, 0, 0) scale(1) rotate(0deg);
+        opacity: 0.9;
+        filter: blur(25px) hue-rotate(0deg) brightness(1);
       }
-      .changing-wrap { display: inline-block; position: relative; min-width: 10ch; }
-      .changing-word {
-        display: inline-block;
-        background: linear-gradient(90deg, #8ab4f8, #a78bfa, #60a5fa);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        transition: opacity .45s ease, transform .45s ease;
-        will-change: transform, opacity;
+
+      20% {
+        transform: translate3d(4%, -2%, 0) scale(1.03) rotate(1deg);
+        opacity: 1;
+        filter: blur(20px) hue-rotate(20deg) brightness(1.1);
       }
-      .word-in { opacity: 1; transform: translateY(0); }
-      .word-out { opacity: 0; transform: translateY(8px); }
-      .posts-hero p {
-        margin: 0 auto;
-        max-width: 780px;
-        color: var(--muted);
-        font-size: clamp(14px, 2.2vw, 16px);
-        position: relative;
+
+      40% {
+        transform: translate3d(-3%, -4%, 0) scale(1.06) rotate(-1deg);
+        opacity: 0.95;
+        filter: blur(30px) hue-rotate(40deg) brightness(1.2);
       }
-      .hero-badges {
-        margin: 18px auto 0 auto;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: center;
-        width: 100%;
-        max-width: 980px;
+
+      60% {
+        transform: translate3d(3%, -1%, 0) scale(1.02) rotate(0.5deg);
+        opacity: 1;
+        filter: blur(18px) hue-rotate(60deg) brightness(1.15);
       }
-      .badge {
-        padding: 13px 12px;
-        border-radius: 999px;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.1);
-        font-size: 12px;
-        color: #ffffffb3;
+
+      80% {
+        transform: translate3d(-1%, -3%, 0) scale(1.05) rotate(-0.5deg);
+        opacity: 0.92;
+        filter: blur(28px) hue-rotate(80deg) brightness(1.05);
       }
-      /* Auto flip badges every 4s */
-      .hero-badges { perspective: 1000px; }
-      .hero-badges .badge {
-        position: relative;
-        transform-style: preserve-3d;
-        backface-visibility: hidden;
-        will-change: transform;
+
+      100% {
+        transform: translate3d(2%, -2%, 0) scale(1.01) rotate(0deg);
+        opacity: 0.88;
+        filter: blur(22px) hue-rotate(100deg) brightness(1);
+      }
+    }
+
+    .posts-hero h1 {
+      margin: 22px auto 10px auto;
+      max-width: 800px;
+      line-height: 1.12;
+      font-size: 63px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-headline {
+      margin: 22px auto 10px auto;
+      max-width: 840px;
+      line-height: 1.12;
+      font-size: clamp(28px, 5.6vw, 44px);
+      letter-spacing: -0.02em;
+    }
+
+    .changing-wrap {
+      display: inline-block;
+      position: relative;
+      min-width: 10ch;
+    }
+
+    .changing-word {
+      display: inline-block;
+      background: linear-gradient(90deg, #8ab4f8, #a78bfa, #60a5fa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      transition: opacity .45s ease, transform .45s ease;
+      will-change: transform, opacity;
+    }
+
+    .word-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .word-out {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .posts-hero p {
+      margin: 0 auto;
+      max-width: 780px;
+      color: var(--muted);
+      font-size: clamp(14px, 2.2vw, 16px);
+      position: relative;
+    }
+
+    .hero-badges {
+      margin: 18px auto 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      width: 100%;
+      max-width: 980px;
+    }
+
+    .badge {
+      padding: 13px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 12px;
+      color: #ffffffb3;
+    }
+
+    /* Auto flip badges every 4s */
+    .hero-badges {
+      perspective: 1000px;
+    }
+
+    .hero-badges .badge {
+      position: relative;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      will-change: transform;
+      transform: rotateY(0deg) translateZ(0);
+      animation: flipBadge 5s infinite ease-in-out;
+    }
+
+    @keyframes flipBadge {
+
+      0%,
+      45% {
         transform: rotateY(0deg) translateZ(0);
-        animation: flipBadge 5s infinite ease-in-out;
       }
-      @keyframes flipBadge {
-        0%, 45% { transform: rotateY(0deg) translateZ(0); }
-        50%, 95% { transform: rotateY(180deg) translateZ(0); }
-        100% { transform: rotateY(0deg) translateZ(0); }
-      }
-      .hero-badges .badge::after {
-        content: attr(data-back);
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: inherit;
-        border-radius: inherit;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.1);
-        color: #dbeafe;
-        transform: rotateY(180deg) translateZ(1px);
-        backface-visibility: hidden;
-        pointer-events: none;
-      }
-      
 
-      /* Typewriter caret for hero description */
-      .typewriter-caret {
-        display: inline-block;
-        position: relative;
-        overflow: visible;
-        white-space: normal;
+      50%,
+      95% {
+        transform: rotateY(180deg) translateZ(0);
       }
-      .typewriter-caret::after {
-        content: '';
-        position: absolute;
-        right: -2px;
-        top: .2em;
-        bottom: .2em;
-        width: 2px;
-        
-        animation: caretBlink .8s step-end infinite;
-      }
-      @keyframes caretBlink { 50% { opacity: 0; } }
 
-      /* Create Post CTA */
-      .cta-wrap { display: flex; justify-content: center; margin: 18px 0 8px 0; }
-      .create-post-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 12px 18px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, var(--primary), var(--primary-2));
-        color: #081217;
-        border: none;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 8px 24px rgba(1,210,142,0.2);
-        transition: transform 160ms ease, box-shadow 160ms ease;
+      100% {
+        transform: rotateY(0deg) translateZ(0);
       }
-      .create-post-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(1,210,142,0.25); }
+    }
 
-      /* Composer Section (slide down) */
-      .composer {
-        max-width: 780px;
-        margin: 12px auto 0 auto;
-        padding: 0 16px;
-      }
-      .composer-card {
-        background: var(--card);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 14px;
-        overflow: hidden;
-        transform-origin: top;
-        transition: grid-template-rows 240ms ease, opacity 240ms ease;
-        display: grid;
-        grid-template-rows: 0fr;
+    .hero-badges .badge::after {
+      content: attr(data-back);
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: inherit;
+      border-radius: inherit;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #dbeafe;
+      transform: rotateY(180deg) translateZ(1px);
+      backface-visibility: hidden;
+      pointer-events: none;
+    }
+
+
+    /* Typewriter caret for hero description */
+    .typewriter-caret {
+      display: inline-block;
+      position: relative;
+      overflow: visible;
+      white-space: normal;
+    }
+
+    .typewriter-caret::after {
+      content: '';
+      position: absolute;
+      right: -2px;
+      top: .2em;
+      bottom: .2em;
+      width: 2px;
+
+      animation: caretBlink .8s step-end infinite;
+    }
+
+    @keyframes caretBlink {
+      50% {
         opacity: 0;
-        position: relative;
       }
-      
-      .composer-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: 
-          radial-gradient(ellipse 300px 150px at 20% 20%, rgba(1, 210, 142, 0.08) 0%, transparent 50%),
-          radial-gradient(ellipse 250px 125px at 80% 80%, rgba(138, 180, 248, 0.06) 0%, transparent 50%);
-        pointer-events: none;
-        z-index: -1;
-        animation: composerAurora 18s ease-in-out infinite alternate;
-      }
-      
-      @keyframes composerAurora {
-        0% {
-          opacity: 0.3;
-          transform: scale(1) rotate(0deg);
-          filter: hue-rotate(0deg);
-        }
-        50% {
-          opacity: 0.6;
-          transform: scale(1.05) rotate(1deg);
-          filter: hue-rotate(30deg);
-        }
-        100% {
-          opacity: 0.4;
-          transform: scale(1.02) rotate(-0.5deg);
-          filter: hue-rotate(60deg);
-        }
-      }
-      .composer-card.open { grid-template-rows: 1fr; opacity: 1; }
-      .composer-inner { overflow: hidden; }
-      .composer-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 14px 14px 0 14px;
-      }
-      .composer-title { font-weight: 600; color: var(--text); }
-      .close-composer {
-        background: transparent;
-        border: none;
-        color: var(--muted);
-        cursor: pointer;
-      }
-      .composer-body { padding: 12px 14px 4px 14px; position: relative; }
-      .tooltip-pill { position: absolute;  color: #ffe4a3; padding: 8px 10px; border-radius: 10px; font-size: 12px; pointer-events: none; opacity: 0; transition: opacity .2s ease; z-index: 1000; }
+    }
 
-      .composer-canvas {
-        border-radius: 12px;
-        min-height: 160px;
-        padding: 18px;
-        background: linear-gradient(135deg, #0f172a, #0b0c10);
-        color: #ffffff;
-        outline: none;
-        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
-        background-size: cover;
-        background-position: center;
-        word-break: break-word;
+    /* Create Post CTA */
+    .cta-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 18px 0 8px 0;
+    }
+
+    .create-post-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #081217;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(1, 210, 142, 0.2);
+      transition: transform 160ms ease, box-shadow 160ms ease;
+    }
+
+    .create-post-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(1, 210, 142, 0.25);
+    }
+
+    /* Composer Section (slide down) */
+    .composer {
+      max-width: 780px;
+      margin: 12px auto 0 auto;
+      padding: 0 16px;
+    }
+
+    .composer-card {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      overflow: hidden;
+      transform-origin: top;
+      transition: grid-template-rows 240ms ease, opacity 240ms ease;
+      display: grid;
+      grid-template-rows: 0fr;
+      opacity: 0;
+      position: relative;
+    }
+
+    .composer-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse 300px 150px at 20% 20%, rgba(1, 210, 142, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse 250px 125px at 80% 80%, rgba(138, 180, 248, 0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+      animation: composerAurora 18s ease-in-out infinite alternate;
+    }
+
+    @keyframes composerAurora {
+      0% {
+        opacity: 0.3;
+        transform: scale(1) rotate(0deg);
+        filter: hue-rotate(0deg);
       }
-      .composer-canvas[data-placeholder]:empty:before {
-        content: attr(data-placeholder);
-        color: inherit;
-        opacity: 0.65;
+
+      50% {
+        opacity: 0.6;
+        transform: scale(1.05) rotate(1deg);
+        filter: hue-rotate(30deg);
       }
-      .toolbar {
-        display: flex;
-        align-items: center;
-        gap: 8px;
+
+      100% {
+        opacity: 0.4;
+        transform: scale(1.02) rotate(-0.5deg);
+        filter: hue-rotate(60deg);
+      }
+    }
+
+    .composer-card.open {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+
+    .composer-inner {
+      overflow: hidden;
+    }
+
+    .composer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 14px 0 14px;
+    }
+
+    .composer-title {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .close-composer {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .composer-body {
+      padding: 12px 14px 4px 14px;
+      position: relative;
+    }
+
+    .tooltip-pill {
+      position: absolute;
+      color: #ffe4a3;
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .2s ease;
+      z-index: 1000;
+    }
+
+    .composer-canvas {
+      border-radius: 12px;
+      min-height: 160px;
+      padding: 18px;
+      background: linear-gradient(135deg, #0f172a, #0b0c10);
+      color: #ffffff;
+      outline: none;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      background-size: cover;
+      background-position: center;
+      word-break: break-word;
+    }
+
+    .composer-canvas[data-placeholder]:empty:before {
+      content: attr(data-placeholder);
+      color: inherit;
+      opacity: 0.65;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .attach-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .attach-btn input {
+      display: none;
+    }
+
+    .category-select {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: var(--muted);
+    }
+
+    .category-select select {
+      background: transparent;
+      color: #e5e7eb;
+      border: none;
+      outline: none;
+    }
+
+    .category-select option {
+      color: #111827;
+    }
+
+    .swatches {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .bg-swatch.selected {
+      outline: 2px solid var(--accent);
+      box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.3) inset;
+    }
+
+    .font-size-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+    }
+
+    .font-size-control input[type="range"] {
+      width: 120px;
+      accent-color: var(--accent);
+    }
+
+    .bg-swatch {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    .text-toggle {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      color: #ffffff;
+      font-weight: 500;
+      font-size: 13px;
+      transition: all 0.2s ease;
+    }
+
+    .text-toggle.is-dark {
+      background: #ffffff;
+      color: #0b0c10;
+      border-color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .text-toggle.is-light {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .duration-select-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: #8ab4f8;
+    }
+
+    .duration-select-wrap select {
+      background: transparent;
+      color: #ffffff;
+      border: none;
+      outline: none;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .duration-select-wrap select option {
+      color: #111827;
+    }
+
+    .template-chips-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px 2px 14px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .chips-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #8ab4f8;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .template-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .chip-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 5px 12px;
+      color: #e2e8f0;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .chip-btn:hover,
+    .chip-btn:active {
+      background: rgba(138, 180, 248, 0.2);
+      border-color: #8ab4f8;
+      color: #ffffff;
+    }
+
+    .char-counter-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #94a3b8;
+      transition: all 0.2s ease;
+    }
+
+    .char-badge {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      font-weight: 600;
+    }
+
+    .char-counter-pill.valid .char-badge {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+    }
+
+    .char-counter-pill.near-limit .char-badge {
+      background: rgba(245, 158, 11, 0.2);
+      color: #f59e0b;
+    }
+
+    .char-counter-pill.over-limit .char-badge {
+      background: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+
+    @media (max-width: 600px) {
+      .composer-header {
+        padding: 10px 12px;
+      }
+
+      .composer-title {
         flex-wrap: wrap;
-        margin-top: 12px;
-      }
-      .attach-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 10px; color: var(--muted); cursor: pointer; }
-      .attach-btn input { display: none; }
-      .category-select { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 10px; color: var(--muted); }
-      .category-select select { background: transparent; color: #e5e7eb; border: none; outline: none; }
-      .category-select option { color: #111827; }
-      .swatches {
-        display: flex;
-        gap: 8px;
-        overflow-x: auto;
-        padding-bottom: 6px;
-      }
-      .bg-swatch.selected { outline: 2px solid var(--accent); box-shadow: 0 0 0 2px rgba(138,180,248,0.3) inset; }
-      .font-size-control { display: inline-flex; align-items: center; gap: 6px; padding: 6px 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; }
-      .font-size-control input[type="range"] { width: 120px; accent-color: var(--accent); }
-      .bg-swatch {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        border: 1px solid rgba(255,255,255,0.14);
-        cursor: pointer;
-        flex: 0 0 auto;
-      }
-      .text-toggle {
-        margin-left: auto;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.15);
-        border-radius: 8px;
-        padding: 8px 12px;
-        cursor: pointer;
-        color: #ffffff;
-        font-weight: 500;
+        gap: 6px;
         font-size: 13px;
-        transition: all 0.2s ease;
-      }
-      .text-toggle.is-dark {
-        background: #ffffff;
-        color: #0b0c10;
-        border-color: #ffffff;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      }
-      .text-toggle.is-light {
-        background: rgba(255,255,255,0.18);
-        color: #ffffff;
-        border-color: rgba(255,255,255,0.3);
       }
 
       .duration-select-wrap {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.14);
-        border-radius: 20px;
-        padding: 4px 10px;
-        font-size: 12px;
-        color: #8ab4f8;
-      }
-      .duration-select-wrap select {
-        background: transparent;
-        color: #ffffff;
-        border: none;
-        outline: none;
-        font-size: 12px;
-        font-weight: 500;
-        cursor: pointer;
-      }
-      .duration-select-wrap select option { color: #111827; }
-
-      .template-chips-wrap {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 14px 2px 14px;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-      .chips-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #8ab4f8;
-        white-space: nowrap;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-      }
-      .template-chips {
-        display: flex;
-        gap: 8px;
-        overflow-x: auto;
-        padding-bottom: 4px;
-      }
-      .chip-btn {
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 20px;
-        padding: 5px 12px;
-        color: #e2e8f0;
-        font-size: 12px;
-        font-weight: 500;
-        white-space: nowrap;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-      .chip-btn:hover, .chip-btn:active {
-        background: rgba(138,180,248,0.2);
-        border-color: #8ab4f8;
-        color: #ffffff;
-      }
-
-      .char-counter-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 20px;
-        padding: 6px 12px;
-        font-size: 12px;
-        font-weight: 600;
-        color: #94a3b8;
-        transition: all 0.2s ease;
-      }
-      .char-badge {
-        font-size: 11px;
         padding: 2px 6px;
-        border-radius: 10px;
-        background: rgba(239, 68, 68, 0.2);
-        color: #ef4444;
-        font-weight: 600;
-      }
-      .char-counter-pill.valid .char-badge {
-        background: rgba(34, 197, 94, 0.2);
-        color: #22c55e;
-      }
-      .char-counter-pill.near-limit .char-badge {
-        background: rgba(245, 158, 11, 0.2);
-        color: #f59e0b;
-      }
-      .char-counter-pill.over-limit .char-badge {
-        background: rgba(239, 68, 68, 0.3);
-        color: #ef4444;
-      }
-
-      @media (max-width: 600px) {
-        .composer-header { padding: 10px 12px; }
-        .composer-title {
-          flex-wrap: wrap;
-          gap: 6px;
-          font-size: 13px;
-        }
-        .duration-select-wrap {
-          padding: 2px 6px;
-          font-size: 11px;
-        }
-        .toolbar {
-          gap: 6px;
-        }
-        .category-select, .attach-btn, .font-size-control, .text-toggle {
-          padding: 6px 8px;
-          font-size: 12px;
-        }
-        .font-size-control input[type="range"] {
-          width: 75px;
-        }
-      }
-
-      .composer-footer {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 14px 14px 14px;
-        position: relative;
-      }
-      .post-btn {
-        margin-left: auto;
-        padding: 10px 14px;
-        border-radius: 10px;
-        border: none;
-        background: var(--accent);
-        color: #07121a;
-        font-weight: 600;
-        cursor: pointer;
-        opacity: 0.6;
-      }
-      .post-btn.enabled { opacity: 1; }
-      .post-btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; filter: saturate(.7); }
-
-      /* Live Posts */
-      .feed {
-        max-width: 980px;
-        margin: 22px auto 40px auto;
-        padding: 0 16px;
-      }
-      .feed-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 10px;
-      }
-      .chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
-      .chip {
-        padding: 8px 12px;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 999px;
-        color: var(--muted);
-        cursor: pointer;
-        white-space: nowrap;
-      }
-      .chip.active { background: rgba(1,210,142,0.18); border-color: rgba(1,210,142,0.35); color: var(--text); }
-
-      .live-indicator { color: #ff5e5e; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
-      .dot { width: 8px; height: 8px; background: #ff5e5e; border-radius: 50%; animation: blink 1.2s infinite; }
-      @keyframes blink { 50% { opacity: 0.2; } }
-
-      .card-list { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
-      .post-card {
-        grid-column: span 6;
-        background: var(--card);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 12px;
-        padding: 14px;
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-      
-      .post-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(138, 180, 248, 0.05), transparent);
-        transition: left 0.6s ease;
-        pointer-events: none;
-      }
-      
-      .post-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-      }
-      
-      .post-card:hover::before {
-        left: 100%;
-      }
-      @media (max-width: 720px) { .post-card { grid-column: span 12; } }
-      .post-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; flex-wrap: wrap; }
-      .head-left { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-      .post-meta { color: var(--muted); font-size: 12px; }
-      .post-title { font-weight: 600; margin: 4px 0 6px 0; }
-      .post-text { color: #cdd3da; font-size: 14px; white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; }
-      .badge-cat { font-size: 11px; padding: 4px 8px; border-radius: 999px; background: rgba(138,180,248,0.18); border: 1px solid rgba(138,180,248,0.35); color: #d7e3ff; }
-
-      .has-image-badge {
         font-size: 11px;
-        padding: 3px 8px;
-        border-radius: 999px;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        font-weight: 600;
-        transition: all 0.2s ease;
       }
-      .card-image-clue {
-        margin-top: 10px;
-        padding: 6px 12px;
-        border-radius: 8px;
+
+      .toolbar {
+        gap: 6px;
+      }
+
+      .category-select,
+      .attach-btn,
+      .font-size-control,
+      .text-toggle {
+        padding: 6px 8px;
         font-size: 12px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        cursor: pointer;
-        transition: all 0.2s ease;
       }
 
-      /* Dynamic Theme Contrast Adjustments */
-      .post-card.theme-dark-text .badge-cat {
-        background: rgba(0, 0, 0, 0.12);
-        border: 1px solid rgba(0, 0, 0, 0.28);
-        color: #0b0c10;
-        font-weight: 700;
+      .font-size-control input[type="range"] {
+        width: 75px;
       }
-      .post-card.theme-dark-text .post-meta {
-        color: rgba(11, 12, 16, 0.85);
-        font-weight: 600;
-      }
-      .post-card.theme-dark-text .has-image-badge {
-        background: rgba(0, 0, 0, 0.18);
-        border: 1px solid rgba(0, 0, 0, 0.35);
-        color: #0b0c10;
-      }
-      .post-card.theme-dark-text .card-image-clue {
-        background: rgba(0, 0, 0, 0.12);
-        border: 1px solid rgba(0, 0, 0, 0.22);
-        color: #0b0c10;
-      }
-      .post-card.theme-dark-text .card-image-clue:hover {
-        background: rgba(0, 0, 0, 0.22);
-      }
-
-      .post-card.theme-light-text .badge-cat {
-        background: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: #ffffff;
-        font-weight: 600;
-      }
-      .post-card.theme-light-text .post-meta {
-        color: rgba(255, 255, 255, 0.85);
-        font-weight: 500;
-      }
-      .post-card.theme-light-text .has-image-badge {
-        background: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.35);
-        color: #ffffff;
-      }
-      .post-card.theme-light-text .card-image-clue {
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        color: #ffffff;
-      }
-      .post-card.theme-light-text .card-image-clue:hover {
-        background: rgba(255, 255, 255, 0.22);
-      }
-    
-    @media (max-width: 420px){
-        .posts-hero h1{
-            font-size: 40px;
-        }
     }
+
+    .composer-footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px 14px 14px;
+      position: relative;
+    }
+
+    .post-btn {
+      margin-left: auto;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      background: var(--accent);
+      color: #07121a;
+      font-weight: 600;
+      cursor: pointer;
+      opacity: 0.6;
+    }
+
+    .post-btn.enabled {
+      opacity: 1;
+    }
+
+    .post-btn[aria-disabled="true"] {
+      opacity: .45;
+      cursor: not-allowed;
+      filter: saturate(.7);
+    }
+
+    /* Live Posts */
+    .feed {
+      max-width: 980px;
+      margin: 22px auto 40px auto;
+      padding: 0 16px;
+    }
+
+    .feed-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .chip {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .chip.active {
+      background: rgba(1, 210, 142, 0.18);
+      border-color: rgba(1, 210, 142, 0.35);
+      color: var(--text);
+    }
+
+    .live-indicator {
+      color: #ff5e5e;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #ff5e5e;
+      border-radius: 50%;
+      animation: blink 1.2s infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0.2;
+      }
+    }
+
+    .card-list {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+
+    .post-card {
+      grid-column: span 6;
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .post-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(138, 180, 248, 0.05), transparent);
+      transition: left 0.6s ease;
+      pointer-events: none;
+    }
+
+    .post-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .post-card:hover::before {
+      left: 100%;
+    }
+
+    @media (max-width: 720px) {
+      .post-card {
+        grid-column: span 12;
+      }
+    }
+
+    .post-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .head-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .post-meta {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .post-title {
+      font-weight: 600;
+      margin: 4px 0 6px 0;
+    }
+
+    .post-text {
+      color: #cdd3da;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .badge-cat {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(138, 180, 248, 0.18);
+      border: 1px solid rgba(138, 180, 248, 0.35);
+      color: #d7e3ff;
+    }
+
+    .has-image-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .card-image-clue {
+      margin-top: 10px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    /* Dynamic Theme Contrast Adjustments */
+    .post-card.theme-dark-text .badge-cat {
+      background: rgba(0, 0, 0, 0.12);
+      border: 1px solid rgba(0, 0, 0, 0.28);
+      color: #0b0c10;
+      font-weight: 700;
+    }
+
+    .post-card.theme-dark-text .post-meta {
+      color: rgba(11, 12, 16, 0.85);
+      font-weight: 600;
+    }
+
+    .post-card.theme-dark-text .has-image-badge {
+      background: rgba(0, 0, 0, 0.18);
+      border: 1px solid rgba(0, 0, 0, 0.35);
+      color: #0b0c10;
+    }
+
+    .post-card.theme-dark-text .card-image-clue {
+      background: rgba(0, 0, 0, 0.12);
+      border: 1px solid rgba(0, 0, 0, 0.22);
+      color: #0b0c10;
+    }
+
+    .post-card.theme-dark-text .card-image-clue:hover {
+      background: rgba(0, 0, 0, 0.22);
+    }
+
+    .post-card.theme-light-text .badge-cat {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .post-card.theme-light-text .post-meta {
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 500;
+    }
+
+    .post-card.theme-light-text .has-image-badge {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      color: #ffffff;
+    }
+
+    .post-card.theme-light-text .card-image-clue {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+    }
+
+    .post-card.theme-light-text .card-image-clue:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    @media (max-width: 420px) {
+      .posts-hero h1 {
+        font-size: 40px;
+      }
+    }
+
     .truck-button {
       --color: #fff;
       --background: #2B3044;
@@ -800,12 +1094,14 @@
       color: var(--color);
       background: var(--background);
       border-radius: var(--br, 5px);
-      appearance: none; -webkit-appearance: none;
+      appearance: none;
+      -webkit-appearance: none;
       -webkit-tap-highlight-color: transparent;
       transform-style: preserve-3d;
       transform: rotateX(var(--rx, 0deg)) translateZ(0);
       transition: transform .5s, border-radius .3s linear var(--br-d, 0s);
     }
+
     .truck-button::before,
     .truck-button::after {
       content: '';
@@ -819,10 +1115,12 @@
       transform-origin: 0 100%;
       transform: rotateX(90deg) scaleX(var(--sy, 1));
     }
+
     .truck-button::after {
       --sy: var(--progress, 0);
       --b: var(--street-fill);
     }
+
     .truck-button .default,
     .truck-button .success {
       display: block;
@@ -832,6 +1130,7 @@
       opacity: var(--o, 1);
       transition: opacity .3s;
     }
+
     .truck-button .success {
       --o: 0;
       position: absolute;
@@ -839,6 +1138,7 @@
       left: 0;
       right: 0;
     }
+
     .truck-button .success svg {
       width: 12px;
       height: 10px;
@@ -854,12 +1154,14 @@
       stroke-dashoffset: var(--offset, 16px);
       transition: stroke-dashoffset .4s ease .45s;
     }
+
     .truck-button .truck {
       position: absolute;
       width: 72px;
       height: 28px;
       transform: rotateX(90deg) translate3d(var(--truck-x, 4px), calc(var(--truck-y-n, -26) * 1px), 12px);
     }
+
     .truck-button .truck::before,
     .truck-button .truck::after {
       content: '';
@@ -874,7 +1176,11 @@
       background: var(--wheel-dot);
       transform: translateY(calc(var(--truck-y) * -1px)) translateZ(0);
     }
-    .truck-button .truck::after { --l: 54px; }
+
+    .truck-button .truck::after {
+      --l: 54px;
+    }
+
     .truck-button .truck .wheel,
     .truck-button .truck .wheel::before {
       position: absolute;
@@ -886,11 +1192,23 @@
       background: var(--wheel);
       transform: translateZ(0);
     }
-    .truck-button .truck .wheel { transform: translateY(calc(var(--truck-y) * -1px)) translateZ(0); }
-    .truck-button .truck .wheel::before { --l: 35px; --b: 0; content: ''; }
+
+    .truck-button .truck .wheel {
+      transform: translateY(calc(var(--truck-y) * -1px)) translateZ(0);
+    }
+
+    .truck-button .truck .wheel::before {
+      --l: 35px;
+      --b: 0;
+      content: '';
+    }
+
     .truck-button .truck .front,
     .truck-button .truck .back,
-    .truck-button .truck .box { position: absolute; }
+    .truck-button .truck .box {
+      position: absolute;
+    }
+
     .truck-button .truck .back {
       left: 0;
       bottom: 0;
@@ -900,8 +1218,13 @@
       border-radius: 1px 1px 0 0;
       background: linear-gradient(68deg, var(--back-inner) 0%, var(--back-inner) 22%, var(--back-inner-shadow) 22.1%, var(--back-inner-shadow) 100%);
     }
+
     .truck-button .truck .back::before,
-    .truck-button .truck .back::after { content: ''; position: absolute; }
+    .truck-button .truck .back::after {
+      content: '';
+      position: absolute;
+    }
+
     .truck-button .truck .back::before {
       left: 11px;
       top: 0;
@@ -911,6 +1234,7 @@
       border-radius: 0 1px 0 0;
       background: var(--back);
     }
+
     .truck-button .truck .back::after {
       border-radius: 1px;
       width: 73px;
@@ -919,6 +1243,7 @@
       bottom: -2px;
       background: var(--base);
     }
+
     .truck-button .truck .front {
       left: 47px;
       bottom: -1px;
@@ -928,8 +1253,13 @@
       clip-path: polygon(55% 0, 72% 44%, 100% 58%, 100% 100%, 0 100%, 0 0);
       background: linear-gradient(84deg, var(--front-shadow) 0%, var(--front-shadow) 10%, var(--front) 12%, var(--front) 100%);
     }
+
     .truck-button .truck .front::before,
-    .truck-button .truck .front::after { content: ''; position: absolute; }
+    .truck-button .truck .front::after {
+      content: '';
+      position: absolute;
+    }
+
     .truck-button .truck .front::before {
       width: 7px;
       height: 8px;
@@ -939,7 +1269,15 @@
       clip-path: polygon(0 0, 60% 0%, 100% 100%, 0% 100%);
       background: linear-gradient(59deg, var(--window) 0%, var(--window) 57%, var(--window-shadow) 55%, var(--window-shadow) 100%);
     }
-    .truck-button .truck .front::after { width: 3px; height: 2px; right: 0; bottom: 3px; background: var(--front-light); }
+
+    .truck-button .truck .front::after {
+      width: 3px;
+      height: 2px;
+      right: 0;
+      bottom: 3px;
+      background: var(--front-light);
+    }
+
     .truck-button .truck .box {
       width: 13px;
       height: 13px;
@@ -954,8 +1292,13 @@
       background-size: 250% 100%;
       background-position-x: calc(var(--bx, 0) * 1%);
     }
+
     .truck-button .truck .box::before,
-    .truck-button .truck .box::after { content: ''; position: absolute; }
+    .truck-button .truck .box::after {
+      content: '';
+      position: absolute;
+    }
+
     .truck-button .truck .box::before {
       background: rgba(255, 255, 255, 0.2);
       left: 0;
@@ -963,6 +1306,7 @@
       top: 6px;
       height: 1px;
     }
+
     .truck-button .truck .box::after {
       width: 6px;
       left: 100%;
@@ -971,476 +1315,524 @@
       background: var(--back);
       transform: translateX(calc(var(--hx, 0) * 1px));
     }
-    .truck-button.animation { --rx: -90deg; --br: 0; }
-    .truck-button.animation .default { --o: 0; }
-    .truck-button.animation.done { --rx: 0deg; --br: 5px; --br-d: .2s; }
-    .truck-button.animation.done .success { --o: 1; --offset: 0; }
 
-    #snowfallCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:10;}
-      @media (prefers-reduced-motion: reduce){#snowfallCanvas{display:none;}}
-    </style>
-  </head>
-  <body>
-    <!-- <canvas id="snowfallCanvas" aria-hidden="true"></canvas>
-    <button class="back-btn" id="backBtn"><span class="back-pulse"></span><i class="fas fa-arrow-left"></i><span>Back</span></button> -->
-    
-    <section class="posts-hero">
-      <div class="glow"></div>
-      <h1 class="hero-headline">The ultimate place for your<span class="changing-wrap"><span class="changing-word word-in" id="changingWord">Transportation needs</span></span></h1>
-      <p id="heroDesc" class="typewriter-caret">Create a post that auto-expires in 24 hours. Share your vehicle needs, transportation requirements, services offers, general queries, or local updates with the community.</p>
-      <div class="hero-badges">
-        <span class="badge" data-back="No Login">Auto-deletes in 24h</span>
-        <span class="badge" data-back="100% Secure">Simple text post with backgrounds</span>
-        <span class="badge" data-back="Quick Connect">Realtime feed</span>
+    .truck-button.animation {
+      --rx: -90deg;
+      --br: 0;
+    }
+
+    .truck-button.animation .default {
+      --o: 0;
+    }
+
+    .truck-button.animation.done {
+      --rx: 0deg;
+      --br: 5px;
+      --br-d: .2s;
+    }
+
+    .truck-button.animation.done .success {
+      --o: 1;
+      --offset: 0;
+    }
+
+    #snowfallCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #snowfallCanvas {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!--snowfall canvas -->
+  <canvas id="snowfallCanvas" aria-hidden="true"></canvas>
+  <button class="back-btn" id="backBtn"><span class="back-pulse"></span><i
+      class="fas fa-arrow-left"></i><span>Back</span></button>
+
+  <section class="posts-hero">
+    <div class="glow"></div>
+    <h1 class="hero-headline">The ultimate place for your<span class="changing-wrap"><span class="changing-word word-in"
+          id="changingWord">Transportation needs</span></span></h1>
+    <p id="heroDesc" class="typewriter-caret">Create a post that auto-expires in 24 hours. Share your vehicle needs,
+      transportation requirements, services offers, general queries, or local updates with the community.</p>
+    <div class="hero-badges">
+      <span class="badge" data-back="No Login">Auto-deletes in 24h</span>
+      <span class="badge" data-back="100% Secure">Simple text post with backgrounds</span>
+      <span class="badge" data-back="Quick Connect">Realtime feed</span>
+    </div>
+    <div class="cta-wrap">
+      <button class="create-post-btn" id="openComposer"
+        title="Instead of searching vehicles, let them find you. Your post stays live for 24 hours and then vanishes—keeping the platform fresh and safe."><i
+          class="fas fa-pen"></i>Create Post</button>
+    </div>
+  </section>
+
+  <!-- Post Detail Modal -->
+  <div id="postModal" style="display:none; position:fixed; inset:0; z-index:1500; background:rgba(0,0,0,.6);">
+    <div
+      style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(92vw,760px); max-height:86vh; overflow:auto; background:#0f1116; border:1px solid rgba(255,255,255,.12); border-radius:12px;">
+      <div
+        style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08);">
+        <span id="modalCat" class="badge-cat"></span>
+        <button id="postModalClose"
+          style="background:transparent; border:none; color:#9aa3af; font-size:18px; cursor:pointer">✕</button>
       </div>
-      <div class="cta-wrap">
-        <button class="create-post-btn" id="openComposer" title= "Instead of searching vehicles, let them find you. Your post stays live for 24 hours and then vanishes—keeping the platform fresh and safe."><i class="fas fa-pen"></i>Create Post</button>
-      </div>
-    </section>
-    
-    <!-- Post Detail Modal -->
-    <div id="postModal" style="display:none; position:fixed; inset:0; z-index:1500; background:rgba(0,0,0,.6);">
-      <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(92vw,760px); max-height:86vh; overflow:auto; background:#0f1116; border:1px solid rgba(255,255,255,.12); border-radius:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08);">
-          <span id="modalCat" class="badge-cat"></span>
-          <button id="postModalClose" style="background:transparent; border:none; color:#9aa3af; font-size:18px; cursor:pointer">✕</button>
+      <div id="modalBody" style="padding:14px; border-radius:0 0 12px 12px;"></div>
+    </div>
+  </div>
+
+  <section class="composer">
+    <div class="composer-card" id="composerCard" aria-hidden="true">
+      <div class="composer-inner">
+        <div class="composer-header">
+          <div class="composer-title">
+            <span>Create a post</span>
+            <div class="duration-select-wrap">
+              <i class="fas fa-clock" aria-hidden="true"></i>
+              <select id="postDuration" aria-label="Select post duration">
+                <option value="12">Expires in 12h</option>
+                <option value="24" selected>Expires in 24h</option>
+                <option value="48">Expires in 48h</option>
+                <option value="168">Expires in 7 days</option>
+              </select>
+            </div>
+          </div>
+          <button class="close-composer" id="closeComposer" aria-label="Close composer"><i
+              class="fas fa-times"></i></button>
         </div>
-        <div id="modalBody" style="padding:14px; border-radius:0 0 12px 12px;"></div>
+
+        <!-- Template Quick Chips -->
+        <div class="template-chips-wrap">
+          <span class="chips-label"><i class="fas fa-bolt"></i> Quick Fill:</span>
+          <div class="template-chips">
+            <button type="button" class="chip-btn" data-template="need_vehicle" data-category="Vehicle Requirement">🚛
+              Need Vehicle</button>
+            <button type="button" class="chip-btn" data-template="transport_offer" data-category="Transport Offer">📦
+              Transport Offer</button>
+            <button type="button" class="chip-btn" data-template="local_update" data-category="Local Updates">📍 Local
+              Update</button>
+            <button type="button" class="chip-btn" data-template="general_query" data-category="General Query">❓ General
+              Query</button>
+          </div>
+        </div>
+
+        <div class="composer-body">
+          <div id="canvas" class="composer-canvas" contenteditable="true"
+            data-placeholder="(e.g., Need Tata Ace from Agra→Mathura at 5 PM, contact no. 98XXXXXXXX, load 1.5Ton, Pincode 282001)">
+          </div>
+          <div class="toolbar">
+            <div class="category-select">
+              <i class="fas fa-tags" aria-hidden="true"></i>
+              <select id="postCategory" aria-label="Select category">
+                <option value="" selected>Select category</option>
+                <option value="Vehicle Requirement">Vehicle Requirement</option>
+                <option value="Transport Offer">Transport Offer</option>
+                <option value="Service Promotion">Service Promotion</option>
+                <option value="General Query">General Query</option>
+                <option value="Local Updates">Local Updates</option>
+              </select>
+            </div>
+            <div class="swatches" id="swatches">
+              <div class="bg-swatch selected" title="Plain dark" data-bg="linear-gradient(135deg, #0f172a, #0b0c10)">
+              </div>
+              <div class="bg-swatch" title="Mint gradient" data-bg="linear-gradient(135deg, #00f5a0, #00d9f5)"></div>
+              <div class="bg-swatch" title="Sunset" data-bg="linear-gradient(135deg, #ff9966, #ff5e62)"></div>
+              <div class="bg-swatch" title="Aurora" data-bg="linear-gradient(135deg, #a18cd1, #fbc2eb)"></div>
+              <div class="bg-swatch" title="Ocean" data-bg="linear-gradient(135deg, #36d1dc, #5b86e5)"></div>
+              <div class="bg-swatch" title="Deep Blue" data-bg="linear-gradient(135deg, #1f005c, #0a2a88)"></div>
+              <div class="bg-swatch" title="Lime" data-bg="linear-gradient(135deg, #a8ff78, #78ffd6)"></div>
+              <div class="bg-swatch" title="Rose" data-bg="linear-gradient(135deg, #f857a6, #ff5858)"></div>
+            </div>
+            <button class="text-toggle" id="textToggle" aria-pressed="true"><i class="fas fa-font"></i><span>Text:
+                Light</span></button>
+            <label class="attach-btn" for="imageInput"><i class="fas fa-image"></i><span>Add image</span><input
+                id="imageInput" type="file" accept="image/*"></label>
+            <div class="font-size-control">
+              <i class="fas fa-text-height" aria-hidden="true"></i>
+              <input type="range" id="fontSize" min="16" max="48" step="2" value="18" aria-label="Font size">
+            </div>
+          </div>
+          <div class="preview-grid" id="previewGrid"></div>
+        </div>
+        <div class="composer-footer">
+          <div class="char-counter-pill" id="charCounterPill">
+            <span id="charCount">0</span>/500
+            <span class="char-badge" id="charBadge">Min 50</span>
+          </div>
+          <button class="truck-button post-btn" id="postBtn" disabled>
+            <span class="default">Post</span>
+            <span class="success">
+              Posted
+              <svg viewbox="0 0 12 10">
+                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+              </svg>
+            </span>
+            <div class="truck">
+              <div class="wheel"></div>
+              <div class="back"></div>
+              <div class="front"></div>
+              <div class="box"></div>
+            </div>
+          </button>
+          <div class="tooltip-pill" id="postTip"></div>
+        </div>
       </div>
     </div>
-    
-    <section class="composer">
-      <div class="composer-card" id="composerCard" aria-hidden="true">
-        <div class="composer-inner">
-          <div class="composer-header">
-            <div class="composer-title">
-              <span>Create a post</span>
-              <div class="duration-select-wrap">
-                <i class="fas fa-clock" aria-hidden="true"></i>
-                <select id="postDuration" aria-label="Select post duration">
-                  <option value="12">Expires in 12h</option>
-                  <option value="24" selected>Expires in 24h</option>
-                  <option value="48">Expires in 48h</option>
-                  <option value="168">Expires in 7 days</option>
-                </select>
-              </div>
-            </div>
-            <button class="close-composer" id="closeComposer" aria-label="Close composer"><i class="fas fa-times"></i></button>
-          </div>
+  </section>
 
-          <!-- Template Quick Chips -->
-          <div class="template-chips-wrap">
-            <span class="chips-label"><i class="fas fa-bolt"></i> Quick Fill:</span>
-            <div class="template-chips">
-              <button type="button" class="chip-btn" data-template="need_vehicle" data-category="Vehicle Requirement">🚛 Need Vehicle</button>
-              <button type="button" class="chip-btn" data-template="transport_offer" data-category="Transport Offer">📦 Transport Offer</button>
-              <button type="button" class="chip-btn" data-template="local_update" data-category="Local Updates">📍 Local Update</button>
-              <button type="button" class="chip-btn" data-template="general_query" data-category="General Query">❓ General Query</button>
-            </div>
-          </div>
-
-          <div class="composer-body">
-            <div id="canvas" class="composer-canvas" contenteditable="true" data-placeholder="(e.g., Need Tata Ace from Agra→Mathura at 5 PM, contact no. 98XXXXXXXX, load 1.5Ton, Pincode 282001)"></div>
-            <div class="toolbar">
-              <div class="category-select">
-                <i class="fas fa-tags" aria-hidden="true"></i>
-                <select id="postCategory" aria-label="Select category">
-                  <option value="" selected>Select category</option>
-                  <option value="Vehicle Requirement">Vehicle Requirement</option>
-                  <option value="Transport Offer">Transport Offer</option>
-                  <option value="Service Promotion">Service Promotion</option>
-                  <option value="General Query">General Query</option>
-                  <option value="Local Updates">Local Updates</option>
-                </select>
-              </div>
-              <div class="swatches" id="swatches">
-                <div class="bg-swatch selected" title="Plain dark" data-bg="linear-gradient(135deg, #0f172a, #0b0c10)"></div>
-                <div class="bg-swatch" title="Mint gradient" data-bg="linear-gradient(135deg, #00f5a0, #00d9f5)"></div>
-                <div class="bg-swatch" title="Sunset" data-bg="linear-gradient(135deg, #ff9966, #ff5e62)"></div>
-                <div class="bg-swatch" title="Aurora" data-bg="linear-gradient(135deg, #a18cd1, #fbc2eb)"></div>
-                <div class="bg-swatch" title="Ocean" data-bg="linear-gradient(135deg, #36d1dc, #5b86e5)"></div>
-                <div class="bg-swatch" title="Deep Blue" data-bg="linear-gradient(135deg, #1f005c, #0a2a88)"></div>
-                <div class="bg-swatch" title="Lime" data-bg="linear-gradient(135deg, #a8ff78, #78ffd6)"></div>
-                <div class="bg-swatch" title="Rose" data-bg="linear-gradient(135deg, #f857a6, #ff5858)"></div>
-              </div>
-              <button class="text-toggle" id="textToggle" aria-pressed="true"><i class="fas fa-font"></i><span>Text: Light</span></button>
-              <label class="attach-btn" for="imageInput"><i class="fas fa-image"></i><span>Add image</span><input id="imageInput" type="file" accept="image/*"></label>
-              <div class="font-size-control">
-                <i class="fas fa-text-height" aria-hidden="true"></i>
-                <input type="range" id="fontSize" min="16" max="48" step="2" value="18" aria-label="Font size">
-              </div>
-            </div>
-            <div class="preview-grid" id="previewGrid"></div>
-          </div>
-          <div class="composer-footer">
-            <div class="char-counter-pill" id="charCounterPill">
-              <span id="charCount">0</span>/500
-              <span class="char-badge" id="charBadge">Min 50</span>
-            </div>
-            <button class="truck-button post-btn" id="postBtn" disabled>
-              <span class="default">Post</span>
-              <span class="success">
-                Posted
-                <svg viewbox="0 0 12 10">
-                  <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
-                </svg>
-              </span>
-              <div class="truck">
-                <div class="wheel"></div>
-                <div class="back"></div>
-                <div class="front"></div>
-                <div class="box"></div>
-              </div>
-            </button>
-            <div class="tooltip-pill" id="postTip"></div>
-          </div>
-        </div>
+  <section class="feed">
+    <div class="feed-header">
+      <div class="chip-row" id="filters">
+        <div class="chip active">All</div>
+        <div class="chip">Vehicle Requirement</div>
+        <div class="chip">Transport Offer</div>
+        <div class="chip">Service Promotion</div>
+        <div class="chip">General Query</div>
+        <div class="chip">Local Updates</div>
       </div>
-    </section>
-
-    <section class="feed">
-      <div class="feed-header">
-        <div class="chip-row" id="filters">
-          <div class="chip active">All</div>
-          <div class="chip">Vehicle Requirement</div>
-          <div class="chip">Transport Offer</div>
-          <div class="chip">Service Promotion</div>
-          <div class="chip">General Query</div>
-          <div class="chip">Local Updates</div>
-        </div>
-  <!-- Live users indicator removed -->
-      </div>
-      <div class="card-list" id="feedList">
-        <!-- Example posts (demo UI) -->
-      </div>
-    </section>
-    <script src="env.js?v=20260108-1"></script>
-    <script>
-      (function() {
-        const backBtn = document.getElementById('backBtn');
-        if (backBtn) {
-          backBtn.addEventListener('click', function() {
-            if (window.history.length > 1) {
-              window.history.back();
-            } else {
-              const target = typeof window.buildUrl === 'function' ? window.buildUrl('index') : 'index.html';
-              window.location.href = target;
-            }
-          });
-        }
-
-        const openComposer = document.getElementById('openComposer');
-        const closeComposer = document.getElementById('closeComposer');
-        const composerCard = document.getElementById('composerCard');
-        const canvas = document.getElementById('canvas');
-        const postBtn = document.getElementById('postBtn');
-        const textToggle = document.getElementById('textToggle');
-        const swatches = document.getElementById('swatches');
-        const fontSizeRange = document.getElementById('fontSize');
-        const changingWord = document.getElementById('changingWord');
-        const heroDesc = document.getElementById('heroDesc');
-        const imageInput = document.getElementById('imageInput');
-        const previewGrid = document.getElementById('previewGrid');
-        const postTip = document.getElementById('postTip');
-        const postCategory = document.getElementById('postCategory');
-
-        function toggleComposer(open) {
-          const shouldOpen = open ?? !composerCard.classList.contains('open');
-          if (shouldOpen) {
-            composerCard.classList.add('open');
-            composerCard.setAttribute('aria-hidden', 'false');
-            setTimeout(() => canvas.focus(), 60);
+      <!-- Live users indicator removed -->
+    </div>
+    <div class="card-list" id="feedList">
+      <!-- Example posts (demo UI) -->
+    </div>
+  </section>
+  <script src="env.js?v=20260108-1"></script>
+  <script>
+    (function () {
+      const backBtn = document.getElementById('backBtn');
+      if (backBtn) {
+        backBtn.addEventListener('click', function () {
+          if (window.history.length > 1) {
+            window.history.back();
           } else {
-            composerCard.classList.remove('open');
-            composerCard.setAttribute('aria-hidden', 'true');
-          }
-        }
-
-        if (openComposer) {
-          openComposer.addEventListener('click', () => {
-            toggleComposer(true);
-            // hide CTA when composer opens
-            const cta = document.querySelector('.cta-wrap');
-            if (cta) cta.style.display = 'none';
-          });
-        }
-        if (closeComposer) {
-          closeComposer.addEventListener('click', () => {
-            toggleComposer(false);
-            // restore CTA when composer closes
-            const cta = document.querySelector('.cta-wrap');
-            if (cta) cta.style.display = '';
-          });
-        }
-
-        const charCount = document.getElementById('charCount');
-        const charBadge = document.getElementById('charBadge');
-        const charCounterPill = document.getElementById('charCounterPill');
-
-        function updateCharCounter() {
-          const n = textLength();
-          if (charCount) charCount.textContent = n;
-          if (!charCounterPill || !charBadge) return;
-          charCounterPill.classList.remove('valid', 'near-limit', 'over-limit');
-          if (n < 50) {
-            charBadge.textContent = 'Min 50';
-          } else if (n <= 450) {
-            charCounterPill.classList.add('valid');
-            charBadge.textContent = 'Ready';
-          } else if (n <= 500) {
-            charCounterPill.classList.add('near-limit');
-            charBadge.textContent = 'Near Limit';
-          } else {
-            charCounterPill.classList.add('over-limit');
-            charBadge.textContent = 'Max 500';
-          }
-        }
-
-        // Enable post button only if valid 50-500 chars
-        function textLength() { return canvas.innerText ? canvas.innerText.replace(/\s+/g, ' ').trim().length : 0; }
-        function isValidLength() { const n = textLength(); return n >= 50 && n <= 500; }
-        function hasCategory() { return postCategory && postCategory.value && postCategory.value.length > 0; }
-        function updatePostButton() {
-          const ok = isValidLength() && hasCategory();
-          // ensure button is always interactive for tooltips
-          postBtn.disabled = false;
-          postBtn.removeAttribute('disabled');
-          postBtn.setAttribute('aria-disabled', ok ? 'false' : 'true');
-          postBtn.classList.toggle('enabled', ok);
-          updateCharCounter();
-        }
-        canvas.addEventListener('input', updatePostButton);
-        if (postCategory) postCategory.addEventListener('change', updatePostButton);
-        updatePostButton();
-
-        // Template Quick Chips Click Handler
-        const templateChips = document.querySelector('.template-chips');
-        if (templateChips) {
-          templateChips.addEventListener('click', (e) => {
-            const btn = e.target.closest('.chip-btn');
-            if (!btn) return;
-            const t = btn.getAttribute('data-template');
-            const cat = btn.getAttribute('data-category');
-            if (cat && postCategory) {
-              postCategory.value = cat;
-            }
-            let text = '';
-            if (t === 'need_vehicle') {
-              text = 'Need [Vehicle Type] from [Pickup Location] to [Drop Location]. Load: [Weight] Tons, Date: [Date/Time]. Contact: [Phone Number].';
-            } else if (t === 'transport_offer') {
-              text = 'Available [Vehicle Type] from [Current City]. Route: [City A] to [City B]. Empty vehicle ready for load. Contact: [Phone Number].';
-            } else if (t === 'local_update') {
-              text = 'Transport Update [City/Area]: Road condition, permit info, or fuel rate update. Contact for details: [Phone Number].';
-            } else if (t === 'general_query') {
-              text = 'Query regarding transport/permit/tax in [State/City]: Need assistance regarding [Details]. Contact: [Phone Number].';
-            }
-            if (text) {
-              canvas.innerText = text;
-              updatePostButton();
-              canvas.focus();
-            }
-          });
-        }
-
-        // Background swatches
-        function applyBackground(bg) {
-          canvas.style.background = bg;
-          canvas.style.backgroundSize = 'cover';
-          canvas.style.backgroundPosition = 'center';
-        }
-        swatches.addEventListener('click', function(e) {
-          const target = e.target.closest('.bg-swatch');
-          if (!target) return;
-          // apply to canvas
-          const color = target.getAttribute('data-bg');
-          applyBackground(color);
-          // paint swatch boxes so they are visible and mark selected
-          target.style.background = color;
-          document.querySelectorAll('.bg-swatch').forEach(s => s.classList.remove('selected'));
-          target.classList.add('selected');
-
-          // Auto-adjust text contrast based on swatch theme
-          const title = (target.getAttribute('title') || '').toLowerCase();
-          if (title.includes('mint') || title.includes('lime') || title.includes('aurora')) {
-            setTextContrast(false); // Dark text for bright gradients
-          } else {
-            setTextContrast(true); // Light text for dark gradients
+            const target = typeof window.buildUrl === 'function' ? window.buildUrl('index') : 'index.html';
+            window.location.href = target;
           }
         });
+      }
 
-        // Initialize swatch visuals on load
-        document.querySelectorAll('.bg-swatch').forEach(s => {
-          const bg = s.getAttribute('data-bg');
-          s.style.background = bg;
+      const openComposer = document.getElementById('openComposer');
+      const closeComposer = document.getElementById('closeComposer');
+      const composerCard = document.getElementById('composerCard');
+      const canvas = document.getElementById('canvas');
+      const postBtn = document.getElementById('postBtn');
+      const textToggle = document.getElementById('textToggle');
+      const swatches = document.getElementById('swatches');
+      const fontSizeRange = document.getElementById('fontSize');
+      const changingWord = document.getElementById('changingWord');
+      const heroDesc = document.getElementById('heroDesc');
+      const imageInput = document.getElementById('imageInput');
+      const previewGrid = document.getElementById('previewGrid');
+      const postTip = document.getElementById('postTip');
+      const postCategory = document.getElementById('postCategory');
+
+      function toggleComposer(open) {
+        const shouldOpen = open ?? !composerCard.classList.contains('open');
+        if (shouldOpen) {
+          composerCard.classList.add('open');
+          composerCard.setAttribute('aria-hidden', 'false');
+          setTimeout(() => canvas.focus(), 60);
+        } else {
+          composerCard.classList.remove('open');
+          composerCard.setAttribute('aria-hidden', 'true');
+        }
+      }
+
+      if (openComposer) {
+        openComposer.addEventListener('click', () => {
+          toggleComposer(true);
+          // hide CTA when composer opens
+          const cta = document.querySelector('.cta-wrap');
+          if (cta) cta.style.display = 'none';
         });
+      }
+      if (closeComposer) {
+        closeComposer.addEventListener('click', () => {
+          toggleComposer(false);
+          // restore CTA when composer closes
+          const cta = document.querySelector('.cta-wrap');
+          if (cta) cta.style.display = '';
+        });
+      }
 
-        // Font size control
-        if (fontSizeRange) {
-          const setSize = (px) => { canvas.style.fontSize = px + 'px'; };
-          setSize(parseInt(fontSizeRange.value, 10));
-          fontSizeRange.addEventListener('input', function() { setSize(parseInt(this.value, 10)); });
-        }
+      const charCount = document.getElementById('charCount');
+      const charBadge = document.getElementById('charBadge');
+      const charCounterPill = document.getElementById('charCounterPill');
 
-        // Image attach + preview
-        const previews = [];
-        // Keep file in memory; upload later after animation completes
-        let pendingImageFile = null;
-        function renderPreviews() {
-          if (!previewGrid) return;
-          previewGrid.innerHTML = '';
-          previews.forEach((src, idx) => {
-            const item = document.createElement('div');
-            item.className = 'preview-item';
-            item.innerHTML = `<img src="${src}" alt="Post attachment" title="Post attachment"><button class="remove-img" data-idx="${idx}" aria-label="Remove">×</button>`;
-            previewGrid.appendChild(item);
-          });
+      function updateCharCounter() {
+        const n = textLength();
+        if (charCount) charCount.textContent = n;
+        if (!charCounterPill || !charBadge) return;
+        charCounterPill.classList.remove('valid', 'near-limit', 'over-limit');
+        if (n < 50) {
+          charBadge.textContent = 'Min 50';
+        } else if (n <= 450) {
+          charCounterPill.classList.add('valid');
+          charBadge.textContent = 'Ready';
+        } else if (n <= 500) {
+          charCounterPill.classList.add('near-limit');
+          charBadge.textContent = 'Near Limit';
+        } else {
+          charCounterPill.classList.add('over-limit');
+          charBadge.textContent = 'Max 500';
         }
-        if (previewGrid) {
-          previewGrid.addEventListener('click', (e) => {
-            const btn = e.target.closest('.remove-img');
-            if (!btn) return;
-            const i = parseInt(btn.getAttribute('data-idx'), 10);
-            previews.splice(i, 1);
-            renderPreviews();
-            if (previews.length === 0) {
-              pendingImageFile = null;
-            }
-          });
-        }
-        if (imageInput) {
-          imageInput.addEventListener('change', function() {
-            const file = this.files && this.files[0];
-            if (!file) return;
-            pendingImageFile = file; // store, upload later
-            const reader = new FileReader();
-            reader.onload = (ev) => { previews.splice(0, previews.length, ev.target.result); renderPreviews(); };
-            reader.readAsDataURL(file);
-            this.value = '';
-          });
-        }
+      }
 
-        // Text color toggle
-        let lightText = true;
-        function setTextContrast(isLight) {
-          lightText = isLight;
-          canvas.style.color = isLight ? '#ffffff' : '#0b0c10';
-          if (textToggle) {
-            textToggle.setAttribute('aria-pressed', String(isLight));
-            const icon = textToggle.querySelector('i');
-            const label = textToggle.querySelector('span');
-            if (isLight) {
-              textToggle.classList.add('is-light');
-              textToggle.classList.remove('is-dark');
-              if (icon) icon.className = 'fas fa-sun';
-              if (label) label.textContent = 'Text: Light';
-            } else {
-              textToggle.classList.add('is-dark');
-              textToggle.classList.remove('is-light');
-              if (icon) icon.className = 'fas fa-moon';
-              if (label) label.textContent = 'Text: Dark';
-            }
+      // Enable post button only if valid 50-500 chars
+      function textLength() { return canvas.innerText ? canvas.innerText.replace(/\s+/g, ' ').trim().length : 0; }
+      function isValidLength() { const n = textLength(); return n >= 50 && n <= 500; }
+      function hasCategory() { return postCategory && postCategory.value && postCategory.value.length > 0; }
+      function updatePostButton() {
+        const ok = isValidLength() && hasCategory();
+        // ensure button is always interactive for tooltips
+        postBtn.disabled = false;
+        postBtn.removeAttribute('disabled');
+        postBtn.setAttribute('aria-disabled', ok ? 'false' : 'true');
+        postBtn.classList.toggle('enabled', ok);
+        updateCharCounter();
+      }
+      canvas.addEventListener('input', updatePostButton);
+      if (postCategory) postCategory.addEventListener('change', updatePostButton);
+      updatePostButton();
+
+      // Template Quick Chips Click Handler
+      const templateChips = document.querySelector('.template-chips');
+      if (templateChips) {
+        templateChips.addEventListener('click', (e) => {
+          const btn = e.target.closest('.chip-btn');
+          if (!btn) return;
+          const t = btn.getAttribute('data-template');
+          const cat = btn.getAttribute('data-category');
+          if (cat && postCategory) {
+            postCategory.value = cat;
           }
+          let text = '';
+          if (t === 'need_vehicle') {
+            text = 'Need [Vehicle Type] from [Pickup Location] to [Drop Location]. Load: [Weight] Tons, Date: [Date/Time]. Contact: [Phone Number].';
+          } else if (t === 'transport_offer') {
+            text = 'Available [Vehicle Type] from [Current City]. Route: [City A] to [City B]. Empty vehicle ready for load. Contact: [Phone Number].';
+          } else if (t === 'local_update') {
+            text = 'Transport Update [City/Area]: Road condition, permit info, or fuel rate update. Contact for details: [Phone Number].';
+          } else if (t === 'general_query') {
+            text = 'Query regarding transport/permit/tax in [State/City]: Need assistance regarding [Details]. Contact: [Phone Number].';
+          }
+          if (text) {
+            canvas.innerText = text;
+            updatePostButton();
+            canvas.focus();
+          }
+        });
+      }
+
+      // Background swatches
+      function applyBackground(bg) {
+        canvas.style.background = bg;
+        canvas.style.backgroundSize = 'cover';
+        canvas.style.backgroundPosition = 'center';
+      }
+      swatches.addEventListener('click', function (e) {
+        const target = e.target.closest('.bg-swatch');
+        if (!target) return;
+        // apply to canvas
+        const color = target.getAttribute('data-bg');
+        applyBackground(color);
+        // paint swatch boxes so they are visible and mark selected
+        target.style.background = color;
+        document.querySelectorAll('.bg-swatch').forEach(s => s.classList.remove('selected'));
+        target.classList.add('selected');
+
+        // Auto-adjust text contrast based on swatch theme
+        const title = (target.getAttribute('title') || '').toLowerCase();
+        if (title.includes('mint') || title.includes('lime') || title.includes('aurora')) {
+          setTextContrast(false); // Dark text for bright gradients
+        } else {
+          setTextContrast(true); // Light text for dark gradients
         }
+      });
+
+      // Initialize swatch visuals on load
+      document.querySelectorAll('.bg-swatch').forEach(s => {
+        const bg = s.getAttribute('data-bg');
+        s.style.background = bg;
+      });
+
+      // Font size control
+      if (fontSizeRange) {
+        const setSize = (px) => { canvas.style.fontSize = px + 'px'; };
+        setSize(parseInt(fontSizeRange.value, 10));
+        fontSizeRange.addEventListener('input', function () { setSize(parseInt(this.value, 10)); });
+      }
+
+      // Image attach + preview
+      const previews = [];
+      // Keep file in memory; upload later after animation completes
+      let pendingImageFile = null;
+      function renderPreviews() {
+        if (!previewGrid) return;
+        previewGrid.innerHTML = '';
+        previews.forEach((src, idx) => {
+          const item = document.createElement('div');
+          item.className = 'preview-item';
+          item.innerHTML = `<img src="${src}" alt="Post attachment" title="Post attachment"><button class="remove-img" data-idx="${idx}" aria-label="Remove">×</button>`;
+          previewGrid.appendChild(item);
+        });
+      }
+      if (previewGrid) {
+        previewGrid.addEventListener('click', (e) => {
+          const btn = e.target.closest('.remove-img');
+          if (!btn) return;
+          const i = parseInt(btn.getAttribute('data-idx'), 10);
+          previews.splice(i, 1);
+          renderPreviews();
+          if (previews.length === 0) {
+            pendingImageFile = null;
+          }
+        });
+      }
+      if (imageInput) {
+        imageInput.addEventListener('change', function () {
+          const file = this.files && this.files[0];
+          if (!file) return;
+          pendingImageFile = file; // store, upload later
+          const reader = new FileReader();
+          reader.onload = (ev) => { previews.splice(0, previews.length, ev.target.result); renderPreviews(); };
+          reader.readAsDataURL(file);
+          this.value = '';
+        });
+      }
+
+      // Text color toggle
+      let lightText = true;
+      function setTextContrast(isLight) {
+        lightText = isLight;
+        canvas.style.color = isLight ? '#ffffff' : '#0b0c10';
         if (textToggle) {
-          textToggle.addEventListener('click', function() {
-            setTextContrast(!lightText);
-          });
+          textToggle.setAttribute('aria-pressed', String(isLight));
+          const icon = textToggle.querySelector('i');
+          const label = textToggle.querySelector('span');
+          if (isLight) {
+            textToggle.classList.add('is-light');
+            textToggle.classList.remove('is-dark');
+            if (icon) icon.className = 'fas fa-sun';
+            if (label) label.textContent = 'Text: Light';
+          } else {
+            textToggle.classList.add('is-dark');
+            textToggle.classList.remove('is-light');
+            if (icon) icon.className = 'fas fa-moon';
+            if (label) label.textContent = 'Text: Dark';
+          }
         }
-        setTextContrast(true);
+      }
+      if (textToggle) {
+        textToggle.addEventListener('click', function () {
+          setTextContrast(!lightText);
+        });
+      }
+      setTextContrast(true);
 
-        // Changing text animation in hero
-        const words = ['Transportation needs', 'Vehicle Requirements', 'Services & Offers', 'Promotions & ads', 'Local Updates & More'];
-        let wordIdx = 0;
-        let intervalId;
-        // Prevent layout jumps on mobile by reserving space for the tallest headline
-        // and the widest changing phrase at current viewport
-        function stabilizeHero() {
-          const headline = document.querySelector('.hero-headline');
-          const wrap = document.querySelector('.changing-wrap');
-          if (!headline || !wrap) return;
-          const probe = headline.cloneNode(true);
-          probe.style.position = 'absolute';
-          probe.style.visibility = 'hidden';
-          probe.style.pointerEvents = 'none';
-          probe.style.left = '-10000px';
-          // Match current width so wrapping behaves the same as visible headline
-          const currentWidth = Math.ceil(headline.getBoundingClientRect().width);
-          if (currentWidth > 0) probe.style.width = currentWidth + 'px';
-          document.body.appendChild(probe);
-          let maxHeight = 0;
-          const probeWord = probe.querySelector('.changing-word');
-          words.forEach(w => {
-            probeWord.textContent = w;
-            const rect = probe.getBoundingClientRect();
-            if (rect.height > maxHeight) maxHeight = rect.height;
-          });
-          document.body.removeChild(probe);
-          headline.style.minHeight = Math.ceil(maxHeight) + 'px';
-          // Do not lock width; allow wrapping so full text remains visible
-        }
-        function cycleWord() {
-          if (!changingWord) return;
-          changingWord.classList.remove('word-in');
-          changingWord.classList.add('word-out');
-          setTimeout(() => {
-            wordIdx = (wordIdx + 1) % words.length;
-            changingWord.textContent = words[wordIdx];
-            changingWord.classList.remove('word-out');
-            changingWord.classList.add('word-in');
-          }, 320);
-        }
-        function startRotation() { intervalId = setInterval(cycleWord, 2000); }
-        function stopRotation() { clearInterval(intervalId); }
-        stabilizeHero();
-        startRotation();
-        let _heroRSzT;
-        window.addEventListener('resize', () => { clearTimeout(_heroRSzT); _heroRSzT = setTimeout(stabilizeHero, 150); });
-        if (changingWord) {
-          changingWord.addEventListener('mouseenter', stopRotation);
-          changingWord.addEventListener('mouseleave', startRotation);
-        }
+      // Changing text animation in hero
+      const words = ['Transportation needs', 'Vehicle Requirements', 'Services & Offers', 'Promotions & ads', 'Local Updates & More'];
+      let wordIdx = 0;
+      let intervalId;
+      // Prevent layout jumps on mobile by reserving space for the tallest headline
+      // and the widest changing phrase at current viewport
+      function stabilizeHero() {
+        const headline = document.querySelector('.hero-headline');
+        const wrap = document.querySelector('.changing-wrap');
+        if (!headline || !wrap) return;
+        const probe = headline.cloneNode(true);
+        probe.style.position = 'absolute';
+        probe.style.visibility = 'hidden';
+        probe.style.pointerEvents = 'none';
+        probe.style.left = '-10000px';
+        // Match current width so wrapping behaves the same as visible headline
+        const currentWidth = Math.ceil(headline.getBoundingClientRect().width);
+        if (currentWidth > 0) probe.style.width = currentWidth + 'px';
+        document.body.appendChild(probe);
+        let maxHeight = 0;
+        const probeWord = probe.querySelector('.changing-word');
+        words.forEach(w => {
+          probeWord.textContent = w;
+          const rect = probe.getBoundingClientRect();
+          if (rect.height > maxHeight) maxHeight = rect.height;
+        });
+        document.body.removeChild(probe);
+        headline.style.minHeight = Math.ceil(maxHeight) + 'px';
+        // Do not lock width; allow wrapping so full text remains visible
+      }
+      function cycleWord() {
+        if (!changingWord) return;
+        changingWord.classList.remove('word-in');
+        changingWord.classList.add('word-out');
+        setTimeout(() => {
+          wordIdx = (wordIdx + 1) % words.length;
+          changingWord.textContent = words[wordIdx];
+          changingWord.classList.remove('word-out');
+          changingWord.classList.add('word-in');
+        }, 320);
+      }
+      function startRotation() { intervalId = setInterval(cycleWord, 2000); }
+      function stopRotation() { clearInterval(intervalId); }
+      stabilizeHero();
+      startRotation();
+      let _heroRSzT;
+      window.addEventListener('resize', () => { clearTimeout(_heroRSzT); _heroRSzT = setTimeout(stabilizeHero, 150); });
+      if (changingWord) {
+        changingWord.addEventListener('mouseenter', stopRotation);
+        changingWord.addEventListener('mouseleave', startRotation);
+      }
 
-        // Demo feed content
-        const feedList = document.getElementById('feedList');
-        // Backend API helpers: always use env.js computed base
-        const API_BASE = (window.API_BASE_URL || (location.protocol === 'file:' ? 'http://localhost:8080' : '')).replace(/\/$/, '');
-        // Presence feature fully removed.
-        async function apiCreatePost(body) {
-          const res = await fetch(API_BASE + '/api/posts', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-          });
-          if (!res.ok) throw new Error('Create failed');
-          return res.json();
-        }
-        async function apiListPosts(category) {
-          const qs = category && category !== 'All' ? ('?category=' + encodeURIComponent(category)) : '';
-          const res = await fetch(API_BASE + '/api/posts' + qs);
-          if (!res.ok) throw new Error('List failed');
-          return res.json();
-        }
-        async function apiUploadImage(file) {
-          const fd = new FormData();
-          fd.append('image', file);
-          const res = await fetch(API_BASE + '/api/posts/upload-image', { method: 'POST', body: fd });
-          if (!res.ok) throw new Error('Upload failed');
-          const data = await res.json();
-          return data.url;
-        }
+      // Demo feed content
+      const feedList = document.getElementById('feedList');
+      // Backend API helpers: always use env.js computed base
+      const API_BASE = (window.API_BASE_URL || (location.protocol === 'file:' ? 'http://localhost:8080' : '')).replace(/\/$/, '');
+      // Presence feature fully removed.
+      async function apiCreatePost(body) {
+        const res = await fetch(API_BASE + '/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error('Create failed');
+        return res.json();
+      }
+      async function apiListPosts(category) {
+        const qs = category && category !== 'All' ? ('?category=' + encodeURIComponent(category)) : '';
+        const res = await fetch(API_BASE + '/api/posts' + qs);
+        if (!res.ok) throw new Error('List failed');
+        return res.json();
+      }
+      async function apiUploadImage(file) {
+        const fd = new FormData();
+        fd.append('image', file);
+        const res = await fetch(API_BASE + '/api/posts/upload-image', { method: 'POST', body: fd });
+        if (!res.ok) throw new Error('Upload failed');
+        const data = await res.json();
+        return data.url;
+      }
 
-        function cardTpl(p) {
-          const el = document.createElement('div');
-          const isDarkText = (typeof p.isLight === 'boolean') && (!p.isLight);
-          el.className = 'post-card ' + (isDarkText ? 'theme-dark-text' : 'theme-light-text');
-          el.dataset.id = p.id || '';
-          el.dataset.created = p.createdAt || '';
-          el.dataset.expires = p.expiresAt || '';
+      function cardTpl(p) {
+        const el = document.createElement('div');
+        const isDarkText = (typeof p.isLight === 'boolean') && (!p.isLight);
+        el.className = 'post-card ' + (isDarkText ? 'theme-dark-text' : 'theme-light-text');
+        el.dataset.id = p.id || '';
+        el.dataset.created = p.createdAt || '';
+        el.dataset.expires = p.expiresAt || '';
 
-          const photoBadge = p.imageUrl ? `<span class="has-image-badge" title="Image attached"><i class="fas fa-camera"></i> 1 Photo</span>` : '';
-          const photoBanner = p.imageUrl ? `<div class="card-image-clue"><i class="fas fa-image"></i> <span>View Attached Photo</span> <i class="fas fa-chevron-right"></i></div>` : '';
+        const photoBadge = p.imageUrl ? `<span class="has-image-badge" title="Image attached"><i class="fas fa-camera"></i> 1 Photo</span>` : '';
+        const photoBanner = p.imageUrl ? `<div class="card-image-clue"><i class="fas fa-image"></i> <span>View Attached Photo</span> <i class="fas fa-chevron-right"></i></div>` : '';
 
-          el.innerHTML = `
+        el.innerHTML = `
             <div class="post-head">
               <div class="head-left">
                 <span class="badge-cat">${p.cat}</span>
@@ -1452,347 +1844,347 @@
             <div class="post-text">${p.text}</div>
             ${photoBanner}
           `;
-          // Apply card background and text styles (preview)
-          if (p.bg) {
-            el.style.background = p.bg;
-            el.style.backgroundSize = 'cover';
-            el.style.backgroundPosition = 'center';
-          }
-          const textEl = el.querySelector('.post-text');
-          if (p.fontSize) textEl.style.fontSize = p.fontSize + 'px';
-          if (typeof p.isLight === 'boolean') textEl.style.color = p.isLight ? '#ffffff' : '#0b0c10';
-          return el;
+        // Apply card background and text styles (preview)
+        if (p.bg) {
+          el.style.background = p.bg;
+          el.style.backgroundSize = 'cover';
+          el.style.backgroundPosition = 'center';
         }
-        let allPosts = [];
-        function renderFeed(filterCat) {
-          feedList.innerHTML = '';
-          const items = filterCat && filterCat !== 'All' ? allPosts.filter(p => p.cat === filterCat) : allPosts;
-          items.forEach(p => feedList.appendChild(cardTpl(p)));
+        const textEl = el.querySelector('.post-text');
+        if (p.fontSize) textEl.style.fontSize = p.fontSize + 'px';
+        if (typeof p.isLight === 'boolean') textEl.style.color = p.isLight ? '#ffffff' : '#0b0c10';
+        return el;
+      }
+      let allPosts = [];
+      function renderFeed(filterCat) {
+        feedList.innerHTML = '';
+        const items = filterCat && filterCat !== 'All' ? allPosts.filter(p => p.cat === filterCat) : allPosts;
+        items.forEach(p => feedList.appendChild(cardTpl(p)));
+      }
+      // Initial load from backend
+      (async () => {
+        try {
+          const list = await apiListPosts('All');
+          allPosts = list.map(x => ({ id: x.id, cat: x.category, title: '', text: x.content, bg: x.backgroundCss, fontSize: x.fontSize, isLight: x.isLightText, imageUrl: x.imageUrl, createdAt: x.createdAt, expiresAt: x.expiresAt }));
+          renderFeed('All');
+          updateAllMetas();
+        } catch (e) {
+          // fallback: empty
         }
-        // Initial load from backend
-        (async () => {
-          try {
-            const list = await apiListPosts('All');
-            allPosts = list.map(x => ({ id: x.id, cat: x.category, title: '', text: x.content, bg: x.backgroundCss, fontSize: x.fontSize, isLight: x.isLightText, imageUrl: x.imageUrl, createdAt: x.createdAt, expiresAt: x.expiresAt }));
-            renderFeed('All');
-            updateAllMetas();
-          } catch (e) {
-            // fallback: empty
-          }
-        })();
+      })();
 
-        // Relative time + countdown helpers
-        function computeMeta(createdIso, expiresIso) {
-          const now = new Date();
-          const created = createdIso ? new Date(createdIso) : now;
-          const expires = expiresIso ? new Date(expiresIso) : new Date(now.getTime() + 24*60*60*1000);
-          const diffMs = now - created;
-          const diffMin = Math.floor(diffMs / 60000);
-          let left = '';
-          const leftMs = expires - now;
-          if (leftMs > 0) {
-            const leftMin = Math.floor(leftMs / 60000);
-            const lh = Math.floor(leftMin / 60);
-            const lm = leftMin % 60;
-            left = `${lh}h ${lm}m left`;
-          } else {
-            left = 'expired';
-          }
-          let rel = '';
-          if (diffMin < 1) rel = 'just now';
-          else if (diffMin === 1) rel = '1 minute ago';
-          else if (diffMin === 2) rel = '2 minutes ago';
-          else rel = '';
-          return rel ? `${rel} • ${left}` : left;
+      // Relative time + countdown helpers
+      function computeMeta(createdIso, expiresIso) {
+        const now = new Date();
+        const created = createdIso ? new Date(createdIso) : now;
+        const expires = expiresIso ? new Date(expiresIso) : new Date(now.getTime() + 24 * 60 * 60 * 1000);
+        const diffMs = now - created;
+        const diffMin = Math.floor(diffMs / 60000);
+        let left = '';
+        const leftMs = expires - now;
+        if (leftMs > 0) {
+          const leftMin = Math.floor(leftMs / 60000);
+          const lh = Math.floor(leftMin / 60);
+          const lm = leftMin % 60;
+          left = `${lh}h ${lm}m left`;
+        } else {
+          left = 'expired';
         }
-        function updateAllMetas() {
-          const cards = feedList.querySelectorAll('.post-card');
-          cards.forEach(card => {
-            const created = card.dataset.created;
-            const expires = card.dataset.expires;
-            const metaEl = card.querySelector('.post-meta');
-            if (metaEl) metaEl.textContent = computeMeta(created, expires);
-          });
-        }
-        setInterval(updateAllMetas, 30000);
+        let rel = '';
+        if (diffMin < 1) rel = 'just now';
+        else if (diffMin === 1) rel = '1 minute ago';
+        else if (diffMin === 2) rel = '2 minutes ago';
+        else rel = '';
+        return rel ? `${rel} • ${left}` : left;
+      }
+      function updateAllMetas() {
+        const cards = feedList.querySelectorAll('.post-card');
+        cards.forEach(card => {
+          const created = card.dataset.created;
+          const expires = card.dataset.expires;
+          const metaEl = card.querySelector('.post-meta');
+          if (metaEl) metaEl.textContent = computeMeta(created, expires);
+        });
+      }
+      setInterval(updateAllMetas, 30000);
 
-        // Mock post action with validation + rotating tooltips + animation + success message
-        const funnyTips = [
-          'Scammers are not allowed here.',
-          'Your post is shorter than a WhatsApp status.',
-          'Even your crush writes longer texts than this.',
-          'Minimum 50-500 characters required to post.',
-          'We love short posts, but not this short.',
-          'Short posts are cool, but this one’s too short to help anyone.',
-          'कृपया कम से कम 50-500 अक्षर तक लिखें।'
-        ];
-        const realTips = [
-          'Please write at least 50-500 characters.',
-          'Add pickup, drop, or load details.',
-          'We need more info to help you better.',
-          'Please add more details to help transporters.',
-          'We couldn’t publish this. Add more content.',
-          'Only 50-500 characters allowed.',
-          'Please write between 50-500 characters.',
-          'कृपया 50-500 अक्षर के बीच लिखें।'
-        ];
-        let tipClicks = 0;
-        function showTip(message) {
-          if (!postTip) return;
-          postTip.textContent = message;
-          // Position over the Post button
-          const btnRect = postBtn.getBoundingClientRect();
-          const footerRect = postBtn.parentElement.getBoundingClientRect();
-          const top = btnRect.top - footerRect.top - postTip.offsetHeight - 8; // directly above with 8px gap
-          const left = (btnRect.left - footerRect.left) + (btnRect.width/2) - (postTip.offsetWidth/2);
-          postTip.style.top = top + 'px';
-          postTip.style.left = Math.max(8, left) + 'px';
-          postTip.style.setProperty('--rot', (Math.random() * 6 - 3) + 'deg');
-          postTip.style.opacity = '1';
-          clearTimeout(postTip._t);
-          postTip._t = setTimeout(() => { postTip.style.opacity = '0'; }, 4200);
+      // Mock post action with validation + rotating tooltips + animation + success message
+      const funnyTips = [
+        'Scammers are not allowed here.',
+        'Your post is shorter than a WhatsApp status.',
+        'Even your crush writes longer texts than this.',
+        'Minimum 50-500 characters required to post.',
+        'We love short posts, but not this short.',
+        'Short posts are cool, but this one’s too short to help anyone.',
+        'कृपया कम से कम 50-500 अक्षर तक लिखें।'
+      ];
+      const realTips = [
+        'Please write at least 50-500 characters.',
+        'Add pickup, drop, or load details.',
+        'We need more info to help you better.',
+        'Please add more details to help transporters.',
+        'We couldn’t publish this. Add more content.',
+        'Only 50-500 characters allowed.',
+        'Please write between 50-500 characters.',
+        'कृपया 50-500 अक्षर के बीच लिखें।'
+      ];
+      let tipClicks = 0;
+      function showTip(message) {
+        if (!postTip) return;
+        postTip.textContent = message;
+        // Position over the Post button
+        const btnRect = postBtn.getBoundingClientRect();
+        const footerRect = postBtn.parentElement.getBoundingClientRect();
+        const top = btnRect.top - footerRect.top - postTip.offsetHeight - 8; // directly above with 8px gap
+        const left = (btnRect.left - footerRect.left) + (btnRect.width / 2) - (postTip.offsetWidth / 2);
+        postTip.style.top = top + 'px';
+        postTip.style.left = Math.max(8, left) + 'px';
+        postTip.style.setProperty('--rot', (Math.random() * 6 - 3) + 'deg');
+        postTip.style.opacity = '1';
+        clearTimeout(postTip._t);
+        postTip._t = setTimeout(() => { postTip.style.opacity = '0'; }, 4200);
+      }
+      postBtn.addEventListener('click', async function (e) {
+        const len = textLength();
+        if (!hasCategory()) {
+          e.preventDefault();
+          const msg = 'Please select category before posting.';
+          showTip(msg);
+          return;
         }
-        postBtn.addEventListener('click', async function(e) {
-          const len = textLength();
-          if (!hasCategory()) {
-            e.preventDefault();
-            const msg = 'Please select category before posting.';
-            showTip(msg);
-            return;
-          }
-          if (len < 50) {
-            e.preventDefault();
-            const useFunny = tipClicks % 2 === 0;
-            tipClicks++;
-            const list = useFunny ? funnyTips : realTips;
-            const msg = list[Math.floor(Math.random() * list.length)];
-            showTip(msg);
-            return;
-          }
-          if (len > 500) {
-            e.preventDefault();
-            showTip('Keep it concise. Max 500 characters.');
-            return;
-          }
-          // valid -> run truck animation, then show success message replacing composer
-          const button = postBtn;
-          // Always ensure data structure exists
-          const box = button.querySelector('.box');
-          const truck = button.querySelector('.truck');
-          if (!box || !truck) return;
-          // prevent double-trigger while animating
-          if (button.classList.contains('animation')) return;
-          // We'll animate first; the actual upload + save happens at timeline complete
-          // reset CSS custom props to initial before new run
-          gsap.set(button, { '--progress': 0, '--hx': 0, '--bx': 0, '--box-s': 0.5, '--box-o': 0, '--truck-y': 0, '--truck-y-n': -26 });
-          gsap.set(box, { x: -24, y: -6 });
-          button.classList.remove('done');
-          button.classList.add('animation');
-          gsap.to(button, { '--box-s': 1, '--box-o': 1, duration: 0.3, delay: 0.5 });
-          gsap.to(box, { x: 0, duration: 0.4, delay: 0.7 });
-          gsap.to(button, { '--hx': -5, '--bx': 50, duration: 0.18, delay: 0.92 });
-          gsap.to(box, { y: 0, duration: 0.1, delay: 1.15 });
-          gsap.set(button, { '--truck-y': 0, '--truck-y-n': -26 });
-          gsap.to(button, {
-            '--truck-y': 1,
-            '--truck-y-n': -25,
-            duration: 0.2,
-            delay: 1.25,
-            onComplete() {
-              gsap.timeline({
-                onComplete: async () => {
-                  // Upload image now (if any), then create post
-                  let imageUrlToSave = null;
-                  try {
-                    if (pendingImageFile) {
-                      imageUrlToSave = await apiUploadImage(pendingImageFile);
-                    }
-                    const storedUserId = parseInt(localStorage.getItem('userId') || '0', 10) || 0;
-                    const durationEl = document.getElementById('postDuration');
-                    const selectedDuration = durationEl ? (parseInt(durationEl.value, 10) || 24) : 24;
-                    await apiCreatePost({
-                      userId: storedUserId,
-                      content: canvas.innerText.trim(),
-                      category: postCategory ? postCategory.value : 'General',
-                      fontSize: parseInt(getComputedStyle(canvas).fontSize, 10) || 18,
-                      isLightText: lightText,
-                      backgroundCss: canvas.style.background || '',
-                      imageUrl: imageUrlToSave,
-                      expiryHours: selectedDuration
-                    });
-                  } catch (err) {
-                    showTip('Server error. Please try again.');
-                    button.classList.remove('animation');
-                    return;
+        if (len < 50) {
+          e.preventDefault();
+          const useFunny = tipClicks % 2 === 0;
+          tipClicks++;
+          const list = useFunny ? funnyTips : realTips;
+          const msg = list[Math.floor(Math.random() * list.length)];
+          showTip(msg);
+          return;
+        }
+        if (len > 500) {
+          e.preventDefault();
+          showTip('Keep it concise. Max 500 characters.');
+          return;
+        }
+        // valid -> run truck animation, then show success message replacing composer
+        const button = postBtn;
+        // Always ensure data structure exists
+        const box = button.querySelector('.box');
+        const truck = button.querySelector('.truck');
+        if (!box || !truck) return;
+        // prevent double-trigger while animating
+        if (button.classList.contains('animation')) return;
+        // We'll animate first; the actual upload + save happens at timeline complete
+        // reset CSS custom props to initial before new run
+        gsap.set(button, { '--progress': 0, '--hx': 0, '--bx': 0, '--box-s': 0.5, '--box-o': 0, '--truck-y': 0, '--truck-y-n': -26 });
+        gsap.set(box, { x: -24, y: -6 });
+        button.classList.remove('done');
+        button.classList.add('animation');
+        gsap.to(button, { '--box-s': 1, '--box-o': 1, duration: 0.3, delay: 0.5 });
+        gsap.to(box, { x: 0, duration: 0.4, delay: 0.7 });
+        gsap.to(button, { '--hx': -5, '--bx': 50, duration: 0.18, delay: 0.92 });
+        gsap.to(box, { y: 0, duration: 0.1, delay: 1.15 });
+        gsap.set(button, { '--truck-y': 0, '--truck-y-n': -26 });
+        gsap.to(button, {
+          '--truck-y': 1,
+          '--truck-y-n': -25,
+          duration: 0.2,
+          delay: 1.25,
+          onComplete() {
+            gsap.timeline({
+              onComplete: async () => {
+                // Upload image now (if any), then create post
+                let imageUrlToSave = null;
+                try {
+                  if (pendingImageFile) {
+                    imageUrlToSave = await apiUploadImage(pendingImageFile);
                   }
-                  // success UI
-                  button.classList.add('done');
+                  const storedUserId = parseInt(localStorage.getItem('userId') || '0', 10) || 0;
                   const durationEl = document.getElementById('postDuration');
                   const selectedDuration = durationEl ? (parseInt(durationEl.value, 10) || 24) : 24;
-                  const container = document.querySelector('.composer');
-                  if (container) {
-                    container.innerHTML = '<div style="max-width:780px;margin:20px auto;padding:18px;border:1px solid rgba(255,255,255,0.12);border-radius:12px;background:rgba(255,255,255,0.04);text-align:center">\
+                  await apiCreatePost({
+                    userId: storedUserId,
+                    content: canvas.innerText.trim(),
+                    category: postCategory ? postCategory.value : 'General',
+                    fontSize: parseInt(getComputedStyle(canvas).fontSize, 10) || 18,
+                    isLightText: lightText,
+                    backgroundCss: canvas.style.background || '',
+                    imageUrl: imageUrlToSave,
+                    expiryHours: selectedDuration
+                  });
+                } catch (err) {
+                  showTip('Server error. Please try again.');
+                  button.classList.remove('animation');
+                  return;
+                }
+                // success UI
+                button.classList.add('done');
+                const durationEl = document.getElementById('postDuration');
+                const selectedDuration = durationEl ? (parseInt(durationEl.value, 10) || 24) : 24;
+                const container = document.querySelector('.composer');
+                if (container) {
+                  container.innerHTML = '<div style="max-width:780px;margin:20px auto;padding:18px;border:1px solid rgba(255,255,255,0.12);border-radius:12px;background:rgba(255,255,255,0.04);text-align:center">\
                       <div style="margin-bottom:8px;"><span class="badge-cat">' + (postCategory ? postCategory.value : 'General') + '</span></div>\
                       <h3 style="margin:6px 0 10px 0;">Your post is live!</h3>\
                       <p style=\"color:#cbd5e1;margin:6px 0;\">It will automatically expire after ' + selectedDuration + ' hours to keep the feed clean and updated.</p>\
                       <p style=\"color:#9aa3af;margin:6px 0;\">If you want to repost then refresh the page</p>\
                     </div>';
-                  }
-                  // refresh feed
-                  (async () => {
-                    try {
-                      const activeChip = document.querySelector('.chip-row .chip.active');
-                      const activeCat = activeChip ? activeChip.textContent.trim() : 'All';
-                      const list = await apiListPosts(activeCat);
-                      allPosts = list.map(x => ({ id: x.id, cat: x.category, title: '', text: x.content, bg: x.backgroundCss, fontSize: x.fontSize, isLight: x.isLightText, imageUrl: x.imageUrl, createdAt: x.createdAt, expiresAt: x.expiresAt }));
-                      renderFeed(activeCat);
-                      updateAllMetas();
-                    } catch (_) {}
-                  })();
                 }
-              })
+                // refresh feed
+                (async () => {
+                  try {
+                    const activeChip = document.querySelector('.chip-row .chip.active');
+                    const activeCat = activeChip ? activeChip.textContent.trim() : 'All';
+                    const list = await apiListPosts(activeCat);
+                    allPosts = list.map(x => ({ id: x.id, cat: x.category, title: '', text: x.content, bg: x.backgroundCss, fontSize: x.fontSize, isLight: x.isLightText, imageUrl: x.imageUrl, createdAt: x.createdAt, expiresAt: x.expiresAt }));
+                    renderFeed(activeCat);
+                    updateAllMetas();
+                  } catch (_) { }
+                })();
+              }
+            })
               .to(truck, { x: 0, duration: 0.4 })
               .to(truck, { x: 40, duration: 1 })
               .to(truck, { x: 20, duration: 0.6 })
               .to(truck, { x: 96, duration: 0.4 });
-              gsap.to(button, { '--progress': 1, duration: 2.4, ease: 'power2.in' });
-            }
-          });
-        });
-
-        // Hover tips removed per request: no tooltip on hover, only on click validation
-
-        // Category chip filtering
-        const chipRow = document.getElementById('filters');
-        if (chipRow) {
-          chipRow.addEventListener('click', (e) => {
-            const chip = e.target.closest('.chip');
-            if (!chip) return;
-            document.querySelectorAll('#filters .chip').forEach(c => c.classList.remove('active'));
-            chip.classList.add('active');
-            const cat = chip.textContent.trim();
-            (async () => {
-              try {
-                const list = await apiListPosts(cat);
-                allPosts = list.map(x => ({ id: x.id, cat: x.category, title: '', text: x.content, bg: x.backgroundCss, fontSize: x.fontSize, isLight: x.isLightText, imageUrl: x.imageUrl, createdAt: x.createdAt, expiresAt: x.expiresAt }));
-                renderFeed(cat);
-                updateAllMetas();
-              } catch (_) {}
-            })();
-          });
-        }
-
-        // Openable post detail modal
-        feedList.addEventListener('click', (e) => {
-          const card = e.target.closest('.post-card');
-          if (!card) return;
-          const id = card.dataset.id;
-          const p = allPosts.find(x => x.id === id) || allPosts.find(x => !x.id && x.text === card.querySelector('.post-text')?.textContent);
-          if (!p) return;
-          const modal = document.getElementById('postModal');
-          const modalBody = document.getElementById('modalBody');
-          const modalCat = document.getElementById('modalCat');
-          modalCat.textContent = p.cat || '';
-          modalBody.style.background = p.bg || 'linear-gradient(135deg,#0f172a,#0b0c10)';
-          modalBody.style.backgroundSize = 'cover';
-          modalBody.style.backgroundPosition = 'center';
-          modalBody.innerHTML = '';
-          const text = document.createElement('div');
-          text.className = 'post-text';
-          text.style.fontSize = (p.fontSize || 18) + 'px';
-          text.style.color = (typeof p.isLight === 'boolean' ? (p.isLight ? '#ffffff' : '#0b0c10') : '#ffffff');
-          text.textContent = p.text || '';
-          modalBody.appendChild(text);
-          if (p.imageUrl) {
-            const img = document.createElement('img');
-            img.src = p.imageUrl;
-            img.alt = 'Attached image';
-            img.style.maxWidth = '100%';
-            img.style.borderRadius = '8px';
-            img.style.marginTop = '12px';
-            modalBody.appendChild(img);
+            gsap.to(button, { '--progress': 1, duration: 2.4, ease: 'power2.in' });
           }
-          modal.style.display = 'block';
         });
-        document.getElementById('postModalClose').addEventListener('click', ()=>{
-          document.getElementById('postModal').style.display = 'none';
-        });
-      })();
+      });
 
-      // Real typewriter effect for hero description
-      (function() {
-        const el = document.getElementById('heroDesc');
-        if (!el) return;
-        const full = el.textContent.trim();
-        el.textContent = '';
-        let i = 0;
-        function type() {
-          if (i <= full.length) {
-            el.textContent = full.slice(0, i);
-            i++;
-            setTimeout(type, i < 12 ? 30 : 12);
-          }
+      // Hover tips removed per request: no tooltip on hover, only on click validation
+
+      // Category chip filtering
+      const chipRow = document.getElementById('filters');
+      if (chipRow) {
+        chipRow.addEventListener('click', (e) => {
+          const chip = e.target.closest('.chip');
+          if (!chip) return;
+          document.querySelectorAll('#filters .chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          const cat = chip.textContent.trim();
+          (async () => {
+            try {
+              const list = await apiListPosts(cat);
+              allPosts = list.map(x => ({ id: x.id, cat: x.category, title: '', text: x.content, bg: x.backgroundCss, fontSize: x.fontSize, isLight: x.isLightText, imageUrl: x.imageUrl, createdAt: x.createdAt, expiresAt: x.expiresAt }));
+              renderFeed(cat);
+              updateAllMetas();
+            } catch (_) { }
+          })();
+        });
+      }
+
+      // Openable post detail modal
+      feedList.addEventListener('click', (e) => {
+        const card = e.target.closest('.post-card');
+        if (!card) return;
+        const id = card.dataset.id;
+        const p = allPosts.find(x => x.id === id) || allPosts.find(x => !x.id && x.text === card.querySelector('.post-text')?.textContent);
+        if (!p) return;
+        const modal = document.getElementById('postModal');
+        const modalBody = document.getElementById('modalBody');
+        const modalCat = document.getElementById('modalCat');
+        modalCat.textContent = p.cat || '';
+        modalBody.style.background = p.bg || 'linear-gradient(135deg,#0f172a,#0b0c10)';
+        modalBody.style.backgroundSize = 'cover';
+        modalBody.style.backgroundPosition = 'center';
+        modalBody.innerHTML = '';
+        const text = document.createElement('div');
+        text.className = 'post-text';
+        text.style.fontSize = (p.fontSize || 18) + 'px';
+        text.style.color = (typeof p.isLight === 'boolean' ? (p.isLight ? '#ffffff' : '#0b0c10') : '#ffffff');
+        text.textContent = p.text || '';
+        modalBody.appendChild(text);
+        if (p.imageUrl) {
+          const img = document.createElement('img');
+          img.src = p.imageUrl;
+          img.alt = 'Attached image';
+          img.style.maxWidth = '100%';
+          img.style.borderRadius = '8px';
+          img.style.marginTop = '12px';
+          modalBody.appendChild(img);
         }
-        setTimeout(type, 250);
-      })();
+        modal.style.display = 'block';
+      });
+      document.getElementById('postModalClose').addEventListener('click', () => {
+        document.getElementById('postModal').style.display = 'none';
+      });
+    })();
 
-      // script for truck button (composer Post button)
-      const truckButtons = document.querySelectorAll('.composer .truck-button');
-      truckButtons.forEach(button => {
-        button.addEventListener('click', e => {
-          // Post button has its own full logic (validation + animation + success)
-          if (button.id === 'postBtn') return;
-          if (button.hasAttribute('disabled')) return;
-          e.preventDefault();
+    // Real typewriter effect for hero description
+    (function () {
+      const el = document.getElementById('heroDesc');
+      if (!el) return;
+      const full = el.textContent.trim();
+      el.textContent = '';
+      let i = 0;
+      function type() {
+        if (i <= full.length) {
+          el.textContent = full.slice(0, i);
+          i++;
+          setTimeout(type, i < 12 ? 30 : 12);
+        }
+      }
+      setTimeout(type, 250);
+    })();
 
-          const box = button.querySelector('.box');
-          const truck = button.querySelector('.truck');
+    // script for truck button (composer Post button)
+    const truckButtons = document.querySelectorAll('.composer .truck-button');
+    truckButtons.forEach(button => {
+      button.addEventListener('click', e => {
+        // Post button has its own full logic (validation + animation + success)
+        if (button.id === 'postBtn') return;
+        if (button.hasAttribute('disabled')) return;
+        e.preventDefault();
 
-          const afterAnimation = () => {
-            // keep composer open, maybe show success state
-          };
+        const box = button.querySelector('.box');
+        const truck = button.querySelector('.truck');
 
-          if (!button.classList.contains('done')) {
-            if (!button.classList.contains('animation')) {
-              button.classList.add('animation');
+        const afterAnimation = () => {
+          // keep composer open, maybe show success state
+        };
 
-              gsap.to(button, { '--box-s': 1, '--box-o': 1, duration: 0.3, delay: 0.5 });
-              gsap.to(box, { x: 0, duration: 0.4, delay: 0.7 });
-              gsap.to(button, { '--hx': -5, '--bx': 50, duration: 0.18, delay: 0.92 });
-              gsap.to(box, { y: 0, duration: 0.1, delay: 1.15 });
+        if (!button.classList.contains('done')) {
+          if (!button.classList.contains('animation')) {
+            button.classList.add('animation');
 
-              gsap.set(button, { '--truck-y': 0, '--truck-y-n': -26 });
-              gsap.to(button, {
-                '--truck-y': 1,
-                '--truck-y-n': -25,
-                duration: 0.2,
-                delay: 1.25,
-                onComplete() {
-                  gsap.timeline({
-                    onComplete() {
-                      button.classList.add('done');
-                      afterAnimation();
-                    }
-                  })
+            gsap.to(button, { '--box-s': 1, '--box-o': 1, duration: 0.3, delay: 0.5 });
+            gsap.to(box, { x: 0, duration: 0.4, delay: 0.7 });
+            gsap.to(button, { '--hx': -5, '--bx': 50, duration: 0.18, delay: 0.92 });
+            gsap.to(box, { y: 0, duration: 0.1, delay: 1.15 });
+
+            gsap.set(button, { '--truck-y': 0, '--truck-y-n': -26 });
+            gsap.to(button, {
+              '--truck-y': 1,
+              '--truck-y-n': -25,
+              duration: 0.2,
+              delay: 1.25,
+              onComplete() {
+                gsap.timeline({
+                  onComplete() {
+                    button.classList.add('done');
+                    afterAnimation();
+                  }
+                })
                   .to(truck, { x: 0, duration: 0.4 })
                   .to(truck, { x: 40, duration: 1 })
                   .to(truck, { x: 20, duration: 0.6 })
                   .to(truck, { x: 96, duration: 0.4 });
 
-                  gsap.to(button, { '--progress': 1, duration: 2.4, ease: 'power2.in' });
-                }
-              });
-            }
-          } else {
-            button.classList.remove('animation', 'done');
-            gsap.set(truck, { x: 4 });
-            gsap.set(button, { '--progress': 0, '--hx': 0, '--bx': 0, '--box-s': 0.5, '--box-o': 0, '--truck-y': 0, '--truck-y-n': -26 });
-            gsap.set(box, { x: -24, y: -6 });
+                gsap.to(button, { '--progress': 1, duration: 2.4, ease: 'power2.in' });
+              }
+            });
           }
-        });
+        } else {
+          button.classList.remove('animation', 'done');
+          gsap.set(truck, { x: 4 });
+          gsap.set(button, { '--progress': 0, '--hx': 0, '--bx': 0, '--box-s': 0.5, '--box-o': 0, '--truck-y': 0, '--truck-y-n': -26 });
+          gsap.set(box, { x: -24, y: -6 });
+        }
       });
+    });
 
-      (function(){
+    (function () {
       try {
         var canvas = document.getElementById('snowfallCanvas');
         if (!canvas) return;
@@ -1812,7 +2204,7 @@
         var flakes = [];
         var running = true;
 
-        function resize(){
+        function resize() {
           var rectW = window.innerWidth || document.documentElement.clientWidth || 0;
           var rectH = window.innerHeight || document.documentElement.clientHeight || 0;
           w = Math.max(1, rectW);
@@ -1824,8 +2216,8 @@
           ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
 
-        function rand(min, max){ return min + Math.random() * (max - min); }
-        function makeFlake(resetToTop){
+        function rand(min, max) { return min + Math.random() * (max - min); }
+        function makeFlake(resetToTop) {
           return {
             x: rand(0, w),
             y: resetToTop ? rand(-h, 0) : rand(0, h),
@@ -1837,7 +2229,7 @@
           };
         }
 
-        function initFlakes(){
+        function initFlakes() {
           flakes.length = 0;
           var density = 0.00012; // flakes per px^2
           var count = Math.max(35, Math.min(120, Math.floor(w * h * density)));
@@ -1845,7 +2237,7 @@
         }
 
         var lastT = 0;
-        function tick(t){
+        function tick(t) {
           if (!running) return;
           if (!lastT) lastT = t;
           var dt = Math.min(0.05, (t - lastT) / 1000);
@@ -1874,14 +2266,14 @@
           requestAnimationFrame(tick);
         }
 
-        function start(){
+        function start() {
           resize();
           initFlakes();
           requestAnimationFrame(tick);
         }
 
-        window.addEventListener('resize', function(){ resize(); initFlakes(); }, { passive: true });
-        document.addEventListener('visibilitychange', function(){
+        window.addEventListener('resize', function () { resize(); initFlakes(); }, { passive: true });
+        document.addEventListener('visibilitychange', function () {
           running = !document.hidden;
           if (running) { lastT = 0; requestAnimationFrame(tick); }
         });
@@ -1892,8 +2284,7 @@
       }
     })();
 
-    </script>
-  </body>
+  </script>
+</body>
+
 </html>
-
-
